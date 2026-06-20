@@ -636,21 +636,44 @@
       // Solo indicativo visual, no cambia el audio (limitación de fetch)
     };
 
-    // ── DESCARGAR MP3 ─────────────────────────────────────────────
+    // ── DESCARGAR CLIP DE 15s ─────────────────────────────────────
     window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
       const btn = document.getElementById(`dlBtn-${idx}`);
-      btn.textContent = '⏳ Descargando...';
+      btn.textContent = '⏳ Procesando...';
       btn.classList.add('loading');
-
       try {
-        const res  = await fetch(url);
-        const blob = await res.blob();
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') await ctx.resume();
+        const res = await fetch(url);
+        if (!res.ok) throw new Error();
+        const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+
+        // Solo los primeros 15 segundos desde un punto aleatorio representativo
+        const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 2);
+        const startAt  = buf.duration > 30
+          ? Math.min(maxStart, buf.duration * 0.15)
+          : 0;
+        const dur = Math.min(CLIP_DURATION, buf.duration - startAt);
+
+        // Renderizar solo el clip offline
+        const offCtx = new OfflineAudioContext(buf.numberOfChannels, Math.floor(dur * buf.sampleRate), buf.sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buf;
+        const gain = offCtx.createGain();
+        gain.gain.setValueAtTime(0, 0);
+        gain.gain.linearRampToValueAtTime(1, FADE_DURATION);
+        gain.gain.setValueAtTime(1, dur - FADE_DURATION);
+        gain.gain.linearRampToValueAtTime(0, dur);
+        src.connect(gain); gain.connect(offCtx.destination);
+        src.start(0, startAt, dur);
+        const rendered = await offCtx.startRendering();
+        const wav = bufferToWav(rendered);
+        const blob = new Blob([wav], { type: 'audio/wav' });
 
         const album = unescape(albumEsc);
         const title = unescape(titleEsc);
-        const filename = `${cleanAlbumForFilename(album)} - ${title}.mp3`
-          .replace(/[<>:"/\\|?*]/g, '')  // quitar caracteres inválidos
-          .slice(0, 100);
+        const filename = `${cleanAlbumForFilename(album)} - ${title} [Omnibites 15s].wav`
+          .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
 
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -658,17 +681,30 @@
         a.click();
         URL.revokeObjectURL(a.href);
 
-        btn.textContent = '✅ Descargado';
-        setTimeout(() => {
-          btn.textContent = '⬇️ Descargar MP3';
-          btn.classList.remove('loading');
-        }, 3000);
-      } catch (e) {
+        btn.textContent = '✅ ¡Listo!';
+        setTimeout(() => { btn.textContent = '⬇️ Clip 15s'; btn.classList.remove('loading'); }, 3000);
+      } catch {
         btn.textContent = '❌ Error';
         btn.classList.remove('loading');
-        setTimeout(() => { btn.textContent = '⬇️ Descargar MP3'; }, 2500);
+        setTimeout(() => { btn.textContent = '⬇️ Clip 15s'; }, 2500);
       }
     };
+
+    function bufferToWav(buf) {
+      const numCh=buf.numberOfChannels, sr=buf.sampleRate, len=buf.length;
+      const data=new Float32Array(len*numCh);
+      for(let ch=0;ch<numCh;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)data[i*numCh+ch]=d[i];}
+      const out=new Int16Array(data.length);
+      for(let i=0;i<data.length;i++)out[i]=Math.max(-32768,Math.min(32767,data[i]*32768));
+      const hdr=new ArrayBuffer(44), v=new DataView(hdr);
+      const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+      ws(0,'RIFF');v.setUint32(4,36+out.byteLength,true);ws(8,'WAVE');
+      ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);
+      v.setUint16(22,numCh,true);v.setUint32(24,sr,true);v.setUint32(28,sr*numCh*2,true);
+      v.setUint16(32,numCh*2,true);v.setUint16(34,16,true);
+      ws(36,'data');v.setUint32(40,out.byteLength,true);
+      return new Uint8Array([...new Uint8Array(hdr),...new Uint8Array(out.buffer)]);
+    }
 
     // ── COMPARTIR EN OMNIBITES ────────────────────────────────────
     window.compartir = function(idx, url, titleEsc, albumEsc) {
