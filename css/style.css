@@ -833,3 +833,175 @@ body {
   .community-grid { grid-template-columns: 1fr; }
   .cb-stats { gap: 1.25rem; }
 }
+
+/* ============================================
+   NAVBAR — AVATAR Y AUTH
+   ============================================ */
+.nav-auth-guest {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.nav-auth-guest:hover { border-color: var(--neon); color: var(--neon); }
+.avatar-placeholder { font-size: 1.1rem; line-height: 1; }
+.nav-auth-label { font-size: 0.8rem; }
+
+.nav-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem 0.3rem 0.4rem;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+  position: relative;
+}
+.nav-user-btn:hover { border-color: var(--neon); }
+
+.nav-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+}
+.nav-avatar-fallback {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--neon);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Dropdown del usuario */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-width: 180px;
+  padding: 0.5rem 0;
+  display: none;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.user-dropdown.open { display: block; }
+.user-dropdown a,
+.user-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.15s, color 0.15s;
+}
+.user-dropdown a:hover,
+.user-dropdown button:hover { background: var(--bg3); color: var(--neon); }
+.user-dropdown hr { border: none; border-top: 1px solid var(--border); margin: 0.3rem 0; }
+
+.btn-sm-nav { padding: 0.45rem 0.9rem; font-size: 0.8rem; }
+
+/* ============================================
+   HERO CTA — NUEVA ESTRUCTURA
+   ============================================ */
+.hero-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  max-width: 460px;
+}
+
+.hero-cta-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.hero-cta-card:hover { transform: translateX(3px); }
+.cta-buscar:hover { border-color: var(--neon); background: rgba(57,255,20,0.04); }
+.cta-crear { flex-direction: column; align-items: flex-start; }
+.cta-crear:hover { border-color: var(--purple); background: rgba(139,92,246,0.04); }
+
+.cta-card-icon { font-size: 1.6rem; flex-shrink: 0; }
+.cta-card-text { flex: 1; }
+.cta-card-text strong { display: block; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.15rem; }
+.cta-card-text span { font-size: 0.78rem; color: var(--text-dim); }
+.cta-card-arrow { font-size: 1.1rem; color: var(--neon); font-weight: 700; }
+
+/* Submenu crear */
+.cta-crear > .cta-card-icon,
+.cta-crear > .cta-card-text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.cta-crear-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+.cta-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+.cta-sub-btn {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.65rem 0.9rem;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: border-color 0.2s, color 0.2s;
+}
+.cta-sub-btn:hover { border-color: var(--purple); color: var(--purple); }
+.cta-sub-btn small { font-size: 0.72rem; color: var(--text-dim); font-weight: 400; margin-top: 0.15rem; }
+
+@media (max-width: 768px) {
+  .hero-cta-wrap { max-width: 100%; }
+  .nav-auth-label { display: none; }
+  .btn-sm-nav { display: none; }
+}
