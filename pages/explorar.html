@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explorar — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <div class="nav-links">
+      <a href="explorar.html" style="color:var(--neon)">Explorar</a>
+      <a href="subir.html">Subir Audio</a>
+      <div id="nav-auth"></div>
+    </div>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Subir Audio</a>
+  </div>
+
+  <div class="explorar-header">
+    <h1>🔍 Explorar Audios</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Busca por juego, audio o consola..." />
+      <button class="btn-primary" id="searchBtn">Buscar</button>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <button class="filter-chip active" data-filter="todos">Todos</button>
+    <button class="filter-chip" data-filter="nes">NES</button>
+    <button class="filter-chip" data-filter="snes">SNES</button>
+    <button class="filter-chip" data-filter="n64">N64</button>
+    <button class="filter-chip" data-filter="gba">Game Boy</button>
+    <button class="filter-chip" data-filter="ps1">PlayStation</button>
+    <button class="filter-chip" data-filter="arcade">Arcade</button>
+  </div>
+
+  <div class="explorar-grid">
+    <div class="audio-grid" id="audioGrid">
+      <div class="audio-card skeleton"></div>
+      <div class="audio-card skeleton"></div>
+      <div class="audio-card skeleton"></div>
+      <div class="audio-card skeleton"></div>
+      <div class="audio-card skeleton"></div>
+      <div class="audio-card skeleton"></div>
+    </div>
+    <div id="emptyMsg" style="display:none;text-align:center;padding:4rem;color:var(--text-dim);">
+      <p style="font-size:2rem;margin-bottom:1rem;">🎮</p>
+      <p>No se encontraron audios con ese criterio.</p>
+      <a href="subir.html" class="btn-primary" style="margin-top:1.5rem;display:inline-block;">¡Sé el primero en subir uno!</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from '../js/firebase-config.js';
+    import { auth } from '../js/firebase-config.js';
+    import {
+      collection, getDocs, query, orderBy, where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    let allAudios = [];
+    let activeFilter = 'todos';
+
+    // Leer consola de URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('consola')) activeFilter = params.get('consola');
+
+    async function loadAudios() {
+      const grid = document.getElementById('audioGrid');
+      try {
+        let q = query(collection(db, 'audios'), orderBy('creadoEn', 'desc'));
+        const snap = await getDocs(q);
+        allAudios = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (allAudios.length === 0) allAudios = DEMO_AUDIOS;
+      } catch {
+        allAudios = DEMO_AUDIOS;
+      }
+      renderAudios();
+    }
+
+    function renderAudios() {
+      const grid = document.getElementById('audioGrid');
+      const empty = document.getElementById('emptyMsg');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+
+      let filtered = allAudios.filter(a => {
+        const matchFilter = activeFilter === 'todos' || (a.consola || '').toLowerCase() === activeFilter;
+        const matchSearch = !search
+          || (a.titulo || '').toLowerCase().includes(search)
+          || (a.juego || '').toLowerCase().includes(search)
+          || (a.consola || '').toLowerCase().includes(search);
+        return matchFilter && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      grid.innerHTML = filtered.map(a => `
+        <div class="audio-card" onclick="window.location.href='reproductor.html?id=${a.id}'">
+          <div class="card-game">${a.consola || 'Desconocida'}</div>
+          <div class="card-title">${a.titulo || 'Sin título'}</div>
+          <div class="card-console">🎮 ${a.juego || 'Juego desconocido'}</div>
+          <div class="card-wave" style="background:var(--bg3);height:40px;border-radius:4px;"></div>
+          <div class="card-footer">
+            <div>
+              <div class="card-stars">${'★'.repeat(Math.round(a.rating || 4))}${'☆'.repeat(5 - Math.round(a.rating || 4))}</div>
+              <div class="card-duration">${a.duracion || '—'}</div>
+            </div>
+            <button class="card-play-btn" onclick="event.stopPropagation()">▶</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Filtros
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      if (btn.dataset.filter === activeFilter) btn.classList.add('active');
+      else btn.classList.remove('active');
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderAudios();
+      });
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', renderAudios);
+    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') renderAudios(); });
+
+    // Datos demo
+    const DEMO_AUDIOS = [
+      { id:'d1', consola:'SNES', juego:'Super Mario World', titulo:'Overworld Theme', duracion:'1:24', rating:5 },
+      { id:'d2', consola:'NES',  juego:'The Legend of Zelda', titulo:'Dungeon Music', duracion:'0:45', rating:4 },
+      { id:'d3', consola:'PS1',  juego:'Final Fantasy VII', titulo:'One-Winged Angel', duracion:'2:10', rating:5 },
+      { id:'d4', consola:'N64',  juego:'Ocarina of Time', titulo:'Gerudo Valley', duracion:'1:38', rating:5 },
+      { id:'d5', consola:'GBA',  juego:'Pokémon FireRed', titulo:'Battle Theme', duracion:'0:55', rating:4 },
+      { id:'d6', consola:'Arcade', juego:'Street Fighter II', titulo:'Ken Stage', duracion:'1:12', rating:4 },
+    ];
+
+    loadAudios();
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>

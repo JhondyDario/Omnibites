@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subir Audio — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .upload-drop {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      margin-bottom: 1.5rem;
+    }
+    .upload-drop:hover, .upload-drop.dragover {
+      border-color: var(--neon);
+      background: rgba(57,255,20,0.03);
+    }
+    .upload-drop .upload-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .upload-drop p { color: var(--text-dim); font-size: 0.85rem; }
+    .upload-drop input { display: none; }
+
+    #editorSection { display: none; }
+    #editorSection.visible { display: block; }
+
+    .trim-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .time-input-group label { font-size: 0.75rem; color: var(--text-dim); display: block; margin-bottom: 0.3rem; }
+    .time-input-group input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      width: 100%;
+    }
+    .progress-bar {
+      height: 4px;
+      background: var(--bg3);
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--neon);
+      width: 0%;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <div class="nav-links">
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html" style="color:var(--neon)">Subir Audio</a>
+      <div id="nav-auth"></div>
+    </div>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+
+  <main class="editor-page">
+    <h1>📤 Subir Audio</h1>
+
+    <!-- PASO 1: Cargar archivo -->
+    <div class="editor-box" style="margin-bottom:1.5rem;">
+      <h2 style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.25rem;font-family:var(--font-pixel)">PASO 1 — Selecciona el audio</h2>
+      <div class="upload-drop" id="dropZone">
+        <div class="upload-icon">🎵</div>
+        <p>Arrastra tu archivo aquí o haz clic para seleccionar</p>
+        <p style="margin-top:0.4rem;font-size:0.75rem;">MP3, WAV, OGG — máximo 50MB</p>
+        <input type="file" id="fileInput" accept="audio/*" />
+      </div>
+      <div id="fileInfo" style="display:none;font-size:0.85rem;color:var(--neon);margin-bottom:0.5rem;"></div>
+    </div>
+
+    <!-- PASO 2: Editor de recorte -->
+    <div id="editorSection" class="editor-box" style="margin-bottom:1.5rem;">
+      <h2 style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.25rem;font-family:var(--font-pixel)">PASO 2 — Recorta (opcional)</h2>
+
+      <div class="waveform-container">
+        <canvas id="waveformCanvas" height="120"></canvas>
+        <div id="selectionOverlay" class="selection-overlay" style="display:none;"></div>
+      </div>
+
+      <div class="time-display">
+        <span>Inicio: <span id="startTime">0.00s</span></span>
+        <span>Fin: <span id="endTime">0.00s</span></span>
+        <span>Duración: <span id="selDuration">—</span></span>
+      </div>
+
+      <div class="trim-controls">
+        <div class="time-input-group">
+          <label>Segundo de inicio</label>
+          <input type="number" id="trimStart" value="0" min="0" step="0.1" />
+        </div>
+        <div class="time-input-group">
+          <label>Segundo de fin</label>
+          <input type="number" id="trimEnd" value="0" min="0" step="0.1" />
+        </div>
+      </div>
+
+      <div class="editor-controls">
+        <button class="btn-primary" id="playBtn">▶ Reproducir selección</button>
+        <button class="btn-outline" id="playFullBtn">▶ Audio completo</button>
+        <button class="btn-outline" id="stopBtn">⏹ Detener</button>
+      </div>
+    </div>
+
+    <!-- PASO 3: Información -->
+    <div class="editor-box">
+      <h2 style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.25rem;font-family:var(--font-pixel)">PASO 3 — Información del audio</h2>
+
+      <div class="form-group">
+        <label>Título del audio *</label>
+        <input type="text" id="titulo" placeholder="Ej: Overworld Theme - Intro" />
+      </div>
+      <div class="form-group">
+        <label>Nombre del juego *</label>
+        <input type="text" id="juego" placeholder="Ej: Super Mario World" />
+      </div>
+      <div class="form-group">
+        <label>Consola *</label>
+        <select id="consola">
+          <option value="">— Selecciona —</option>
+          <option value="NES">NES</option>
+          <option value="SNES">SNES</option>
+          <option value="N64">Nintendo 64</option>
+          <option value="GBA">Game Boy / GBA</option>
+          <option value="GameCube">GameCube</option>
+          <option value="Wii">Wii</option>
+          <option value="PS1">PlayStation 1</option>
+          <option value="PS2">PlayStation 2</option>
+          <option value="Arcade">Arcade</option>
+          <option value="Sega">Sega Genesis / Master System</option>
+          <option value="Otra">Otra</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <textarea id="descripcion" placeholder="¿Qué hace especial este audio? ¿En qué momento del juego suena?"></textarea>
+      </div>
+
+      <div class="progress-bar" id="progressBar" style="display:none;">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <button class="btn-primary form-submit" id="submitBtn">🚀 Publicar Audio</button>
+    </div>
+  </main>
+
+  <script type="module">
+    import { auth, db, storage } from '../js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    let currentUser = null;
+    let audioBuffer = null;
+    let audioCtx = null;
+    let sourceNode = null;
+    let audioDuration = 0;
+    let originalFile = null;
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (!user) {
+        window.showToast && window.showToast('Debes iniciar sesión para subir audios.', 'error');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+      }
+    });
+
+    // Drop zone
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('audio/')) processFile(file);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+    async function processFile(file) {
+      if (file.size > 50 * 1024 * 1024) { window.showToast('El archivo supera los 50MB.', 'error'); return; }
+      originalFile = file;
+      document.getElementById('fileInfo').style.display = 'block';
+      document.getElementById('fileInfo').textContent = `✅ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+
+      // Decodificar con Web Audio API
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const arrayBuf = await file.arrayBuffer();
+      audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
+      audioDuration = audioBuffer.duration;
+
+      document.getElementById('trimEnd').value = audioDuration.toFixed(1);
+      document.getElementById('endTime').textContent = audioDuration.toFixed(2) + 's';
+
+      drawWaveform();
+      document.getElementById('editorSection').classList.add('visible');
+      updateDuration();
+    }
+
+    function drawWaveform() {
+      const canvas = document.getElementById('waveformCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      const data = audioBuffer.getChannelData(0);
+      const step = Math.ceil(data.length / canvas.width);
+      const amp  = canvas.height / 2;
+      ctx.fillStyle = '#12121a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#39ff14';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < canvas.width; i++) {
+        let min = 0, max = 0;
+        for (let j = 0; j < step; j++) {
+          const v = data[i * step + j] || 0;
+          if (v < min) min = v;
+          if (v > max) max = v;
+        }
+        ctx.moveTo(i, amp + min * amp);
+        ctx.lineTo(i, amp + max * amp);
+      }
+      ctx.stroke();
+    }
+
+    function updateDuration() {
+      const start = parseFloat(document.getElementById('trimStart').value) || 0;
+      const end   = parseFloat(document.getElementById('trimEnd').value) || audioDuration;
+      document.getElementById('startTime').textContent  = start.toFixed(2) + 's';
+      document.getElementById('endTime').textContent    = end.toFixed(2) + 's';
+      document.getElementById('selDuration').textContent = (end - start).toFixed(2) + 's';
+    }
+
+    document.getElementById('trimStart').addEventListener('input', updateDuration);
+    document.getElementById('trimEnd').addEventListener('input', updateDuration);
+
+    function playSegment(start, end) {
+      if (!audioBuffer) return;
+      if (sourceNode) { try { sourceNode.stop(); } catch {} }
+      sourceNode = audioCtx.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+      sourceNode.connect(audioCtx.destination);
+      sourceNode.start(0, start, end - start);
+    }
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      const start = parseFloat(document.getElementById('trimStart').value) || 0;
+      const end   = parseFloat(document.getElementById('trimEnd').value) || audioDuration;
+      playSegment(start, end);
+    });
+    document.getElementById('playFullBtn').addEventListener('click', () => playSegment(0, audioDuration));
+    document.getElementById('stopBtn').addEventListener('click', () => { try { sourceNode?.stop(); } catch {} });
+
+    // Subir a Firebase
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      if (!currentUser) { window.showToast('Inicia sesión primero.', 'error'); return; }
+      if (!originalFile) { window.showToast('Selecciona un archivo de audio.', 'error'); return; }
+      const titulo  = document.getElementById('titulo').value.trim();
+      const juego   = document.getElementById('juego').value.trim();
+      const consola = document.getElementById('consola').value;
+      if (!titulo || !juego || !consola) { window.showToast('Completa los campos obligatorios.', 'error'); return; }
+
+      const start = parseFloat(document.getElementById('trimStart').value) || 0;
+      const end   = parseFloat(document.getElementById('trimEnd').value) || audioDuration;
+
+      document.getElementById('progressBar').style.display = 'block';
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').textContent = 'Subiendo...';
+
+      try {
+        // Subir archivo a Firebase Storage
+        const storageRef = ref(storage, `audios/${currentUser.uid}/${Date.now()}_${originalFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, originalFile);
+
+        uploadTask.on('state_changed', (snap) => {
+          const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+          document.getElementById('progressFill').style.width = pct + '%';
+        });
+
+        await uploadTask;
+        const url = await getDownloadURL(storageRef);
+
+        // Guardar metadata en Firestore
+        await addDoc(collection(db, 'audios'), {
+          titulo,
+          juego,
+          consola,
+          descripcion: document.getElementById('descripcion').value.trim(),
+          url,
+          trimStart: start,
+          trimEnd: end,
+          duracion: (end - start).toFixed(2) + 's',
+          autorId: currentUser.uid,
+          autorNombre: currentUser.displayName || 'Jugador',
+          likes: 0,
+          rating: 0,
+          totalVotos: 0,
+          creadoEn: serverTimestamp()
+        });
+
+        window.showToast('✅ Audio publicado con éxito');
+        setTimeout(() => window.location.href = 'explorar.html', 1500);
+      } catch (e) {
+        console.error(e);
+        window.showToast('Error al subir el audio. Inténtalo de nuevo.', 'error');
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').textContent = '🚀 Publicar Audio';
+      }
+    });
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
