@@ -7,6 +7,197 @@
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .search-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 1rem;
+    }
+    .search-section h1 {
+      font-family: var(--font-pixel);
+      font-size: 0.85rem;
+      color: var(--neon);
+      margin-bottom: 1.5rem;
+    }
+    .search-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .search-bar input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: var(--neon); }
+    .search-hint {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+    .search-hint span {
+      color: var(--neon);
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+    .search-hint span:hover { text-decoration: underline; }
+
+    /* Resultados */
+    .results-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+    .results-header {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+    .results-header strong { color: var(--neon); }
+
+    /* Audio result card */
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .result-card:hover { border-color: var(--neon); }
+    .result-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .result-card-info { flex: 1; }
+    .result-card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+    }
+    .result-card-meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .result-card-meta span { color: var(--neon); margin-right: 0.5rem; }
+
+    /* Mini player */
+    .mini-player {
+      background: var(--bg3);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .mini-play-btn {
+      background: var(--neon);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+    .mini-play-btn:hover { opacity: 0.8; }
+    .mini-play-btn.playing { background: var(--purple); }
+
+    .mini-progress-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .mini-progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .mini-progress-fill {
+      height: 100%;
+      background: var(--neon);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .mini-time {
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.78rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-sm-green  { background: var(--neon); color: #000; }
+    .btn-sm-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+    .btn-sm-outline:hover { border-color: var(--neon); color: var(--neon); }
+
+    /* Estado vacío / cargando */
+    .state-msg {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-dim);
+    }
+    .state-msg .emoji { font-size: 3rem; margin-bottom: 1rem; }
+    .state-msg p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .state-msg small { font-size: 0.78rem; }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--neon);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Fade indicator */
+    .fade-badge {
+      display: inline-block;
+      background: rgba(57,255,20,0.1);
+      border: 1px solid var(--neon-dim);
+      color: var(--neon);
+      border-radius: 20px;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
 
@@ -24,131 +215,349 @@
     <a href="subir.html">Subir Audio</a>
   </div>
 
-  <div class="explorar-header">
-    <h1>🔍 Explorar Audios</h1>
+  <!-- BÚSQUEDA -->
+  <div class="search-section">
+    <h1>🔍 Buscar Audios</h1>
     <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Busca por juego, audio o consola..." />
+      <input type="text" id="searchInput"
+        placeholder="Ej: Star Fox Assault, Zelda, Mario Kart..." />
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
+    <p class="search-hint">
+      Prueba con:
+      <span onclick="quickSearch('Star Fox Assault GameCube music')">Star Fox Assault</span>
+      <span onclick="quickSearch('Super Mario World SNES soundtrack')">Mario World</span>
+      <span onclick="quickSearch('Zelda Ocarina of Time music')">Zelda OoT</span>
+      <span onclick="quickSearch('Sonic the Hedgehog music')">Sonic</span>
+    </p>
   </div>
 
-  <div class="filters-bar">
-    <button class="filter-chip active" data-filter="todos">Todos</button>
-    <button class="filter-chip" data-filter="nes">NES</button>
-    <button class="filter-chip" data-filter="snes">SNES</button>
-    <button class="filter-chip" data-filter="n64">N64</button>
-    <button class="filter-chip" data-filter="gba">Game Boy</button>
-    <button class="filter-chip" data-filter="ps1">PlayStation</button>
-    <button class="filter-chip" data-filter="arcade">Arcade</button>
-  </div>
-
-  <div class="explorar-grid">
-    <div class="audio-grid" id="audioGrid">
-      <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
+  <!-- RESULTADOS -->
+  <div class="results-wrap">
+    <div id="stateMsg" class="state-msg">
+      <div class="emoji">🎮</div>
+      <p>Busca un juego para encontrar sus audios</p>
+      <small>Powered by Archive.org — miles de soundtracks gratuitos</small>
     </div>
-    <div id="emptyMsg" style="display:none;text-align:center;padding:4rem;color:var(--text-dim);">
-      <p style="font-size:2rem;margin-bottom:1rem;">🎮</p>
-      <p>No se encontraron audios con ese criterio.</p>
-      <a href="subir.html" class="btn-primary" style="margin-top:1.5rem;display:inline-block;">¡Sé el primero en subir uno!</a>
-    </div>
+    <div id="resultsHeader" style="display:none" class="results-header"></div>
+    <div id="resultsList"></div>
   </div>
 
   <script type="module">
-    import { db } from '../js/firebase-config.js';
     import { auth } from '../js/firebase-config.js';
-    import {
-      collection, getDocs, query, orderBy, where
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    let allAudios = [];
-    let activeFilter = 'todos';
+    let currentUser = null;
+    onAuthStateChanged(auth, u => currentUser = u);
 
-    // Leer consola de URL
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('consola')) activeFilter = params.get('consola');
+    // Audio context global para fade
+    let audioCtx = null;
+    let activeSource = null;
+    let activeGain   = null;
+    let activeCard   = null;
+    let progressInterval = null;
 
-    async function loadAudios() {
-      const grid = document.getElementById('audioGrid');
-      try {
-        let q = query(collection(db, 'audios'), orderBy('creadoEn', 'desc'));
-        const snap = await getDocs(q);
-        allAudios = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if (allAudios.length === 0) allAudios = DEMO_AUDIOS;
-      } catch {
-        allAudios = DEMO_AUDIOS;
-      }
-      renderAudios();
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
     }
 
-    function renderAudios() {
-      const grid = document.getElementById('audioGrid');
-      const empty = document.getElementById('emptyMsg');
-      const search = document.getElementById('searchInput').value.toLowerCase();
+    // ── BÚSQUEDA EN ARCHIVE.ORG ──────────────────────────────────
+    async function searchArchive(query) {
+      showLoading();
+      try {
+        // Archive.org Advanced Search API
+        const q = encodeURIComponent(`(${query}) AND mediatype:audio`);
+        const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,description,creator,year&rows=12&output=json&sort[]=downloads+desc`;
+        const res  = await fetch(url);
+        const data = await res.json();
+        const docs = data?.response?.docs || [];
 
-      let filtered = allAudios.filter(a => {
-        const matchFilter = activeFilter === 'todos' || (a.consola || '').toLowerCase() === activeFilter;
-        const matchSearch = !search
-          || (a.titulo || '').toLowerCase().includes(search)
-          || (a.juego || '').toLowerCase().includes(search)
-          || (a.consola || '').toLowerCase().includes(search);
-        return matchFilter && matchSearch;
-      });
+        if (docs.length === 0) {
+          showEmpty(query);
+          return;
+        }
 
-      if (filtered.length === 0) {
-        grid.innerHTML = '';
-        empty.style.display = 'block';
-        return;
+        // Para cada resultado, buscar los archivos de audio dentro
+        const items = await Promise.all(
+          docs.slice(0, 8).map(doc => fetchItemFiles(doc))
+        );
+        const flat = items.flat().filter(Boolean);
+
+        if (flat.length === 0) { showEmpty(query); return; }
+
+        renderResults(flat, query);
+      } catch (e) {
+        console.error(e);
+        showError();
       }
-      empty.style.display = 'none';
-      grid.innerHTML = filtered.map(a => `
-        <div class="audio-card" onclick="window.location.href='reproductor.html?id=${a.id}'">
-          <div class="card-game">${a.consola || 'Desconocida'}</div>
-          <div class="card-title">${a.titulo || 'Sin título'}</div>
-          <div class="card-console">🎮 ${a.juego || 'Juego desconocido'}</div>
-          <div class="card-wave" style="background:var(--bg3);height:40px;border-radius:4px;"></div>
-          <div class="card-footer">
-            <div>
-              <div class="card-stars">${'★'.repeat(Math.round(a.rating || 4))}${'☆'.repeat(5 - Math.round(a.rating || 4))}</div>
-              <div class="card-duration">${a.duracion || '—'}</div>
+    }
+
+    async function fetchItemFiles(doc) {
+      try {
+        const res  = await fetch(`https://archive.org/metadata/${doc.identifier}/files`);
+        const data = await res.json();
+        const files = (data?.result || [])
+          .filter(f => /\.(mp3|ogg|flac|wav)$/i.test(f.name))
+          .slice(0, 3);
+
+        return files.map(f => ({
+          id:       doc.identifier + '/' + f.name,
+          title:    cleanName(f.name),
+          album:    doc.title || doc.identifier,
+          creator:  doc.creator || 'Desconocido',
+          year:     doc.year || '',
+          duration: f.length ? formatTime(parseFloat(f.length)) : '—',
+          seconds:  f.length ? parseFloat(f.length) : 0,
+          url:      `https://archive.org/download/${doc.identifier}/${encodeURIComponent(f.name)}`,
+          archiveId: doc.identifier
+        }));
+      } catch { return []; }
+    }
+
+    function cleanName(name) {
+      return name
+        .replace(/\.[^.]+$/, '')          // quita extensión
+        .replace(/[-_]/g, ' ')            // guiones → espacios
+        .replace(/^\d+\s*/, '')           // quita número inicial
+        .replace(/\b\w/g, c => c.toUpperCase()); // Title Case
+    }
+
+    // ── RENDER ───────────────────────────────────────────────────
+    function renderResults(items, query) {
+      const header = document.getElementById('resultsHeader');
+      const list   = document.getElementById('resultsList');
+      const state  = document.getElementById('stateMsg');
+
+      state.style.display  = 'none';
+      header.style.display = 'block';
+      header.innerHTML     = `Encontrados <strong>${items.length}</strong> audios para "<strong>${query}</strong>" — Clip de preview: 15 seg con fade`;
+
+      list.innerHTML = items.map((item, i) => `
+        <div class="result-card" id="card-${i}">
+          <div class="result-card-top">
+            <div class="result-card-info">
+              <div class="result-card-title">${item.title}</div>
+              <div class="result-card-meta">
+                <span>🎮</span>${item.album}
+                ${item.year ? `· ${item.year}` : ''}
+                · ${item.duration}
+                <span class="fade-badge" style="margin-left:0.4rem">♫ Fade 15s</span>
+              </div>
             </div>
-            <button class="card-play-btn" onclick="event.stopPropagation()">▶</button>
+          </div>
+
+          <div class="mini-player">
+            <button class="mini-play-btn" id="playBtn-${i}"
+              onclick="togglePlay(${i}, '${item.url}', ${item.seconds})">▶</button>
+            <div class="mini-progress-wrap">
+              <div class="mini-progress-bar" onclick="seekTo(event, ${i}, ${item.seconds})">
+                <div class="mini-progress-fill" id="prog-${i}"></div>
+              </div>
+              <div class="mini-time">
+                <span id="cur-${i}">0:00</span>
+                <span>preview 15s</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn-sm btn-sm-green"
+              onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
+              📤 Compartir en Omnibites
+            </button>
+            <a class="btn-sm btn-sm-outline"
+              href="https://archive.org/details/${item.archiveId}" target="_blank">
+              🗄️ Ver en Archive.org
+            </a>
           </div>
         </div>
       `).join('');
+
+      // Guardar items para compartir
+      window._items = items;
     }
 
-    // Filtros
-    document.querySelectorAll('.filter-chip').forEach(btn => {
-      if (btn.dataset.filter === activeFilter) btn.classList.add('active');
-      else btn.classList.remove('active');
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeFilter = btn.dataset.filter;
-        renderAudios();
+    // ── PLAYER CON FADE IN/OUT ────────────────────────────────────
+    const CLIP_DURATION = 15; // segundos
+    const FADE_DURATION  = 2; // segundos de fade
+
+    window.togglePlay = async function(idx, url, totalSecs) {
+      const btn = document.getElementById(`playBtn-${idx}`);
+
+      // Si ya está sonando esta tarjeta → pausar
+      if (activeCard === idx) {
+        stopActive();
+        return;
+      }
+
+      // Detener lo que estaba sonando
+      stopActive();
+
+      btn.textContent = '⏳';
+      btn.disabled = true;
+
+      try {
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') await ctx.resume();
+
+        // Fetch y decodificar audio
+        const res    = await fetch(url);
+        const arrBuf = await res.arrayBuffer();
+        const buf    = await ctx.decodeAudioData(arrBuf);
+
+        // Punto de inicio aleatorio (evita siempre el principio)
+        const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 5);
+        const startAt  = totalSecs > 30
+          ? Math.random() * Math.min(maxStart, buf.duration * 0.3) + buf.duration * 0.1
+          : 0;
+
+        // Nodo de fuente
+        const source = ctx.createBufferSource();
+        source.buffer = buf;
+
+        // Nodo de ganancia (volumen) para fade
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+
+        // Fade IN
+        gain.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_DURATION);
+
+        // Fade OUT al final del clip
+        const clipEnd = ctx.currentTime + CLIP_DURATION;
+        gain.gain.setValueAtTime(1, clipEnd - FADE_DURATION);
+        gain.gain.linearRampToValueAtTime(0, clipEnd);
+
+        source.connect(gain);
+        gain.connect(ctx.destination);
+
+        source.start(0, startAt, CLIP_DURATION);
+        source.onended = () => {
+          if (activeCard === idx) stopActive();
+        };
+
+        activeSource = source;
+        activeGain   = gain;
+        activeCard   = idx;
+
+        btn.textContent = '⏸';
+        btn.classList.add('playing');
+        btn.disabled = false;
+
+        // Barra de progreso
+        const startTime = ctx.currentTime;
+        progressInterval = setInterval(() => {
+          const elapsed = Math.min(ctx.currentTime - startTime, CLIP_DURATION);
+          const pct     = (elapsed / CLIP_DURATION) * 100;
+          const progEl  = document.getElementById(`prog-${idx}`);
+          const curEl   = document.getElementById(`cur-${idx}`);
+          if (progEl) progEl.style.width = pct + '%';
+          if (curEl)  curEl.textContent  = formatTime(elapsed);
+          if (elapsed >= CLIP_DURATION) clearInterval(progressInterval);
+        }, 100);
+
+      } catch (e) {
+        console.error(e);
+        btn.textContent = '▶';
+        btn.disabled = false;
+        alert('No se pudo cargar este audio. Prueba con otro resultado.');
+      }
+    };
+
+    function stopActive() {
+      if (activeSource) {
+        try {
+          activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+          activeSource.stop(audioCtx.currentTime + 0.3);
+        } catch {}
+        activeSource = null;
+        activeGain   = null;
+      }
+      clearInterval(progressInterval);
+      if (activeCard !== null) {
+        const btn  = document.getElementById(`playBtn-${activeCard}`);
+        const prog = document.getElementById(`prog-${activeCard}`);
+        const cur  = document.getElementById(`cur-${activeCard}`);
+        if (btn)  { btn.textContent = '▶'; btn.classList.remove('playing'); btn.disabled = false; }
+        if (prog) prog.style.width = '0%';
+        if (cur)  cur.textContent  = '0:00';
+      }
+      activeCard = null;
+    }
+
+    window.seekTo = function(e, idx, totalSecs) {
+      // Solo indicativo visual, no cambia el audio (limitación de fetch)
+    };
+
+    // ── COMPARTIR EN OMNIBITES ────────────────────────────────────
+    window.compartir = function(idx, url, titleEsc, albumEsc) {
+      const title = unescape(titleEsc);
+      const album = unescape(albumEsc);
+      const params = new URLSearchParams({
+        url, titulo: title, juego: album
       });
+      window.location.href = `subir.html?${params.toString()}`;
+    };
+
+    // ── HELPERS ───────────────────────────────────────────────────
+    function showLoading() {
+      document.getElementById('resultsHeader').style.display = 'none';
+      document.getElementById('resultsList').innerHTML = '';
+      document.getElementById('stateMsg').style.display = 'block';
+      document.getElementById('stateMsg').innerHTML = `
+        <div class="spinner"></div>
+        <p>Buscando en Archive.org...</p>
+        <small>Esto puede tardar unos segundos</small>
+      `;
+    }
+    function showEmpty(q) {
+      document.getElementById('stateMsg').innerHTML = `
+        <div class="emoji">😔</div>
+        <p>No encontramos audios para "<strong>${q}</strong>"</p>
+        <small>Prueba con el nombre en inglés o solo el nombre del juego</small>
+      `;
+      document.getElementById('stateMsg').style.display = 'block';
+    }
+    function showError() {
+      document.getElementById('stateMsg').innerHTML = `
+        <div class="emoji">⚠️</div>
+        <p>Error de conexión con Archive.org</p>
+        <small>Verifica tu internet e inténtalo de nuevo</small>
+      `;
+    }
+
+    function formatTime(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m   = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2,'0');
+      return `${m}:${sec}`;
+    }
+
+    // ── EVENTOS ───────────────────────────────────────────────────
+    function doSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) return;
+      stopActive();
+      searchArchive(q);
+    }
+
+    window.quickSearch = function(q) {
+      document.getElementById('searchInput').value = q;
+      doSearch();
+    };
+
+    document.getElementById('searchBtn').addEventListener('click', doSearch);
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
     });
 
-    document.getElementById('searchBtn').addEventListener('click', renderAudios);
-    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') renderAudios(); });
-
-    // Datos demo
-    const DEMO_AUDIOS = [
-      { id:'d1', consola:'SNES', juego:'Super Mario World', titulo:'Overworld Theme', duracion:'1:24', rating:5 },
-      { id:'d2', consola:'NES',  juego:'The Legend of Zelda', titulo:'Dungeon Music', duracion:'0:45', rating:4 },
-      { id:'d3', consola:'PS1',  juego:'Final Fantasy VII', titulo:'One-Winged Angel', duracion:'2:10', rating:5 },
-      { id:'d4', consola:'N64',  juego:'Ocarina of Time', titulo:'Gerudo Valley', duracion:'1:38', rating:5 },
-      { id:'d5', consola:'GBA',  juego:'Pokémon FireRed', titulo:'Battle Theme', duracion:'0:55', rating:4 },
-      { id:'d6', consola:'Arcade', juego:'Street Fighter II', titulo:'Ken Stage', duracion:'1:12', rating:4 },
-    ];
-
-    loadAudios();
+    // Si viene de un parámetro en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('q')) {
+      document.getElementById('searchInput').value = urlParams.get('q');
+      doSearch();
+    }
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
