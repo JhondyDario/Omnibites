@@ -186,6 +186,36 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Sugerencias dinámicas post-búsqueda */
+    .related-wrap {
+      margin-bottom: 1.25rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+    .related-wrap strong { color: var(--text); }
+    .related-chip {
+      display: inline-block;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      margin: 0.3rem 0.25rem 0 0;
+      cursor: pointer;
+      color: var(--neon);
+      font-size: 0.75rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .related-chip:hover { background: rgba(57,255,20,0.08); border-color: var(--neon); }
+
+    /* Botón descarga */
+    .btn-sm-download {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .btn-sm-download:hover { background: var(--cyan); color: #000; }
+    .btn-sm-download.loading { opacity: 0.6; pointer-events: none; }
+
     /* Fade indicator */
     .fade-badge {
       display: inline-block;
@@ -223,17 +253,22 @@
         placeholder="Ej: Star Fox Assault, Zelda, Mario Kart..." />
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
-    <p class="search-hint">
-      Prueba con:
-      <span onclick="quickSearch('Star Fox Assault OST soundtrack')">Star Fox Assault</span>
-      <span onclick="quickSearch('Super Mario World OST soundtrack')">Mario World</span>
-      <span onclick="quickSearch('Zelda Ocarina of Time OST soundtrack')">Zelda OoT</span>
-      <span onclick="quickSearch('Sonic the Hedgehog OST soundtrack')">Sonic</span>
-    </p>
+    <div id="searchHints">
+      <p class="search-hint">
+        Prueba con:
+        <span onclick="quickSearch('Star Fox Assault')">Star Fox: Assault</span>
+        <span onclick="quickSearch('Super Mario World')">Super Mario World</span>
+        <span onclick="quickSearch('Zelda Ocarina of Time')">Zelda: Ocarina of Time</span>
+        <span onclick="quickSearch('Sonic the Hedgehog')">Sonic the Hedgehog</span>
+        <span onclick="quickSearch('Metroid Prime')">Metroid Prime</span>
+        <span onclick="quickSearch('F-Zero GX')">F-Zero GX</span>
+      </p>
+    </div>
   </div>
 
   <!-- RESULTADOS -->
   <div class="results-wrap">
+    <div id="relatedWrap" style="display:none" class="related-wrap"></div>
     <div id="stateMsg" class="state-msg">
       <div class="emoji">🎮</div>
       <p>Busca un juego para encontrar sus audios</p>
@@ -408,10 +443,25 @@
 
     function cleanName(name) {
       return name
-        .replace(/\.[^.]+$/, '')          // quita extensión
-        .replace(/[-_]/g, ' ')            // guiones → espacios
-        .replace(/^\d+\s*/, '')           // quita número inicial
-        .replace(/\b\w/g, c => c.toUpperCase()); // Title Case
+        .replace(/\.[^.]+$/, '')
+        .replace(/[-_]/g, ' ')
+        .replace(/^\d+\s*/, '')
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // Limpia el nombre del álbum para el nombre de descarga
+    // Ej: "Star Fox Assault Orchestra Soundtrack CD Original Soundtrack [NINTENDO 050321] (L100 C)/01 Star Fox Theme"
+    // → "Star Fox Assault Orchestra Soundtrack CD"
+    function cleanAlbumForFilename(album) {
+      return album
+        .replace(/\/.*$/, '')            // quita todo tras /
+        .replace(/\[.*?\]/g, '')         // quita [corchetes]
+        .replace(/\(.*?\)/g, '')         // quita (paréntesis)
+        .replace(/original soundtrack/gi, '')
+        .replace(/soundtrack/gi, 'OST')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 60);                   // máximo 60 caracteres
     }
 
     // ── RENDER ───────────────────────────────────────────────────
@@ -457,9 +507,13 @@
               onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
               📤 Compartir en Omnibites
             </button>
+            <button class="btn-sm btn-sm-download" id="dlBtn-${i}"
+              onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
+              ⬇️ Descargar MP3
+            </button>
             <a class="btn-sm btn-sm-outline"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
-              🗄️ Ver en Archive.org
+              🗄️ Archive.org
             </a>
           </div>
         </div>
@@ -467,6 +521,7 @@
 
       // Guardar items para compartir
       window._items = items;
+      updateSearchHints(query);
     }
 
     // ── PLAYER CON FADE IN/OUT ────────────────────────────────────
@@ -581,6 +636,40 @@
       // Solo indicativo visual, no cambia el audio (limitación de fetch)
     };
 
+    // ── DESCARGAR MP3 ─────────────────────────────────────────────
+    window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
+      const btn = document.getElementById(`dlBtn-${idx}`);
+      btn.textContent = '⏳ Descargando...';
+      btn.classList.add('loading');
+
+      try {
+        const res  = await fetch(url);
+        const blob = await res.blob();
+
+        const album = unescape(albumEsc);
+        const title = unescape(titleEsc);
+        const filename = `${cleanAlbumForFilename(album)} - ${title}.mp3`
+          .replace(/[<>:"/\\|?*]/g, '')  // quitar caracteres inválidos
+          .slice(0, 100);
+
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+
+        btn.textContent = '✅ Descargado';
+        setTimeout(() => {
+          btn.textContent = '⬇️ Descargar MP3';
+          btn.classList.remove('loading');
+        }, 3000);
+      } catch (e) {
+        btn.textContent = '❌ Error';
+        btn.classList.remove('loading');
+        setTimeout(() => { btn.textContent = '⬇️ Descargar MP3'; }, 2500);
+      }
+    };
+
     // ── COMPARTIR EN OMNIBITES ────────────────────────────────────
     window.compartir = function(idx, url, titleEsc, albumEsc) {
       const title = unescape(titleEsc);
@@ -590,6 +679,56 @@
       });
       window.location.href = `subir.html?${params.toString()}`;
     };
+
+    // ── SUGERENCIAS RELACIONADAS ──────────────────────────────────
+    // Base de datos de juegos relacionados por franquicia/género
+    const RELATED_GAMES = {
+      'star fox': ['Star Fox 64', 'Star Fox Adventures', 'Star Fox Command', 'Star Fox Zero'],
+      'mario':    ['Super Mario 64', 'Mario Kart 64', 'Paper Mario', 'Mario Galaxy', 'Mario Odyssey'],
+      'zelda':    ['Zelda: Majora\'s Mask', 'Zelda: Wind Waker', 'Zelda: Twilight Princess', 'Zelda: Skyward Sword'],
+      'sonic':    ['Sonic Adventure', 'Sonic Adventure 2', 'Sonic Heroes', 'Sonic Rush'],
+      'metroid':  ['Metroid Fusion', 'Metroid Zero Mission', 'Metroid Prime 2', 'Metroid Prime 3'],
+      'pokemon':  ['Pokemon Gold Silver', 'Pokemon Ruby Sapphire', 'Pokemon Diamond Pearl', 'Pokemon HeartGold'],
+      'kirby':    ['Kirby Super Star', 'Kirby 64', 'Kirby Amazing Mirror', 'Kirby Canvas Curse'],
+      'donkey':   ['Donkey Kong Country 2', 'Donkey Kong Country 3', 'DK64'],
+      'mega man': ['Mega Man X2', 'Mega Man X3', 'Mega Man Zero', 'Mega Man Battle Network'],
+      'castlevania': ['Castlevania Symphony of the Night', 'Castlevania Circle of the Moon', 'Castlevania Aria of Sorrow'],
+      'final fantasy': ['Final Fantasy VI', 'Final Fantasy VIII', 'Final Fantasy IX', 'Final Fantasy X'],
+      'f-zero':   ['F-Zero X', 'F-Zero GX', 'F-Zero Maximum Velocity'],
+      'fire emblem': ['Fire Emblem Sacred Stones', 'Fire Emblem Path of Radiance', 'Fire Emblem Awakening'],
+    };
+
+    function showRelatedSuggestions(query) {
+      const wrap = document.getElementById('relatedWrap');
+      const qLow = query.toLowerCase();
+
+      // Buscar franquicia que coincida
+      let related = [];
+      for (const [key, games] of Object.entries(RELATED_GAMES)) {
+        if (qLow.includes(key) || key.includes(qLow.split(' ')[0])) {
+          related = games.filter(g => !g.toLowerCase().includes(qLow));
+          break;
+        }
+      }
+
+      // Si no hay relacionados específicos, mostrar géneros similares
+      if (related.length === 0) {
+        related = ['Super Smash Bros Melee', 'Metroid Prime', 'Pikmin', 'Luigi\'s Mansion', 'Animal Crossing'];
+      }
+
+      wrap.style.display = 'block';
+      wrap.innerHTML = `
+        <strong>Búsquedas relacionadas:</strong><br/>
+        ${related.slice(0, 5).map(g =>
+          `<span class="related-chip" onclick="quickSearch('${g}')">${g}</span>`
+        ).join('')}
+      `;
+    }
+
+    // Actualizar hints del buscador tras búsqueda
+    function updateSearchHints(query) {
+      showRelatedSuggestions(query);
+    }
 
     // ── HELPERS ───────────────────────────────────────────────────
     function showLoading() {
@@ -630,6 +769,7 @@
       const q = document.getElementById('searchInput').value.trim();
       if (!q) return;
       stopActive();
+      document.getElementById('relatedWrap').style.display = 'none';
       searchArchive(q);
     }
 
