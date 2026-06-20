@@ -1,190 +1,139 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subir Audio — Omnibites</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crear Soundbite — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .url-input-wrap {
-      display: flex;
-      gap: 0.75rem;
-    }
-    .url-input-wrap input { flex: 1; }
-    .url-input-wrap button { flex-shrink: 0; }
+    .tab-row { display:flex;gap:.5rem;margin-bottom:1.5rem; }
+    .tab-btn { flex:1;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-dim);font-size:.82rem;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:border-color .2s,color .2s; }
+    .tab-btn.active { border-color:var(--neon);color:var(--neon); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
 
-    #previewSection { display: none; margin-bottom: 1.5rem; }
-    #previewSection.visible { display: block; }
+    .url-wrap { display:flex;gap:.75rem;margin-bottom:.6rem; }
+    .url-wrap input { flex:1; }
+    .auth-wall { background:var(--bg2);border:1px solid var(--neon);border-radius:10px;padding:2.5rem;text-align:center;max-width:460px;margin:4rem auto; }
+    .auth-wall .aw-icon { font-size:3rem;margin-bottom:1rem; }
+    .auth-wall h2 { font-family:var(--font-pixel);font-size:.8rem;color:var(--neon);margin-bottom:.75rem; }
+    .auth-wall p { color:var(--text-dim);font-size:.85rem;margin-bottom:1.5rem; }
+    .auth-wall .aw-btns { display:flex;gap:.75rem;justify-content:center; }
 
-    .audio-preview-box {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-    }
-    .audio-preview-box audio {
-      width: 100%;
-      margin-bottom: 0.75rem;
-      accent-color: var(--neon);
-    }
+    .trim-grid { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem; }
+    .tg label { font-size:.75rem;color:var(--text-dim);display:block;margin-bottom:.3rem;text-transform:uppercase; }
+    .tg input { background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.5rem .75rem;border-radius:var(--radius);font-family:var(--font-pixel);font-size:.65rem;width:100%;outline:none; }
+    .tg input:focus { border-color:var(--neon); }
+    .time-disp { font-family:var(--font-pixel);font-size:.52rem;color:var(--neon);display:flex;gap:1.5rem;margin-bottom:1rem; }
 
-    .trim-controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .time-input-group label {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      display: block;
-      margin-bottom: 0.3rem;
-      text-transform: uppercase;
-    }
-    .time-input-group input {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--radius);
-      font-family: var(--font-pixel);
-      font-size: 0.65rem;
-      width: 100%;
-      outline: none;
-    }
-    .time-input-group input:focus { border-color: var(--neon); }
+    .drop-zone { border:2px dashed var(--border);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s; }
+    .drop-zone:hover,.drop-zone.over { border-color:var(--neon);background:rgba(57,255,20,.03); }
+    .drop-zone input { display:none; }
+    .drop-icon { font-size:2.5rem;margin-bottom:.6rem; }
+    .drop-zone p { color:var(--text-dim);font-size:.82rem; }
+    .drop-zone small { font-size:.72rem;color:var(--text-dim); }
+    .file-ok { color:var(--neon);font-size:.82rem;margin-top:.75rem; }
+    .file-err { color:var(--danger);font-size:.82rem;margin-top:.5rem; }
 
-    .time-display {
-      display: flex;
-      gap: 1.5rem;
-      font-family: var(--font-pixel);
-      font-size: 0.55rem;
-      color: var(--neon);
-      margin-bottom: 1rem;
-    }
-
-    .source-chips {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    .source-chip {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 0.3rem 0.8rem;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      cursor: pointer;
-    }
-    .source-chip:hover { border-color: var(--neon); color: var(--neon); }
-
-    .step-label {
-      font-family: var(--font-pixel);
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-bottom: 1.25rem;
-    }
-    .url-hint {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-top: 0.5rem;
-    }
-    .url-hint a { color: var(--neon); text-decoration: none; }
+    .preview-box { background:var(--bg3);border-radius:6px;padding:1rem;margin-bottom:1rem; }
+    .preview-box audio { width:100%;accent-color:var(--neon); }
+    .preview-info { font-size:.75rem;color:var(--text-dim);margin-top:.4rem; }
   </style>
 </head>
 <body>
-
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html" style="color:var(--neon)">Subir Audio</a>
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html">Explorar música</a>
+      <a href="subir.html" style="color:var(--neon)">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
     <button class="hamburger" id="hamburger">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Subir Audio</a>
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <div id="mobile-auth"></div>
   </div>
 
-  <main class="editor-page">
-    <h1>📤 Compartir Audio</h1>
+  <!-- MURO DE AUTENTICACIÓN (se muestra si no hay sesión) -->
+  <div id="authWall" style="display:none;padding:2rem 1.5rem;">
+    <div class="auth-wall">
+      <div class="aw-icon">🔒</div>
+      <h2>Necesitas una cuenta</h2>
+      <p>Para crear y publicar soundbites en Omnibites debes iniciar sesión o registrarte. ¡Es gratis y rápido!</p>
+      <div class="aw-btns">
+        <a href="registro.html" class="btn-primary">Registrarme gratis</a>
+        <a href="login.html" class="btn-outline">Ya tengo cuenta</a>
+      </div>
+    </div>
+  </div>
 
-    <!-- PASO 1: URL -->
-    <div class="editor-box" style="margin-bottom:1.5rem;">
-      <p class="step-label">PASO 1 — Pega el enlace del audio</p>
+  <!-- FORMULARIO (se muestra solo con sesión) -->
+  <main id="mainForm" class="editor-page" style="display:none">
+    <h1>✂️ Crear Soundbite</h1>
 
-      <div class="source-chips">
-        <span class="source-chip" onclick="setExample('archive')">🗄️ Archive.org</span>
-        <span class="source-chip" onclick="setExample('youtube')">▶️ YouTube</span>
-        <span class="source-chip" onclick="setExample('soundcloud')">☁️ SoundCloud</span>
-        <span class="source-chip" onclick="setExample('directo')">🔗 Enlace directo MP3</span>
+    <!-- PASO 1: FUENTE DEL AUDIO -->
+    <div class="editor-box" style="margin-bottom:1.5rem">
+      <p style="font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem">PASO 1 — ¿De dónde viene el audio?</p>
+      <div class="tab-row">
+        <button class="tab-btn active" data-tab="url">🔗 URL de Archive.org</button>
+        <button class="tab-btn" data-tab="file">📁 Subir desde mi dispositivo</button>
       </div>
 
-      <div class="url-input-wrap">
-        <input type="url" id="audioUrl"
-          placeholder="https://archive.org/... o enlace directo a MP3/OGG" />
-        <button class="btn-primary" id="loadBtn">Cargar</button>
+      <!-- TAB: URL -->
+      <div class="tab-panel active" id="tab-url">
+        <div class="url-wrap">
+          <input type="url" id="audioUrl" class="form-group input" placeholder="https://archive.org/download/..."/>
+          <button class="btn-primary" id="loadBtn">Cargar</button>
+        </div>
+        <p style="font-size:.75rem;color:var(--text-dim)">💡 Busca en <a href="explorar.html" style="color:var(--neon)">Explorar música</a> y usa "Compartir en Omnibites" para rellenar esto automáticamente.</p>
+        <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
       </div>
-      <p class="url-hint">
-        💡 Recomendamos <a href="https://archive.org/details/classicvideogamemusic" target="_blank">Archive.org</a>
-        — tiene miles de soundtracks de videojuegos gratuitos y legales.
-      </p>
 
-      <div id="loadError" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:0.75rem;"></div>
+      <!-- TAB: ARCHIVO -->
+      <div class="tab-panel" id="tab-file">
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">🎵</div>
+          <p>Arrastra tu archivo aquí o haz clic</p>
+          <small>Solo MP3 · Duración: 10 a 15 segundos</small>
+          <input type="file" id="fileInput" accept=".mp3,audio/mpeg"/>
+        </div>
+        <div id="fileError" class="file-err" style="display:none"></div>
+        <div id="fileOk" class="file-ok" style="display:none"></div>
+      </div>
     </div>
 
-    <!-- PASO 2: Preview y recorte -->
-    <div id="previewSection" class="editor-box" style="margin-bottom:1.5rem;">
-      <p class="step-label">PASO 2 — Escucha y define el recorte (opcional)</p>
-
-      <div class="audio-preview-box">
+    <!-- PASO 2: PREVIEW Y RECORTE (solo para URL) -->
+    <div id="previewSection" style="display:none" class="editor-box" style="margin-bottom:1.5rem">
+      <p style="font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem">PASO 2 — Escucha y define el recorte</p>
+      <div class="preview-box">
         <audio id="audioPlayer" controls crossorigin="anonymous"></audio>
-        <div id="durationInfo" style="font-size:0.78rem;color:var(--text-dim);"></div>
+        <div class="preview-info" id="durationInfo"></div>
       </div>
-
-      <div class="trim-controls">
-        <div class="time-input-group">
-          <label>Segundo de inicio</label>
-          <input type="number" id="trimStart" value="0" min="0" step="0.5" />
-        </div>
-        <div class="time-input-group">
-          <label>Segundo de fin</label>
-          <input type="number" id="trimEnd" value="0" min="0" step="0.5" />
-        </div>
+      <div class="trim-grid">
+        <div class="tg"><label>Segundo de inicio</label><input type="number" id="trimStart" value="0" min="0" step="0.5"/></div>
+        <div class="tg"><label>Segundo de fin</label><input type="number" id="trimEnd" value="15" min="0" step="0.5"/></div>
       </div>
-
-      <div class="time-display">
+      <div class="time-disp">
         <span>Inicio: <span id="startDisp">0.00s</span></span>
-        <span>Fin: <span id="endDisp">0.00s</span></span>
-        <span>Selección: <span id="selDisp">—</span></span>
+        <span>Fin: <span id="endDisp">15.00s</span></span>
+        <span>Clip: <span id="selDisp">15.00s</span></span>
       </div>
-
-      <div class="editor-controls">
-        <button class="btn-primary" id="playSelBtn">▶ Escuchar selección</button>
-        <button class="btn-outline" id="playFullBtn">▶ Completo</button>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
         <button class="btn-outline" id="stopBtn">⏹ Detener</button>
       </div>
     </div>
 
-    <!-- PASO 3: Información -->
+    <!-- PASO 3: INFORMACIÓN -->
     <div class="editor-box">
-      <p class="step-label">PASO 3 — Información del audio</p>
-
-      <div class="form-group">
-        <label>Título del audio *</label>
-        <input type="text" id="titulo" placeholder="Ej: Overworld Theme - Intro" />
-      </div>
-      <div class="form-group">
-        <label>Nombre del juego *</label>
-        <input type="text" id="juego" placeholder="Ej: Super Mario World" />
-      </div>
+      <p style="font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem">PASO 3 — Información del soundbite</p>
+      <div class="form-group"><label>Título del soundbite *</label><input type="text" id="titulo" placeholder="Ej: Tema principal - Star Fox Assault"/></div>
+      <div class="form-group"><label>Nombre del juego *</label><input type="text" id="juego" placeholder="Ej: Star Fox: Assault"/></div>
       <div class="form-group">
         <label>Consola *</label>
         <select id="consola">
@@ -197,179 +146,208 @@
           <option value="Wii">Wii</option>
           <option value="PS1">PlayStation 1</option>
           <option value="PS2">PlayStation 2</option>
-          <option value="Arcade">Arcade</option>
           <option value="Sega">Sega Genesis / Master System</option>
+          <option value="Arcade">Arcade</option>
           <option value="Otra">Otra</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Categoría</label>
+        <label>Categoría *</label>
         <select id="categoria">
-          <option value="musica">🎵 Música / BGM</option>
-          <option value="efecto">💥 Efecto de sonido</option>
-          <option value="voz">🗣️ Voz / Diálogo</option>
-          <option value="jingle">🎶 Jingle / Fanfare</option>
-          <option value="ambiental">🌿 Ambiental</option>
+          <option value="">— Selecciona —</option>
+          <option value="ost">OST (Original Soundtrack)</option>
+          <option value="soundtrack">Soundtrack completo</option>
+          <option value="bgm">BGM (Background Music)</option>
+          <option value="tema-batalla">Tema de batalla</option>
+          <option value="tema-titulo">Tema de título / pantalla inicial</option>
+          <option value="tema-creditos">Créditos finales</option>
+          <option value="personalizado">Personalizado (no sé cuál elegir)</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Descripción (opcional)</label>
-        <textarea id="descripcion"
-          placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
-      </div>
-
-      <button class="btn-primary form-submit" id="submitBtn">🚀 Publicar en Omnibites</button>
+      <div class="form-group"><label>Descripción (opcional)</label><textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea></div>
+      <button class="btn-primary form-submit" id="submitBtn">🚀 Publicar Soundbite</button>
     </div>
   </main>
 
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      collection, addDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     let currentUser = null;
-    const player = document.getElementById('audioPlayer');
+    let audioPlayer = document.getElementById('audioPlayer');
+    let localFileUrl = null;
+    let localFileDuration = 0;
+    let activeTab = 'url';
 
-    onAuthStateChanged(auth, (user) => {
+    // ── AUTH GUARD ──
+    onAuthStateChanged(auth, user => {
       currentUser = user;
-      if (!user) {
-        showToast('Debes iniciar sesión para publicar audios.', 'error');
-        setTimeout(() => window.location.href = 'login.html', 2000);
+      if (user) {
+        document.getElementById('authWall').style.display = 'none';
+        document.getElementById('mainForm').style.display = 'block';
+        prefillFromURL();
+      } else {
+        document.getElementById('authWall').style.display = 'block';
+        document.getElementById('mainForm').style.display = 'none';
       }
     });
 
-    // Ejemplos por fuente
-    window.setExample = (tipo) => {
-      const ejemplos = {
-        archive:   'https://archive.org/download/SuperMarioWorldSoundtrack/01%20-%20Title%20Theme.mp3',
-        youtube:   'https://www.youtube.com/watch?v=EJEMPLO (YouTube no permite reproducción directa, usa Archive.org)',
-        soundcloud:'https://soundcloud.com/ejemplo',
-        directo:   'https://ejemplo.com/audio.mp3'
-      };
-      document.getElementById('audioUrl').value = ejemplos[tipo];
-      document.getElementById('audioUrl').focus();
-    };
+    // ── PREFILL desde explorar.html ──
+    function prefillFromURL() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('url')) {
+        document.getElementById('audioUrl').value = p.get('url');
+        loadAudioUrl(p.get('url'));
+      }
+      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
+      if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
+    }
 
-    // Cargar audio desde URL
+    // ── TABS ──
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${activeTab}`).classList.add('active');
+        document.getElementById('previewSection').style.display = activeTab === 'url' ? '' : 'none';
+      });
+    });
+
+    // ── TAB URL ──
     document.getElementById('loadBtn').addEventListener('click', () => {
-      const url = document.getElementById('audioUrl').value.trim();
-      const errEl = document.getElementById('loadError');
+      loadAudioUrl(document.getElementById('audioUrl').value.trim());
+    });
+
+    function loadAudioUrl(url) {
+      const errEl = document.getElementById('urlError');
       errEl.style.display = 'none';
-
       if (!url) { errEl.textContent = 'Pega un enlace primero.'; errEl.style.display = 'block'; return; }
-
-      player.src = url;
-      player.load();
-
-      player.onloadedmetadata = () => {
-        const dur = player.duration;
-        document.getElementById('trimEnd').value   = dur.toFixed(1);
-        document.getElementById('durationInfo').textContent =
-          `✅ Audio cargado — Duración total: ${formatTime(dur)}`;
-        document.getElementById('previewSection').classList.add('visible');
+      audioPlayer.src = url;
+      audioPlayer.load();
+      audioPlayer.onloadedmetadata = () => {
+        const dur = audioPlayer.duration;
+        document.getElementById('trimEnd').value = Math.min(dur, 15).toFixed(1);
+        document.getElementById('durationInfo').textContent = `✅ Duración total: ${fmt(dur)} — define el clip de máximo 15 seg`;
+        document.getElementById('previewSection').style.display = 'block';
         updateDisp();
       };
-
-      player.onerror = () => {
-        errEl.textContent = '❌ No se pudo cargar ese enlace. Prueba con un enlace directo a MP3/OGG desde Archive.org.';
+      audioPlayer.onerror = () => {
+        errEl.textContent = '❌ No se pudo cargar. Usa un enlace directo a MP3/OGG desde Archive.org.';
         errEl.style.display = 'block';
       };
-    });
-
-    // Controles de recorte
-    function updateDisp() {
-      const s = parseFloat(document.getElementById('trimStart').value) || 0;
-      const e = parseFloat(document.getElementById('trimEnd').value)   || player.duration || 0;
-      document.getElementById('startDisp').textContent = s.toFixed(2) + 's';
-      document.getElementById('endDisp').textContent   = e.toFixed(2) + 's';
-      document.getElementById('selDisp').textContent   = (e - s).toFixed(2) + 's';
     }
+
     document.getElementById('trimStart').addEventListener('input', updateDisp);
     document.getElementById('trimEnd').addEventListener('input', updateDisp);
+    function updateDisp() {
+      const s = parseFloat(document.getElementById('trimStart').value)||0;
+      const e = parseFloat(document.getElementById('trimEnd').value)||15;
+      document.getElementById('startDisp').textContent = s.toFixed(2)+'s';
+      document.getElementById('endDisp').textContent   = e.toFixed(2)+'s';
+      document.getElementById('selDisp').textContent   = (e-s).toFixed(2)+'s';
+    }
 
     document.getElementById('playSelBtn').addEventListener('click', () => {
-      const s = parseFloat(document.getElementById('trimStart').value) || 0;
-      const e = parseFloat(document.getElementById('trimEnd').value)   || player.duration;
-      player.currentTime = s;
-      player.play();
-      const check = setInterval(() => {
-        if (player.currentTime >= e) { player.pause(); clearInterval(check); }
-      }, 100);
+      const s = parseFloat(document.getElementById('trimStart').value)||0;
+      const e = parseFloat(document.getElementById('trimEnd').value)||15;
+      audioPlayer.currentTime = s;
+      audioPlayer.play();
+      const iv = setInterval(() => { if (audioPlayer.currentTime >= e) { audioPlayer.pause(); clearInterval(iv); } }, 100);
     });
+    document.getElementById('stopBtn').addEventListener('click', () => audioPlayer.pause());
 
-    document.getElementById('playFullBtn').addEventListener('click', () => {
-      player.currentTime = 0; player.play();
-    });
+    // ── TAB ARCHIVO ──
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
 
-    document.getElementById('stopBtn').addEventListener('click', () => player.pause());
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); validateFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', e => validateFile(e.target.files[0]));
 
-    // Publicar
+    function validateFile(file) {
+      const errEl = document.getElementById('fileError');
+      const okEl  = document.getElementById('fileOk');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+
+      if (!file) return;
+      if (file.type !== 'audio/mpeg' && !file.name.endsWith('.mp3')) {
+        errEl.textContent = '❌ Solo se aceptan archivos MP3.';
+        errEl.style.display = 'block'; return;
+      }
+
+      // Verificar duración
+      const tmpUrl = URL.createObjectURL(file);
+      const tmpAudio = new Audio(tmpUrl);
+      tmpAudio.onloadedmetadata = () => {
+        const dur = tmpAudio.duration;
+        URL.revokeObjectURL(tmpUrl);
+        if (dur < 10 || dur > 15) {
+          errEl.textContent = `❌ El archivo dura ${dur.toFixed(1)}s. Debe ser entre 10 y 15 segundos.`;
+          errEl.style.display = 'block'; localFileUrl = null; return;
+        }
+        localFileUrl = URL.createObjectURL(file);
+        localFileDuration = dur;
+        okEl.textContent = `✅ ${file.name} — ${dur.toFixed(1)}s · Listo para publicar`;
+        okEl.style.display = 'block';
+      };
+    }
+
+    // ── PUBLICAR ──
     document.getElementById('submitBtn').addEventListener('click', async () => {
-      if (!currentUser) { showToast('Inicia sesión primero.', 'error'); return; }
+      if (!currentUser) { window.showToast('Inicia sesión primero.','error'); return; }
 
-      const url      = document.getElementById('audioUrl').value.trim();
       const titulo   = document.getElementById('titulo').value.trim();
       const juego    = document.getElementById('juego').value.trim();
       const consola  = document.getElementById('consola').value;
       const categoria= document.getElementById('categoria').value;
 
-      if (!url)     { showToast('Pega un enlace de audio.', 'error'); return; }
-      if (!titulo)  { showToast('Ponle un título al audio.', 'error'); return; }
-      if (!juego)   { showToast('Escribe el nombre del juego.', 'error'); return; }
-      if (!consola) { showToast('Selecciona la consola.', 'error'); return; }
+      if (!titulo)   { window.showToast('Ponle un título.','error'); return; }
+      if (!juego)    { window.showToast('Escribe el nombre del juego.','error'); return; }
+      if (!consola)  { window.showToast('Selecciona la consola.','error'); return; }
+      if (!categoria){ window.showToast('Selecciona la categoría.','error'); return; }
+
+      let url = '';
+      let trimStart = 0, trimEnd = 15;
+
+      if (activeTab === 'url') {
+        url = document.getElementById('audioUrl').value.trim();
+        if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
+        trimStart = parseFloat(document.getElementById('trimStart').value)||0;
+        trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
+      } else {
+        if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
+        url = localFileUrl;
+        trimEnd = localFileDuration;
+      }
 
       const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Publicando...';
-
-      const trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
-      const trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || player.duration || 0;
+      btn.disabled = true; btn.textContent = 'Publicando...';
 
       try {
-        await addDoc(collection(db, 'audios'), {
-          url,
-          titulo,
-          juego,
-          consola,
-          categoria,
-          descripcion:  document.getElementById('descripcion').value.trim(),
-          trimStart,
-          trimEnd,
-          duracion:     formatTime(trimEnd - trimStart),
-          autorId:      currentUser.uid,
-          autorNombre:  currentUser.displayName || 'Jugador',
-          likes:        0,
-          rating:       0,
-          totalVotos:   0,
-          creadoEn:     serverTimestamp()
+        await addDoc(collection(db,'audios'), {
+          url, titulo, juego, consola, categoria,
+          descripcion: document.getElementById('descripcion').value.trim(),
+          trimStart, trimEnd,
+          duracion: fmt(trimEnd - trimStart),
+          autorId: currentUser.uid,
+          autorNombre: currentUser.displayName || 'Jugador',
+          likes: 0, rating: 0, totalVotos: 0,
+          creadoEn: serverTimestamp()
         });
-
-        showToast('✅ ¡Audio publicado con éxito!');
-        setTimeout(() => window.location.href = 'explorar.html', 1500);
-      } catch (e) {
-        console.error(e);
-        showToast('Error al publicar. Inténtalo de nuevo.', 'error');
-        btn.disabled = false;
-        btn.textContent = '🚀 Publicar en Omnibites';
+        window.showToast('✅ ¡Soundbite publicado!');
+        setTimeout(() => window.location.href = 'comunidad.html', 1500);
+      } catch {
+        window.showToast('Error al publicar. Inténtalo de nuevo.','error');
+        btn.disabled = false; btn.textContent = '🚀 Publicar Soundbite';
       }
     });
 
-    function formatTime(s) {
-      if (!s || isNaN(s)) return '0:00';
-      const m = Math.floor(s / 60);
-      const sec = Math.floor(s % 60).toString().padStart(2, '0');
-      return `${m}:${sec}`;
-    }
-
-    function showToast(msg, type = 'success') {
-      const el = document.createElement('div');
-      el.className = `toast ${type === 'error' ? 'error' : ''}`;
-      el.textContent = msg;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3500);
-    }
+    function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
