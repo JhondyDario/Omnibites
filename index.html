@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Omnibites — Audios de Videojuegos</title>
-  <meta name="description" content="Encuentra, recorta y descarga audios de ROMs de videojuegos. Comparte tus favoritos con la comunidad." />
+  <title>Omnibites — Soundbites de Videojuegos</title>
+  <meta name="description" content="La comunidad para encontrar, calificar, descargar y compartir soundbites de tus juegos favoritos." />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,23 +15,16 @@
   <nav class="navbar">
     <a href="index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="pages/explorar.html">Explorar</a>
+      <a href="pages/comunidad.html">Soundbites</a>
+      <a href="pages/explorar.html">Explorar música</a>
       <a href="pages/subir.html">Crear Soundbite</a>
-      <div id="nav-auth">
-        <!-- JS lo rellena según sesión -->
-        <a href="pages/login.html" class="nav-auth-guest">
-          <span class="avatar-placeholder">👾</span>
-          <span class="nav-auth-label">Iniciar sesión</span>
-        </a>
-        <a href="pages/registro.html" class="btn-primary btn-sm-nav">Regístrate gratis</a>
-      </div>
+      <div id="nav-auth"></div>
     </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
-
-  <!-- MOBILE MENU -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="pages/explorar.html">Explorar</a>
+    <a href="pages/comunidad.html">Soundbites</a>
+    <a href="pages/explorar.html">Explorar música</a>
     <a href="pages/subir.html">Crear Soundbite</a>
     <div id="mobile-auth">
       <a href="pages/login.html">Iniciar sesión</a>
@@ -45,56 +38,30 @@
     <div class="hero-content">
       <p class="hero-eyebrow">🎮 La comunidad de audio retro</p>
       <h1 class="hero-title">Sonidos que <br/><span class="glitch" data-text="RECUERDAS">RECUERDAS</span></h1>
-      <p class="hero-sub">Busca, recorta y descarga audios de tus ROMs favoritas.<br/>Compártelos con jugadores de todo el mundo.</p>
-      <div class="hero-cta-wrap">
-
-        <!-- BUSCAR SOUNDBITES -->
-        <a href="pages/explorar.html" class="hero-cta-card cta-buscar">
-          <div class="cta-card-icon">🔊</div>
-          <div class="cta-card-text">
-            <strong>Buscar Soundbites</strong>
-            <span>Audios subidos por la comunidad</span>
-          </div>
-          <div class="cta-card-arrow">→</div>
-        </a>
-
-        <!-- CREAR SOUNDBITE -->
-        <div class="hero-cta-card cta-crear">
-          <div class="cta-crear-top">
-            <div class="cta-card-icon">✂️</div>
-            <div class="cta-card-text">
-              <strong>Crear Soundbite</strong>
-              <span>Elige cómo quieres crearlo</span>
-            </div>
-          </div>
-          <div class="cta-submenu">
-            <a href="pages/explorar.html" class="cta-sub-btn">
-              🗄️ Buscar en Archive.org
-              <small>Explora, recorta y descarga</small>
-            </a>
-            <a href="pages/subir.html" class="cta-sub-btn">
-              📁 Subir mi propio audio
-              <small>Sube un archivo MP3/WAV tuyo</small>
-            </a>
-          </div>
-        </div>
-
-      </div>
-      <div class="hero-stats">
-        <div class="stat"><span id="stat-audios">0</span><label>Audios</label></div>
-        <div class="stat"><span id="stat-juegos">0</span><label>Juegos</label></div>
-        <div class="stat"><span id="stat-usuarios">0</span><label>Jugadores</label></div>
-      </div>
+      <p class="hero-sub">La comunidad donde puedes <strong>encontrar</strong>, <strong>calificar</strong>, <strong>descargar</strong> y <strong>compartir</strong> los soundbites de tus juegos favoritos — todo en un solo lugar.</p>
     </div>
     <div class="hero-visual">
       <div class="pixel-art-screen">
         <div class="screen-scanlines"></div>
+        <div class="screen-label">OMNIBITES</div>
         <div class="waveform-demo">
-          <canvas id="demoWave" width="280" height="80"></canvas>
+          <canvas id="demoWave" width="280" height="70"></canvas>
         </div>
-        <div class="screen-controls">
-          <button class="px-btn" id="demoPlay">▶</button>
-          <div class="px-track">MARIO_WORLD_1-1.wav</div>
+        <div class="screen-stats">
+          <div class="screen-stat">
+            <span class="screen-stat-val" id="stat-audios">—</span>
+            <span class="screen-stat-label">AUDIOS</span>
+          </div>
+          <div class="screen-stat-divider"></div>
+          <div class="screen-stat">
+            <span class="screen-stat-val" id="stat-juegos">—</span>
+            <span class="screen-stat-label">JUEGOS</span>
+          </div>
+          <div class="screen-stat-divider"></div>
+          <div class="screen-stat">
+            <span class="screen-stat-val" id="stat-usuarios">—</span>
+            <span class="screen-stat-label">JUGADORES</span>
+          </div>
         </div>
       </div>
     </div>
@@ -103,46 +70,13 @@
   <!-- FEATURED AUDIOS -->
   <section class="section">
     <div class="section-header">
-      <h2>🔥 Audios Populares</h2>
-      <a href="pages/explorar.html" class="link-more">Ver todos →</a>
+      <h2>🔥 Soundbites Populares</h2>
+      <a href="pages/comunidad.html" class="link-more">Ver todos →</a>
     </div>
     <div class="audio-grid" id="featuredGrid">
-      <!-- Populated by JS -->
       <div class="audio-card skeleton"></div>
       <div class="audio-card skeleton"></div>
       <div class="audio-card skeleton"></div>
-      <div class="audio-card skeleton"></div>
-    </div>
-  </section>
-
-  <!-- CONSOLES FILTER -->
-  <section class="section consoles-section">
-    <h2>Explorar por Consola</h2>
-    <div class="consoles-grid">
-      <a href="pages/explorar.html?consola=nes" class="console-card">
-        <span class="console-icon">🟥</span>
-        <span>NES</span>
-      </a>
-      <a href="pages/explorar.html?consola=snes" class="console-card">
-        <span class="console-icon">🟪</span>
-        <span>SNES</span>
-      </a>
-      <a href="pages/explorar.html?consola=n64" class="console-card">
-        <span class="console-icon">🟦</span>
-        <span>N64</span>
-      </a>
-      <a href="pages/explorar.html?consola=gba" class="console-card">
-        <span class="console-icon">🟩</span>
-        <span>Game Boy</span>
-      </a>
-      <a href="pages/explorar.html?consola=ps1" class="console-card">
-        <span class="console-icon">⬜</span>
-        <span>PlayStation</span>
-      </a>
-      <a href="pages/explorar.html?consola=arcade" class="console-card">
-        <span class="console-icon">🕹️</span>
-        <span>Arcade</span>
-      </a>
     </div>
   </section>
 
@@ -153,22 +87,22 @@
       <div class="how-step">
         <div class="how-num">1</div>
         <h3>Busca</h3>
-        <p>Busca audios por juego, consola o categoría.</p>
+        <p>Explora miles de soundtracks en Archive.org por nombre de juego.</p>
       </div>
       <div class="how-step">
         <div class="how-num">2</div>
         <h3>Recorta</h3>
-        <p>Selecciona los segundos exactos que quieres con nuestro editor.</p>
+        <p>Define el inicio y fin del clip. 15 segundos perfectos con fade.</p>
       </div>
       <div class="how-step">
         <div class="how-num">3</div>
         <h3>Descarga</h3>
-        <p>Exporta en MP3 o WAV directo desde tu navegador.</p>
+        <p>Descarga tu soundbite en MP3 directo desde el navegador.</p>
       </div>
       <div class="how-step">
         <div class="how-num">4</div>
         <h3>Comparte</h3>
-        <p>Sube tus propios audios y recibe reseñas de la comunidad.</p>
+        <p>Publícalo en Omnibites y recibe calificaciones de la comunidad.</p>
       </div>
     </div>
   </section>
@@ -180,46 +114,34 @@
       <p>Omnibites es una comunidad — tú decides cómo participar</p>
     </div>
     <div class="community-grid">
-
-      <!-- CARD 1: EXPLORAR Y CALIFICAR -->
       <div class="community-card rate-card">
         <div class="cc-glow"></div>
         <div class="cc-icon">⭐</div>
         <h3>Escucha y Califica</h3>
-        <p>Busca soundtracks de tus juegos favoritos, escucha el preview de 15 segundos con efecto fade y dales tu puntuación. Tu opinión construye la biblioteca.</p>
+        <p>Busca soundbites de tus juegos favoritos, escucha el preview de 15 segundos con efecto fade y dales tu puntuación. Tu opinión construye la biblioteca.</p>
         <div class="cc-tags">
-          <span>🎮 +2,000 juegos</span>
           <span>🔊 Preview instantáneo</span>
           <span>⭐ Sistema de estrellas</span>
+          <span>🎮 Por consola y juego</span>
         </div>
-        <a href="pages/explorar.html" class="cc-btn cc-btn-rate">Explorar Audios →</a>
+        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate">Ver Soundbites →</a>
       </div>
-
-      <!-- CARD 2: SUBIR Y COMPARTIR -->
       <div class="community-card upload-card">
         <div class="cc-glow cc-glow-purple"></div>
         <div class="cc-icon">📤</div>
         <h3>Sube y Comparte</h3>
-        <p>¿Encontraste un audio épico que nadie conoce? Compártelo con la comunidad. Busca en Archive.org, agrega los datos del juego y publícalo en segundos.</p>
+        <p>¿Encontraste un audio épico que nadie conoce? Compártelo. Busca en Archive.org o sube tu propio archivo, define el recorte y publícalo en segundos.</p>
         <div class="cc-tags">
           <span>🗄️ Desde Archive.org</span>
           <span>✂️ Define el recorte</span>
           <span>🌍 Visible para todos</span>
         </div>
-        <a href="pages/subir.html" class="cc-btn cc-btn-upload">Subir un Audio →</a>
+        <a href="pages/subir.html" class="cc-btn cc-btn-upload">Crear Soundbite →</a>
       </div>
-
     </div>
-
-    <!-- MINI LEADERBOARD / MOTIVACIÓN -->
     <div class="community-banner">
       <div class="cb-pixel">INSERT COIN</div>
-      <p>Cada audio que subes o calificas hace crecer la biblioteca retro más completa en español. <strong>¿Cuántos puedes agregar hoy?</strong></p>
-      <div class="cb-stats">
-        <div>🎵 <strong id="home-stat-audios">—</strong> audios subidos</div>
-        <div>🎮 <strong id="home-stat-juegos">—</strong> juegos distintos</div>
-        <div>👾 <strong id="home-stat-usuarios">—</strong> jugadores activos</div>
-      </div>
+      <p>Cada soundbite que subes o calificas hace crecer la biblioteca retro más completa en español. <strong>¿Cuántos puedes agregar hoy?</strong></p>
     </div>
   </section>
 
@@ -230,13 +152,12 @@
       <p>Hecho con 🎮 para la comunidad retro</p>
       <div class="footer-links">
         <a href="#">Sobre el proyecto</a>
-        <a href="#">GitHub</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
         <a href="#">Contacto</a>
       </div>
     </div>
   </footer>
 
-  <!-- SCRIPTS -->
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/home.js"></script>
