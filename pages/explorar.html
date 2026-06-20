@@ -225,10 +225,10 @@
     </div>
     <p class="search-hint">
       Prueba con:
-      <span onclick="quickSearch('Star Fox Assault GameCube music')">Star Fox Assault</span>
-      <span onclick="quickSearch('Super Mario World SNES soundtrack')">Mario World</span>
-      <span onclick="quickSearch('Zelda Ocarina of Time music')">Zelda OoT</span>
-      <span onclick="quickSearch('Sonic the Hedgehog music')">Sonic</span>
+      <span onclick="quickSearch('Star Fox Assault OST soundtrack')">Star Fox Assault</span>
+      <span onclick="quickSearch('Super Mario World OST soundtrack')">Mario World</span>
+      <span onclick="quickSearch('Zelda Ocarina of Time OST soundtrack')">Zelda OoT</span>
+      <span onclick="quickSearch('Sonic the Hedgehog OST soundtrack')">Sonic</span>
     </p>
   </div>
 
@@ -262,27 +262,102 @@
       return audioCtx;
     }
 
-    // ── BÚSQUEDA EN ARCHIVE.ORG ──────────────────────────────────
+    // ── PALABRAS IGNORADAS (stopwords) ───────────────────────────
+    const STOPWORDS = new Set(['the','de','la','el','los','las','un','una','and','of','for','en','a','con','por','del']);
+
+    // ── ENRIQUECER QUERY AUTOMÁTICAMENTE ─────────────────────────
+    // El usuario escribe lo que sea → el sistema lo convierte en
+    // una búsqueda precisa sin que el usuario tenga que saber nada
+    function enrichQuery(raw) {
+      const clean = raw.trim().toLowerCase();
+
+      // Detectar si ya tiene términos de OST
+      const alreadyHasOST = /\b(ost|soundtrack|music|audio|sound)\b/.test(clean);
+
+      // Palabras clave del juego (sin stopwords)
+      const words = clean.split(/\s+/).filter(w => w.length > 1 && !STOPWORDS.has(w));
+
+      // Construir título de búsqueda con sinónimos de OST
+      const ostTerms = 'title:(ost OR soundtrack OR "original soundtrack" OR "game music" OR "video game music" OR music OR audio)';
+      const subjectTerms = 'subject:(videogame OR "video game" OR gaming OR nintendo OR sega OR playstation OR "game music" OR ost OR soundtrack OR arcade)';
+
+      // Query principal: título del juego + OST
+      const titleQuery = words.map(w => `title:${w}`).join(' AND ');
+      const primary = `(${titleQuery}) AND (${ostTerms} OR ${subjectTerms}) AND mediatype:audio`;
+
+      // Query de respaldo: solo palabras en cualquier campo + filtro videojuego
+      const anyField = words.join(' ');
+      const fallback = `(${anyField}) AND (${subjectTerms}) AND mediatype:audio`;
+
+      // Query de último recurso: palabras + "soundtrack" o "ost" forzado
+      const lastResort = `("${words.join(' ')}") AND mediatype:audio`;
+
+      return { primary, fallback, lastResort, words };
+    }
+
+    // ── SISTEMA DE PUNTUACIÓN DE RELEVANCIA ──────────────────────
+    function scoreDoc(doc, words) {
+      const title   = (doc.title   || '').toLowerCase();
+      const subject = Array.isArray(doc.subject)
+        ? doc.subject.join(' ').toLowerCase()
+        : (doc.subject || '').toLowerCase();
+
+      let score = 0;
+
+      // +3 por cada palabra del juego en el título
+      words.forEach(w => { if (title.includes(w)) score += 3; });
+
+      // +2 si tiene OST/soundtrack en el título
+      if (/\b(ost|soundtrack|original soundtrack|game music)\b/.test(title)) score += 2;
+
+      // +1 por subject de videojuego
+      if (/\b(videogame|video game|nintendo|sega|playstation|arcade|gaming)\b/.test(subject)) score += 1;
+
+      // -2 si el título NO contiene ninguna palabra del juego (resultado irrelevante)
+      const anyMatch = words.some(w => title.includes(w));
+      if (!anyMatch) score -= 2;
+
+      return score;
+    }
+
+    // ── BÚSQUEDA PRINCIPAL ────────────────────────────────────────
     async function searchArchive(query) {
       showLoading();
       try {
-        // Archive.org Advanced Search API
-        const q = encodeURIComponent(`(${query}) AND mediatype:audio`);
-        const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,description,creator,year&rows=12&output=json&sort[]=downloads+desc`;
-        const res  = await fetch(url);
-        const data = await res.json();
-        const docs = data?.response?.docs || [];
+        const { primary, fallback, lastResort, words } = enrichQuery(query);
+        let docs = [];
 
+        // Intento 1: query precisa con OST
+        docs = await runSearch(primary, 15);
+
+        // Intento 2: fallback con filtro de videojuego
         if (docs.length === 0) {
-          showEmpty(query);
-          return;
+          docs = await runSearch(fallback, 15);
         }
 
-        // Para cada resultado, buscar los archivos de audio dentro
+        // Intento 3: último recurso, cualquier audio con esas palabras
+        if (docs.length === 0) {
+          docs = await runSearch(lastResort, 10);
+        }
+
+        if (docs.length === 0) { showEmpty(query); return; }
+
+        // Puntuar y ordenar por relevancia
+        const scored = docs
+          .map(doc => ({ doc, score: scoreDoc(doc, words) }))
+          .sort((a, b) => b.score - a.score)
+          .filter(s => s.score > -2) // descartar resultados muy irrelevantes
+          .slice(0, 6);              // máximo 6 álbumes para obtener ~10 tracks
+
+        if (scored.length === 0) { showEmpty(query); return; }
+
+        // Obtener archivos de audio de cada álbum
         const items = await Promise.all(
-          docs.slice(0, 8).map(doc => fetchItemFiles(doc))
+          scored.map(s => fetchItemFiles(s.doc, words))
         );
-        const flat = items.flat().filter(Boolean);
+
+        // Aplanar, quitar nulos y limitar a 10 resultados
+        const flat = items.flat().filter(Boolean).slice(0, 10);
 
         if (flat.length === 0) { showEmpty(query); return; }
 
@@ -293,23 +368,39 @@
       }
     }
 
-    async function fetchItemFiles(doc) {
+    async function runSearch(q, rows = 12) {
+      const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,description,creator,year,subject&rows=${rows}&output=json&sort[]=downloads+desc`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      return data?.response?.docs || [];
+    }
+
+    async function fetchItemFiles(doc, words = []) {
       try {
         const res  = await fetch(`https://archive.org/metadata/${doc.identifier}/files`);
         const data = await res.json();
         const files = (data?.result || [])
           .filter(f => /\.(mp3|ogg|flac|wav)$/i.test(f.name))
-          .slice(0, 3);
+          .filter(f => !f.length || parseFloat(f.length) > 10)
+          .filter(f => !/\b(sfx|effect|jingle|short|voice|vo_|fx_)\b/i.test(f.name));
 
-        return files.map(f => ({
-          id:       doc.identifier + '/' + f.name,
-          title:    cleanName(f.name),
-          album:    doc.title || doc.identifier,
-          creator:  doc.creator || 'Desconocido',
-          year:     doc.year || '',
-          duration: f.length ? formatTime(parseFloat(f.length)) : '—',
-          seconds:  f.length ? parseFloat(f.length) : 0,
-          url:      `https://archive.org/download/${doc.identifier}/${encodeURIComponent(f.name)}`,
+        // Puntuar tracks por relevancia con las palabras buscadas
+        const scored = files.map(f => {
+          const nameLower = f.name.toLowerCase();
+          const score = words.filter(w => nameLower.includes(w)).length;
+          return { f, score };
+        }).sort((a, b) => b.score - a.score);
+
+        // Máximo 2 tracks por álbum para dar variedad
+        return scored.slice(0, 2).map(({ f }) => ({
+          id:        doc.identifier + '/' + f.name,
+          title:     cleanName(f.name),
+          album:     doc.title || doc.identifier,
+          creator:   doc.creator || 'Desconocido',
+          year:      doc.year || '',
+          duration:  f.length ? formatTime(parseFloat(f.length)) : '—',
+          seconds:   f.length ? parseFloat(f.length) : 0,
+          url:       `https://archive.org/download/${doc.identifier}/${encodeURIComponent(f.name)}`,
           archiveId: doc.identifier
         }));
       } catch { return []; }
