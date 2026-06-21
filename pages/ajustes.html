@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ajustes — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .settings-page { max-width:600px;margin:0 auto;padding:2.5rem 1.5rem; }
+    .settings-page h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem; }
+    .settings-box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem; }
+    .settings-box h2 { font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem; }
+    .provider-note { background:var(--bg3);border-radius:6px;padding:.75rem 1rem;font-size:.8rem;color:var(--text-dim);margin-bottom:1rem; }
+
+    /* Popup de confirmación */
+    .popup-overlay { position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
+    .popup-box { background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:400px;width:100%;text-align:center; }
+    .popup-box h3 { font-family:var(--font-pixel);font-size:.7rem;color:var(--danger);margin-bottom:.75rem; }
+    .popup-box p { font-size:.85rem;color:var(--text-dim);margin-bottom:1.5rem;line-height:1.6; }
+    .popup-actions { display:flex;gap:.75rem;justify-content:center; }
+    .btn-danger { background:var(--danger);color:#fff;border:none;border-radius:var(--radius);padding:.6rem 1.4rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:var(--font-body); }
+
+    .success-msg { color:var(--neon);font-size:.8rem;margin-top:.5rem;display:none; }
+    .form-error { color:var(--danger);font-size:.8rem;margin-top:.5rem;display:none; }
+  </style>
+</head>
+<body>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <div class="nav-links">
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html">Explorar música</a>
+      <a href="subir.html">Crear Soundbite</a>
+      <div id="nav-auth"></div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
+  </div>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu"><div id="mobile-auth"></div></div>
+
+  <main class="settings-page" id="settingsMain" style="display:none">
+    <h1>Ajustes</h1>
+
+    <!-- CAMBIAR CONTRASEÑA -->
+    <div class="settings-box">
+      <h2>Seguridad — Contraseña</h2>
+      <div id="googleNote" class="provider-note" style="display:none">
+        Tu cuenta usa Google. Puedes añadir una contraseña adicional para entrar también con correo.
+      </div>
+      <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Mínimo 6 caracteres"/></div>
+      <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="confirmPass" placeholder="Repite la contraseña"/></div>
+      <div id="passError" class="form-error"></div>
+      <div id="passSuccess" class="success-msg">Contraseña actualizada correctamente.</div>
+      <button class="btn-primary" id="savePassBtn" style="margin-top:.5rem">Guardar contraseña</button>
+    </div>
+
+    <!-- ELIMINAR CUENTA -->
+    <div class="settings-box">
+      <h2>Zona de peligro</h2>
+      <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Eliminar tu cuenta borrará todos tus soundbites, calificaciones y datos permanentemente. Esta acción no se puede deshacer.</p>
+      <button class="btn-danger" id="deleteAccountBtn">Eliminar mi cuenta</button>
+    </div>
+  </main>
+
+  <!-- POPUP CONFIRMAR ELIMINAR -->
+  <div class="popup-overlay" id="deletePopup" style="display:none">
+    <div class="popup-box">
+      <h3>Eliminar cuenta</h3>
+      <p>Perderás todos tus soundbites, calificaciones y datos de forma permanente. Se te enviará un correo de confirmación. ¿Estás seguro?</p>
+      <div class="popup-actions">
+        <button class="btn-outline" id="cancelDelete">Cancelar</button>
+        <button class="btn-danger" id="confirmDelete">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-config.js';
+    import {
+      onAuthStateChanged, updatePassword, EmailAuthProvider,
+      reauthenticateWithCredential, reauthenticateWithPopup,
+      GoogleAuthProvider, linkWithCredential, deleteUser, sendEmailVerification
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
+    let isGoogleUser = false;
+
+    onAuthStateChanged(auth, user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      document.getElementById('settingsMain').style.display = 'block';
+      isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+      if (isGoogleUser) document.getElementById('googleNote').style.display = 'block';
+    });
+
+    // ── CAMBIAR / AÑADIR CONTRASEÑA ──
+    document.getElementById('savePassBtn').addEventListener('click', async () => {
+      const newPass = document.getElementById('newPass').value;
+      const confPass = document.getElementById('confirmPass').value;
+      const errEl = document.getElementById('passError');
+      const okEl  = document.getElementById('passSuccess');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+
+      if (!newPass || !confPass) { errEl.textContent='Completa ambos campos.'; errEl.style.display='block'; return; }
+      if (newPass.length < 6)   { errEl.textContent='Mínimo 6 caracteres.'; errEl.style.display='block'; return; }
+      if (newPass !== confPass) { errEl.textContent='Las contraseñas no coinciden.'; errEl.style.display='block'; return; }
+
+      try {
+        if (isGoogleUser) {
+          // Para usuarios de Google: vincular credencial de email
+          const cred = EmailAuthProvider.credential(currentUser.email, newPass);
+          await linkWithCredential(currentUser, cred);
+        } else {
+          // Re-autenticar si ya tiene contraseña
+          await updatePassword(currentUser, newPass);
+        }
+        okEl.style.display = 'block';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+      } catch (e) {
+        if (e.code === 'auth/requires-recent-login') {
+          errEl.textContent = 'Por seguridad, cierra sesión, vuelve a entrar y repite esta acción.';
+        } else if (e.code === 'auth/provider-already-linked') {
+          // Ya tiene contraseña, actualizar directamente
+          try { await updatePassword(currentUser, newPass); okEl.style.display='block'; } catch {}
+        } else {
+          errEl.textContent = 'Error: ' + e.message;
+        }
+        errEl.style.display = 'block';
+      }
+    });
+
+    // ── ELIMINAR CUENTA ──
+    document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+      document.getElementById('deletePopup').style.display = 'flex';
+    });
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+      document.getElementById('deletePopup').style.display = 'none';
+    });
+    document.getElementById('confirmDelete').addEventListener('click', async () => {
+      try {
+        const uid = currentUser.uid;
+        // Borrar datos de Firestore
+        await deleteDoc(doc(db,'usuarios',uid));
+        // Eliminar cuenta
+        await deleteUser(currentUser);
+        window.location.href = '../index.html';
+      } catch (e) {
+        document.getElementById('deletePopup').style.display = 'none';
+        if (e.code === 'auth/requires-recent-login') {
+          window.showToast && window.showToast('Por seguridad, cierra sesión y vuelve a entrar antes de eliminar.','error');
+        } else {
+          window.showToast && window.showToast('Error al eliminar: ' + e.message,'error');
+        }
+      }
+    });
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
