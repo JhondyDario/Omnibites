@@ -91,10 +91,20 @@
         <span class="chip" data-val="N64">N64</span>
         <span class="chip" data-val="GBA">Game Boy</span>
         <span class="chip" data-val="GameCube">GameCube</span>
+        <span class="chip" data-val="Wii">Wii</span>
+        <span class="chip" data-val="WiiU">Wii U</span>
+        <span class="chip" data-val="3DS">3DS</span>
+        <span class="chip" data-val="Switch">Switch</span>
         <span class="chip" data-val="PS1">PS1</span>
         <span class="chip" data-val="PS2">PS2</span>
-        <span class="chip" data-val="Sega">Sega</span>
+        <span class="chip" data-val="PS3">PS3</span>
+        <span class="chip" data-val="PS4">PS4</span>
+        <span class="chip" data-val="PSP">PSP</span>
+        <span class="chip" data-val="Genesis">Sega</span>
+        <span class="chip" data-val="Dreamcast">Dreamcast</span>
+        <span class="chip" data-val="Xbox360">Xbox 360</span>
         <span class="chip" data-val="Arcade">Arcade</span>
+        <span class="chip" data-val="PC">PC</span>
       </div>
     </div>
     <div class="filter-group" style="margin-left:auto">
@@ -126,6 +136,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
     import { db, auth } from '../js/firebase-config.js';
     import { collection, getDocs, query, orderBy, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -181,7 +192,7 @@
         <div class="sb-card" id="card-${a.id}">
           <div class="sb-tag">${a.consola||'—'} · ${a.categoria||'soundbite'}</div>
           <div class="sb-title">${a.titulo||'Sin título'}</div>
-          <div class="sb-meta">🎮 ${a.juego||'—'} · <span>por ${a.autorNombre||'Anónimo'}</span></div>
+          <div class="sb-meta">${a.juego||'—'} · <span>por ${a.autorNombre||'Anónimo'}</span></div>
           <div class="sb-player">
             <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
             <div class="sb-prog-wrap">
@@ -192,7 +203,7 @@
           <div class="sb-footer">
             <div>
               <div class="sb-stars" title="Calificar">${stars}</div>
-              <div class="sb-author">👾 ${a.autorNombre||'Anónimo'} · ${a.likes||0} ❤️</div>
+              <div class="sb-author">${a.autorNombre||'Anónimo'} · ${a.likes||0} ❤️</div>
             </div>
             <button class="sb-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">⬇️ MP3</button>
           </div>
@@ -257,51 +268,49 @@
       }
     };
 
-    // ── DESCARGAR SOLO EL CLIP (trimStart → trimEnd) ──
+    // ── DESCARGAR CLIP EN MP3 ──
     window.dlSB = async function(url, titulo) {
       try {
         const ctx=getCtx();
         if(ctx.state==='suspended')await ctx.resume();
         const res=await fetch(url);
+        if(!res.ok) throw new Error();
         const buf=await ctx.decodeAudioData(await res.arrayBuffer());
-        // Crear un buffer solo con el clip
-        const start=0, dur=Math.min(15,buf.duration);
-        const sampleRate=buf.sampleRate;
-        const frames=Math.floor(dur*sampleRate);
-        const clip=ctx.createBuffer(buf.numberOfChannels,frames,sampleRate);
-        for(let ch=0;ch<buf.numberOfChannels;ch++){
-          const src=buf.getChannelData(ch).slice(0,frames);
-          clip.copyToChannel(src,ch);
-        }
-        // Renderizar a WAV (MP3 nativo no disponible sin servidor)
-        const offCtx=new OfflineAudioContext(clip.numberOfChannels,clip.length,clip.sampleRate);
-        const s=offCtx.createBufferSource(); s.buffer=clip; s.connect(offCtx.destination); s.start();
+        const dur=Math.min(15, buf.duration);
+        // Renderizar clip mono a 44100hz con fade
+        const offCtx=new OfflineAudioContext(1, Math.floor(dur*44100), 44100);
+        const src=offCtx.createBufferSource(); src.buffer=buf;
+        const gain=offCtx.createGain();
+        gain.gain.setValueAtTime(0,0);
+        gain.gain.linearRampToValueAtTime(1,2);
+        gain.gain.setValueAtTime(1,dur-2);
+        gain.gain.linearRampToValueAtTime(0,dur);
+        src.connect(gain); gain.connect(offCtx.destination); src.start(0,0,dur);
         const rendered=await offCtx.startRendering();
-        const wav=bufferToWav(rendered);
-        const blob=new Blob([wav],{type:'audio/wav'});
+        // Encode to MP3
+        const samples=rendered.getChannelData(0);
+        const int16=new Int16Array(samples.length);
+        for(let i=0;i<samples.length;i++) int16[i]=Math.max(-32768,Math.min(32767,samples[i]*32767));
+        const enc=new lamejs.Mp3Encoder(1,44100,128);
+        const mp3=[]; const bs=1152;
+        for(let i=0;i<int16.length;i+=bs){
+          const ch=int16.subarray(i,i+bs);
+          const d=enc.encodeBuffer(ch);
+          if(d.length>0) mp3.push(new Uint8Array(d));
+        }
+        const end=enc.flush(); if(end.length>0) mp3.push(new Uint8Array(end));
+        const blob=new Blob(mp3,{type:'audio/mp3'});
         const a=document.createElement('a');
         a.href=URL.createObjectURL(blob);
-        a.download=`${titulo.slice(0,50)} - Omnibites.wav`;
+        a.download=`${titulo.slice(0,50)} [Omnibites].mp3`.replace(/[<>:"/\\|?*]/g,'');
         a.click(); URL.revokeObjectURL(a.href);
-        window.showToast && window.showToast('✅ Descargando clip de 15 segundos');
-      } catch { window.showToast && window.showToast('Error al descargar','error'); }
+        window.showToast && window.showToast('Descargando MP3 — clip de 15 segundos');
+      } catch(e) {
+        console.error(e);
+        window.showToast && window.showToast('Error al descargar','error');
+      }
     };
 
-    function bufferToWav(buf) {
-      const numCh=buf.numberOfChannels, sr=buf.sampleRate, len=buf.length;
-      const data=new Float32Array(len*numCh);
-      for(let ch=0;ch<numCh;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)data[i*numCh+ch]=d[i];}
-      const out=new Int16Array(data.length);
-      for(let i=0;i<data.length;i++)out[i]=Math.max(-32768,Math.min(32767,data[i]*32768));
-      const header=new ArrayBuffer(44), v=new DataView(header);
-      const writeStr=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
-      writeStr(0,'RIFF'); v.setUint32(4,36+out.byteLength,true); writeStr(8,'WAVE');
-      writeStr(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true);
-      v.setUint16(22,numCh,true); v.setUint32(24,sr,true); v.setUint32(28,sr*numCh*2,true);
-      v.setUint16(32,numCh*2,true); v.setUint16(34,16,true);
-      writeStr(36,'data'); v.setUint32(40,out.byteLength,true);
-      return new Uint8Array([...new Uint8Array(header),...new Uint8Array(out.buffer)]);
-    }
 
     // ── CALIFICACIÓN ──
     window.rateItem = async function(id, stars) {
