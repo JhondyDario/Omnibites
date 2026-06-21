@@ -234,10 +234,19 @@
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="explorar.html" style="color:var(--neon)">Explorar</a>
-      <a href="subir.html">Subir Audio</a>
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html" class="active">Explorar música</a>
+      <a href="subir.html">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -278,6 +287,7 @@
     <div id="resultsList"></div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
     import { auth } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -636,28 +646,27 @@
       // Solo indicativo visual, no cambia el audio (limitación de fetch)
     };
 
-    // ── DESCARGAR CLIP DE 15s ─────────────────────────────────────
+    // ── DESCARGAR CLIP DE 15s EN MP3 ──────────────────────────────
     window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
       const btn = document.getElementById(`dlBtn-${idx}`);
-      btn.textContent = '⏳ Procesando...';
+      btn.textContent = '⏳ Convirtiendo...';
       btn.classList.add('loading');
       try {
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') await ctx.resume();
         const res = await fetch(url);
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error('fetch error');
         const buf = await ctx.decodeAudioData(await res.arrayBuffer());
 
-        // Solo los primeros 15 segundos desde un punto aleatorio representativo
         const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 2);
         const startAt  = buf.duration > 30
-          ? Math.min(maxStart, buf.duration * 0.15)
-          : 0;
+          ? Math.min(maxStart, buf.duration * 0.15) : 0;
         const dur = Math.min(CLIP_DURATION, buf.duration - startAt);
 
-        // Renderizar solo el clip offline
-        const offCtx = new OfflineAudioContext(buf.numberOfChannels, Math.floor(dur * buf.sampleRate), buf.sampleRate);
+        // Renderizar clip con fade offline
+        const offCtx = new OfflineAudioContext(1, Math.floor(dur * 44100), 44100);
         const src = offCtx.createBufferSource();
+        // Resamplear al mismo buffer
         src.buffer = buf;
         const gain = offCtx.createGain();
         gain.gain.setValueAtTime(0, 0);
@@ -667,12 +676,14 @@
         src.connect(gain); gain.connect(offCtx.destination);
         src.start(0, startAt, dur);
         const rendered = await offCtx.startRendering();
-        const wav = bufferToWav(rendered);
-        const blob = new Blob([wav], { type: 'audio/wav' });
+
+        // Convertir a MP3 con lamejs
+        const mp3Data = encodeToMP3(rendered);
+        const blob = new Blob(mp3Data, { type: 'audio/mp3' });
 
         const album = unescape(albumEsc);
         const title = unescape(titleEsc);
-        const filename = `${cleanAlbumForFilename(album)} - ${title} [Omnibites 15s].wav`
+        const filename = `${cleanAlbumForFilename(album)} - ${title} [Omnibites].mp3`
           .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
 
         const a = document.createElement('a');
@@ -682,28 +693,33 @@
         URL.revokeObjectURL(a.href);
 
         btn.textContent = '✅ ¡Listo!';
-        setTimeout(() => { btn.textContent = '⬇️ Clip 15s'; btn.classList.remove('loading'); }, 3000);
-      } catch {
+        setTimeout(() => { btn.textContent = '⬇️ MP3'; btn.classList.remove('loading'); }, 3000);
+      } catch (e) {
+        console.error(e);
         btn.textContent = '❌ Error';
         btn.classList.remove('loading');
-        setTimeout(() => { btn.textContent = '⬇️ Clip 15s'; }, 2500);
+        setTimeout(() => { btn.textContent = '⬇️ MP3'; }, 2500);
       }
     };
 
-    function bufferToWav(buf) {
-      const numCh=buf.numberOfChannels, sr=buf.sampleRate, len=buf.length;
-      const data=new Float32Array(len*numCh);
-      for(let ch=0;ch<numCh;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)data[i*numCh+ch]=d[i];}
-      const out=new Int16Array(data.length);
-      for(let i=0;i<data.length;i++)out[i]=Math.max(-32768,Math.min(32767,data[i]*32768));
-      const hdr=new ArrayBuffer(44), v=new DataView(hdr);
-      const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
-      ws(0,'RIFF');v.setUint32(4,36+out.byteLength,true);ws(8,'WAVE');
-      ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);
-      v.setUint16(22,numCh,true);v.setUint32(24,sr,true);v.setUint32(28,sr*numCh*2,true);
-      v.setUint16(32,numCh*2,true);v.setUint16(34,16,true);
-      ws(36,'data');v.setUint32(40,out.byteLength,true);
-      return new Uint8Array([...new Uint8Array(hdr),...new Uint8Array(out.buffer)]);
+    function encodeToMP3(audioBuffer) {
+      const sampleRate = audioBuffer.sampleRate;
+      const samples = audioBuffer.getChannelData(0);
+      const mp3enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
+      const blockSize = 1152;
+      const mp3Data = [];
+      const int16 = new Int16Array(samples.length);
+      for (let i = 0; i < samples.length; i++) {
+        int16[i] = Math.max(-32768, Math.min(32767, samples[i] * 32767));
+      }
+      for (let i = 0; i < int16.length; i += blockSize) {
+        const chunk = int16.subarray(i, i + blockSize);
+        const encoded = mp3enc.encodeBuffer(chunk);
+        if (encoded.length > 0) mp3Data.push(new Uint8Array(encoded));
+      }
+      const end = mp3enc.flush();
+      if (end.length > 0) mp3Data.push(new Uint8Array(end));
+      return mp3Data;
     }
 
     // ── COMPARTIR EN OMNIBITES ────────────────────────────────────
