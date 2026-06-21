@@ -72,25 +72,36 @@
         <div class="cc-glow"></div>
         <div class="cc-icon">⭐</div>
         <h3>Escucha y Califica</h3>
-        <p>Busca soundbites de tus juegos favoritos, escucha el preview de 15 segundos con efecto fade y dales tu puntuación.</p>
-        <div class="cc-tags">
-          <span>Preview instantáneo</span>
-          <span>Sistema de estrellas</span>
-          <span>Por consola y juego</span>
+        <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación.</p>
+        <div class="cc-expand" id="expand-rate" style="display:none">
+          <ul style="margin:.75rem 0 .75rem 1rem;font-size:.82rem;color:var(--text-dim);line-height:1.9">
+            <li>Busca por consola, categoría o nombre del juego</li>
+            <li>Preview de 15 segundos con fade in / fade out automático</li>
+            <li>Califica de 1 a 5 estrellas cada soundbite</li>
+            <li>Descarga en MP3 cualquier clip que te guste</li>
+          </ul>
         </div>
-        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate">Ver Soundbites →</a>
+        <button class="cc-more-btn" onclick="toggleExpand('rate')">Ver más ▾</button>
+        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate" style="margin-top:.75rem">Ver Soundbites →</a>
       </div>
       <div class="community-card upload-card">
         <div class="cc-glow cc-glow-purple"></div>
         <div class="cc-icon">✂️</div>
         <h3>Crea y Comparte</h3>
-        <p>Busca en Archive.org o sube tu propio archivo, define el recorte de 15 segundos con fade y publícalo en la comunidad.</p>
-        <div class="cc-tags">
-          <span>Desde Archive.org</span>
-          <span>Define el recorte</span>
-          <span>Visible para todos</span>
+        <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro.</p>
+        <div class="cc-expand" id="expand-crear" style="display:none">
+          <ul style="margin:.75rem 0 .75rem 1rem;font-size:.82rem;color:var(--text-dim);line-height:1.9">
+            <li>Busca el soundtrack en Archive.org desde el explorador</li>
+            <li>Define el segundo exacto de inicio y fin del clip</li>
+            <li>El soundbite se exporta en MP3 de 15 segundos con fade</li>
+            <li>Publícalo y recibe calificaciones de la comunidad</li>
+          </ul>
         </div>
-        <a href="pages/subir.html" class="cc-btn cc-btn-upload">Crear Soundbite →</a>
+        <button class="cc-more-btn" onclick="toggleExpand('crear')">Ver más ▾</button>
+        <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap;justify-content:center">
+          <a href="pages/explorar.html" class="cc-btn" style="background:var(--bg3);color:var(--neon);border:1px solid var(--neon)">Explorar música</a>
+          <a href="pages/subir.html" class="cc-btn cc-btn-upload">Crear Soundbite →</a>
+        </div>
       </div>
     </div>
     <div class="community-banner">
@@ -112,17 +123,6 @@
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section class="section how-section">
-    <h2>¿Cómo funciona?</h2>
-    <div class="how-grid">
-      <div class="how-step"><div class="how-num">1</div><h3>Busca</h3><p>Explora miles de soundtracks en Archive.org por nombre de juego.</p></div>
-      <div class="how-step"><div class="how-num">2</div><h3>Recorta</h3><p>Define el inicio y fin del clip. 15 segundos perfectos con fade.</p></div>
-      <div class="how-step"><div class="how-num">3</div><h3>Descarga</h3><p>Descarga tu soundbite en formato WAV directamente desde el navegador.</p></div>
-      <div class="how-step"><div class="how-num">4</div><h3>Comparte</h3><p>Publícalo en Omnibites y recibe calificaciones de la comunidad.</p></div>
-    </div>
-  </section>
-
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
@@ -135,6 +135,24 @@
     </div>
   </footer>
 
+  <script>
+    function toggleExpand(id) {
+      const el = document.getElementById('expand-' + id);
+      const btn = el.previousElementSibling;
+      const open = el.style.display === 'block';
+      el.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Ver más ▾' : 'Ver menos ▴';
+    }
+  </script>
+  <script>
+    // Mostrar mensaje si cuenta fue eliminada
+    if (new URLSearchParams(location.search).get('deleted')) {
+      window.addEventListener('load', () => {
+        setTimeout(() => window.showToast && window.showToast('Tu cuenta ha sido eliminada. ¡Hasta luego!'), 500);
+        history.replaceState({}, '', location.pathname);
+      });
+    }
+  </script>
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/home.js"></script>
