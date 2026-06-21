@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Perfil — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .profile-page { max-width:700px;margin:0 auto;padding:2.5rem 1.5rem; }
+    .profile-page h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem; }
+
+    /* Verificación banner */
+    .verify-banner { background:rgba(255,215,0,.08);border:1px solid var(--gold);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap; }
+    .verify-banner p { font-size:.82rem;color:var(--gold);margin:0; }
+    .verify-banner button { background:var(--gold);color:#000;border:none;border-radius:var(--radius);padding:.4rem 1rem;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap; }
+
+    /* Avatar section */
+    .avatar-section { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:2rem;margin-bottom:1.5rem;text-align:center; }
+    .current-avatar { width:90px;height:90px;border-radius:50%;border:3px solid var(--neon);margin:0 auto 1.25rem;overflow:hidden;background:var(--bg3; }
+    .current-avatar img { width:100%;height:100%;object-fit:cover; }
+    .avatar-grid { display:flex;gap:1rem;justify-content:center;margin-top:1rem; }
+    .avatar-opt { width:60px;height:60px;border-radius:50%;border:2px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s; }
+    .avatar-opt:hover { transform:scale(1.1); }
+    .avatar-opt.selected { border-color:var(--neon);box-shadow:0 0 12px rgba(57,255,20,.3); }
+    .avatar-opt img { width:100%;height:100%;object-fit:cover; }
+    .avatar-label { font-size:.72rem;color:var(--text-dim);margin-bottom:.75rem; }
+
+    /* Info section */
+    .profile-info { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.5rem; }
+    .profile-info h2 { font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem; }
+    .info-row { display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--border);font-size:.875rem; }
+    .info-row:last-child { border-bottom:none; }
+    .info-row label { color:var(--text-dim); }
+    .info-row span { color:var(--text);font-weight:500; }
+
+    /* Stats */
+    .profile-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem; }
+    .pstat { background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.25rem;text-align:center; }
+    .pstat strong { display:block;font-family:var(--font-pixel);font-size:1rem;color:var(--neon);margin-bottom:.3rem; }
+    .pstat span { font-size:.75rem;color:var(--text-dim); }
+
+    .profile-actions { display:flex;gap:.75rem;flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <div class="nav-links">
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html">Explorar música</a>
+      <a href="subir.html">Crear Soundbite</a>
+      <div id="nav-auth"></div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
+  </div>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <div id="mobile-auth"></div>
+  </div>
+
+  <main class="profile-page" id="profileMain" style="display:none">
+    <h1>Mi Perfil</h1>
+
+    <!-- Banner verificación -->
+    <div class="verify-banner" id="verifyBanner" style="display:none">
+      <p>Tu correo aún no está verificado. Revisa tu bandeja de entrada.</p>
+      <button id="resendVerify">Reenviar correo</button>
+    </div>
+
+    <!-- Avatar -->
+    <div class="avatar-section">
+      <div class="current-avatar" id="avatarPreview">
+        <img id="avatarImg" src="../assets/avatars/avatar1.svg" alt="Avatar"/>
+      </div>
+      <p class="avatar-label">Elige tu avatar</p>
+      <div class="avatar-grid">
+        <div class="avatar-opt selected" data-avatar="avatar1" id="opt-avatar1">
+          <img src="../assets/avatars/avatar1.svg" alt="Avatar 1"/>
+        </div>
+        <div class="avatar-opt" data-avatar="avatar2" id="opt-avatar2">
+          <img src="../assets/avatars/avatar2.svg" alt="Avatar 2"/>
+        </div>
+      </div>
+      <button class="btn-primary" id="saveAvatarBtn" style="margin-top:1.25rem">Guardar avatar</button>
+    </div>
+
+    <!-- Info -->
+    <div class="profile-info">
+      <h2>Información</h2>
+      <div class="info-row"><label>Nombre</label><span id="infoNombre">—</span></div>
+      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
+      <div class="info-row"><label>Cuenta creada</label><span id="infoFecha">—</span></div>
+      <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="profile-stats">
+      <div class="pstat"><strong id="statAudios">0</strong><span>Soundbites subidos</span></div>
+      <div class="pstat"><strong id="statCalif">0</strong><span>Calificados</span></div>
+      <div class="pstat"><strong id="statLikes">0</strong><span>Me gusta recibidos</span></div>
+    </div>
+
+    <div class="profile-actions">
+      <a href="ajustes.html" class="btn-outline">Ajustes y seguridad</a>
+      <a href="comunidad.html" class="btn-primary">Ver soundbites</a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged, sendEmailVerification }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, getDoc, updateDoc, collection, getDocs, query, where }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const AVATARS = ['avatar1','avatar2'];
+    let currentUser = null;
+    let selectedAvatar = 'avatar1';
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      document.getElementById('profileMain').style.display = 'block';
+
+      // Verificación banner
+      if (!user.emailVerified) {
+        document.getElementById('verifyBanner').style.display = 'flex';
+      }
+
+      // Info básica
+      document.getElementById('infoNombre').textContent = user.displayName || 'Sin nombre';
+      document.getElementById('infoEmail').textContent  = user.email || '—';
+      document.getElementById('infoFecha').textContent  =
+        user.metadata.creationTime
+          ? new Date(user.metadata.creationTime).toLocaleDateString('es-ES')
+          : '—';
+      const providers = user.providerData.map(p => p.providerId);
+      document.getElementById('infoMetodo').textContent =
+        providers.includes('google.com') ? 'Google' : 'Correo y contraseña';
+
+      // Cargar datos de Firestore
+      try {
+        const snap = await getDoc(doc(db,'usuarios',user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          selectedAvatar = data.avatar || 'avatar1';
+          setAvatar(selectedAvatar);
+          document.getElementById('statAudios').textContent = data.audiosSubidos || 0;
+        }
+        // Contar audios
+        const q = query(collection(db,'audios'), where('autorId','==',user.uid));
+        const audiosSnap = await getDocs(q);
+        document.getElementById('statAudios').textContent = audiosSnap.size;
+      } catch {}
+    });
+
+    function setAvatar(name) {
+      document.getElementById('avatarImg').src = `../assets/avatars/${name}.svg`;
+      document.querySelectorAll('.avatar-opt').forEach(o => {
+        o.classList.toggle('selected', o.dataset.avatar === name);
+      });
+      selectedAvatar = name;
+    }
+
+    document.querySelectorAll('.avatar-opt').forEach(opt => {
+      opt.addEventListener('click', () => setAvatar(opt.dataset.avatar));
+    });
+
+    document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
+      if (!currentUser) return;
+      try {
+        await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
+        window.showToast && window.showToast('Avatar guardado');
+      } catch { window.showToast && window.showToast('Error al guardar','error'); }
+    });
+
+    document.getElementById('resendVerify').addEventListener('click', async () => {
+      try {
+        await sendEmailVerification(currentUser);
+        window.showToast && window.showToast('Correo de verificación enviado');
+      } catch { window.showToast && window.showToast('Error al enviar correo','error'); }
+    });
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
