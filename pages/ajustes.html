@@ -7,26 +7,32 @@
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .settings-page { max-width:600px;margin:0 auto;padding:2.5rem 1.5rem; }
+    .settings-page { max-width:580px;margin:0 auto;padding:2.5rem 1.5rem; }
     .settings-page h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem; }
-    .settings-box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem; }
-    .settings-box h2 { font-family:var(--font-pixel);font-size:.65rem;color:var(--text-dim);margin-bottom:1.25rem; }
-    .provider-note { background:var(--bg3);border-radius:6px;padding:.75rem 1rem;font-size:.8rem;color:var(--text-dim);margin-bottom:1rem; }
-
-    /* Popup de confirmación */
-    .popup-overlay { position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
-    .popup-box { background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:400px;width:100%;text-align:center; }
-    .popup-box h3 { font-family:var(--font-pixel);font-size:.7rem;color:var(--danger);margin-bottom:.75rem; }
-    .popup-box p { font-size:.85rem;color:var(--text-dim);margin-bottom:1.5rem;line-height:1.6; }
-    .popup-actions { display:flex;gap:.75rem;justify-content:center; }
+    .sbox { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem; }
+    .sbox h2 { font-family:var(--font-pixel);font-size:.6rem;color:var(--text-dim);margin-bottom:1.25rem; }
+    .provider-note { background:var(--bg3);border-radius:6px;padding:.7rem 1rem;font-size:.78rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.5; }
+    .field-ok  { color:var(--neon);font-size:.78rem;margin-top:.4rem; }
+    .field-err { color:var(--danger);font-size:.78rem;margin-top:.4rem; }
     .btn-danger { background:var(--danger);color:#fff;border:none;border-radius:var(--radius);padding:.6rem 1.4rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:var(--font-body); }
 
-    .success-msg { color:var(--neon);font-size:.8rem;margin-top:.5rem;display:none; }
-    .form-error { color:var(--danger);font-size:.8rem;margin-top:.5rem;display:none; }
+    /* Avatar option in ajustes */
+    .avatar-picker { display:flex;gap:1rem;align-items:center;margin-bottom:1rem; }
+    .av-thumb { width:56px;height:56px;border-radius:50%;border:2px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s; }
+    .av-thumb:hover { transform:scale(1.08); }
+    .av-thumb.selected { border-color:var(--neon);box-shadow:0 0 10px rgba(57,255,20,.3); }
+    .av-thumb img { width:100%;height:100%;object-fit:cover; }
+
+    /* Delete popup */
+    .popup-overlay { position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
+    .popup-box { background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:380px;width:100%;text-align:center; }
+    .popup-box h3 { font-family:var(--font-pixel);font-size:.68rem;color:var(--danger);margin-bottom:.75rem; }
+    .popup-box p { font-size:.85rem;color:var(--text-dim);margin-bottom:1.5rem;line-height:1.6; }
+    .popup-actions { display:flex;gap:.75rem;justify-content:center; }
   </style>
 </head>
 <body>
-    <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
       <a href="comunidad.html">Soundbites</a>
@@ -42,39 +48,52 @@
     <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
-    <button class="hamburger" id="hamburger">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu"><div id="mobile-auth"></div></div>
 
   <main class="settings-page" id="settingsMain" style="display:none">
     <h1>Ajustes</h1>
 
-    <!-- CAMBIAR CONTRASEÑA -->
-    <div class="settings-box">
-      <h2>Seguridad — Contraseña</h2>
-      <div id="googleNote" class="provider-note" style="display:none">
-        Tu cuenta usa Google. Puedes añadir una contraseña adicional para entrar también con correo.
+    <!-- AVATAR -->
+    <div class="sbox">
+      <h2>Avatar</h2>
+      <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:1rem">Elige entre los avatares disponibles:</p>
+      <div class="avatar-picker">
+        <div class="av-thumb" data-avatar="avatar1" id="av-opt-1">
+          <img src="../assets/avatars/avatar1.png" alt="Avatar 1"/>
+        </div>
+        <div class="av-thumb" data-avatar="avatar2" id="av-opt-2">
+          <img src="../assets/avatars/avatar2.png" alt="Avatar 2"/>
+        </div>
       </div>
-      <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Mínimo 6 caracteres"/></div>
+      <div id="avatarOk" class="field-ok" style="display:none">Avatar guardado.</div>
+      <button class="btn-primary" id="saveAvatarBtn" style="margin-top:.5rem">Guardar avatar</button>
+    </div>
+
+    <!-- CONTRASEÑA -->
+    <div class="sbox">
+      <h2>Contraseña</h2>
+      <div id="googleNote" class="provider-note" style="display:none">
+        Tu cuenta usa Google. Puedes añadir una contraseña para entrar también con correo y contraseña.
+      </div>
+      <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Mínimo 8 caracteres"/></div>
       <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="confirmPass" placeholder="Repite la contraseña"/></div>
-      <div id="passError" class="form-error"></div>
-      <div id="passSuccess" class="success-msg">Contraseña actualizada correctamente.</div>
+      <div id="passErr" class="field-err" style="display:none"></div>
+      <div id="passOk"  class="field-ok" style="display:none">Contraseña actualizada.</div>
       <button class="btn-primary" id="savePassBtn" style="margin-top:.5rem">Guardar contraseña</button>
     </div>
 
     <!-- ELIMINAR CUENTA -->
-    <div class="settings-box">
+    <div class="sbox">
       <h2>Zona de peligro</h2>
-      <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Eliminar tu cuenta borrará todos tus soundbites, calificaciones y datos permanentemente. Esta acción no se puede deshacer.</p>
-      <button class="btn-danger" id="deleteAccountBtn">Eliminar mi cuenta</button>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Eliminar tu cuenta borrará todos tus datos permanentemente y no se puede deshacer.</p>
+      <button class="btn-danger" id="deleteBtn">Eliminar mi cuenta</button>
     </div>
   </main>
 
-  <!-- POPUP CONFIRMAR ELIMINAR -->
+  <!-- POPUP eliminar -->
   <div class="popup-overlay" id="deletePopup" style="display:none">
     <div class="popup-box">
-      <h3>Eliminar cuenta</h3>
-      <p>Perderás todos tus soundbites, calificaciones y datos de forma permanente. Se te enviará un correo de confirmación. ¿Estás seguro?</p>
+      <h3>¿Eliminar cuenta?</h3>
+      <p>Perderás todos tus soundbites, calificaciones y datos de forma permanente. Se te enviará un correo de confirmación.</p>
       <div class="popup-actions">
         <button class="btn-outline" id="cancelDelete">Cancelar</button>
         <button class="btn-danger" id="confirmDelete">Sí, eliminar</button>
@@ -85,81 +104,126 @@
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import {
-      onAuthStateChanged, updatePassword, EmailAuthProvider,
-      reauthenticateWithCredential, reauthenticateWithPopup,
-      GoogleAuthProvider, linkWithCredential, deleteUser, sendEmailVerification
+      onAuthStateChanged, updatePassword,
+      EmailAuthProvider, linkWithCredential,
+      deleteUser, sendEmailVerification, reauthenticateWithPopup, GoogleAuthProvider
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, deleteDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null;
-    let isGoogleUser = false;
+    let isGoogle = false;
+    let selectedAvatar = 'avatar1';
 
-    onAuthStateChanged(auth, user => {
-      if (!user) { window.location.href = 'login.html'; return; }
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
       currentUser = user;
       document.getElementById('settingsMain').style.display = 'block';
-      isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
-      if (isGoogleUser) document.getElementById('googleNote').style.display = 'block';
+      isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+      if (isGoogle) document.getElementById('googleNote').style.display = 'block';
+
+      // Cargar avatar actual
+      try {
+        const snap = await getDoc(doc(db, 'usuarios', user.uid));
+        if (snap.exists()) {
+          selectedAvatar = snap.data().avatar || 'avatar1';
+          markSelected(selectedAvatar);
+        }
+      } catch {}
     });
 
-    // ── CAMBIAR / AÑADIR CONTRASEÑA ──
+    // Avatar picker
+    function markSelected(name) {
+      document.querySelectorAll('.av-thumb').forEach(t =>
+        t.classList.toggle('selected', t.dataset.avatar === name));
+      selectedAvatar = name;
+    }
+    document.querySelectorAll('.av-thumb').forEach(t => {
+      t.addEventListener('click', () => markSelected(t.dataset.avatar));
+    });
+    document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
+      try {
+        await updateDoc(doc(db, 'usuarios', currentUser.uid), { avatar: selectedAvatar });
+        const ok = document.getElementById('avatarOk');
+        ok.style.display = 'block';
+        setTimeout(() => ok.style.display = 'none', 3000);
+      } catch { window.showToast && window.showToast('Error al guardar','error'); }
+    });
+
+    // Contraseña
     document.getElementById('savePassBtn').addEventListener('click', async () => {
-      const newPass = document.getElementById('newPass').value;
-      const confPass = document.getElementById('confirmPass').value;
-      const errEl = document.getElementById('passError');
-      const okEl  = document.getElementById('passSuccess');
+      const np = document.getElementById('newPass').value;
+      const cp = document.getElementById('confirmPass').value;
+      const errEl = document.getElementById('passErr');
+      const okEl  = document.getElementById('passOk');
       errEl.style.display = 'none'; okEl.style.display = 'none';
 
-      if (!newPass || !confPass) { errEl.textContent='Completa ambos campos.'; errEl.style.display='block'; return; }
-      if (newPass.length < 6)   { errEl.textContent='Mínimo 6 caracteres.'; errEl.style.display='block'; return; }
-      if (newPass !== confPass) { errEl.textContent='Las contraseñas no coinciden.'; errEl.style.display='block'; return; }
+      if (!np || !cp) { errEl.textContent='Completa ambos campos.'; errEl.style.display='block'; return; }
+      if (np.length < 8) { errEl.textContent='Mínimo 8 caracteres.'; errEl.style.display='block'; return; }
+      if (!/[0-9]/.test(np)) { errEl.textContent='Debe incluir al menos un número.'; errEl.style.display='block'; return; }
+      if (!/[a-zA-Z]/.test(np)) { errEl.textContent='Debe incluir al menos una letra.'; errEl.style.display='block'; return; }
+      if (np !== cp) { errEl.textContent='Las contraseñas no coinciden.'; errEl.style.display='block'; return; }
 
       try {
-        if (isGoogleUser) {
-          // Para usuarios de Google: vincular credencial de email
-          const cred = EmailAuthProvider.credential(currentUser.email, newPass);
+        if (isGoogle) {
+          const cred = EmailAuthProvider.credential(currentUser.email, np);
           await linkWithCredential(currentUser, cred);
         } else {
-          // Re-autenticar si ya tiene contraseña
-          await updatePassword(currentUser, newPass);
+          await updatePassword(currentUser, np);
         }
         okEl.style.display = 'block';
         document.getElementById('newPass').value = '';
         document.getElementById('confirmPass').value = '';
       } catch (e) {
-        if (e.code === 'auth/requires-recent-login') {
-          errEl.textContent = 'Por seguridad, cierra sesión, vuelve a entrar y repite esta acción.';
-        } else if (e.code === 'auth/provider-already-linked') {
-          // Ya tiene contraseña, actualizar directamente
-          try { await updatePassword(currentUser, newPass); okEl.style.display='block'; } catch {}
+        if (e.code === 'auth/provider-already-linked') {
+          // Ya tiene email, actualizar directamente
+          try { await updatePassword(currentUser, np); okEl.style.display='block'; } catch(e2) {
+            errEl.textContent = e2.code === 'auth/requires-recent-login'
+              ? 'Por seguridad, cierra sesión, vuelve a entrar y repite.' : e2.message;
+            errEl.style.display = 'block';
+          }
+        } else if (e.code === 'auth/requires-recent-login') {
+          errEl.textContent = 'Por seguridad, cierra sesión, vuelve a entrar y repite.';
+          errEl.style.display = 'block';
         } else {
-          errEl.textContent = 'Error: ' + e.message;
+          errEl.textContent = e.message;
+          errEl.style.display = 'block';
         }
-        errEl.style.display = 'block';
       }
     });
 
-    // ── ELIMINAR CUENTA ──
-    document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+    // Eliminar cuenta
+    document.getElementById('deleteBtn').addEventListener('click', () => {
       document.getElementById('deletePopup').style.display = 'flex';
     });
     document.getElementById('cancelDelete').addEventListener('click', () => {
       document.getElementById('deletePopup').style.display = 'none';
     });
     document.getElementById('confirmDelete').addEventListener('click', async () => {
+      document.getElementById('confirmDelete').textContent = 'Eliminando...';
+      document.getElementById('confirmDelete').disabled = true;
       try {
+        // Re-autenticar si es Google
+        if (isGoogle) {
+          await reauthenticateWithPopup(currentUser, new GoogleAuthProvider());
+        }
         const uid = currentUser.uid;
-        // Borrar datos de Firestore
-        await deleteDoc(doc(db,'usuarios',uid));
+        const email = currentUser.email;
+        // Borrar datos Firestore
+        await deleteDoc(doc(db, 'usuarios', uid));
         // Eliminar cuenta
         await deleteUser(currentUser);
-        window.location.href = '../index.html';
+        // Redirigir con mensaje
+        window.location.href = ROOT + '/index.html?deleted=1';
       } catch (e) {
         document.getElementById('deletePopup').style.display = 'none';
-        if (e.code === 'auth/requires-recent-login') {
-          window.showToast && window.showToast('Por seguridad, cierra sesión y vuelve a entrar antes de eliminar.','error');
+        document.getElementById('confirmDelete').textContent = 'Sí, eliminar';
+        document.getElementById('confirmDelete').disabled = false;
+        if (e.code === 'auth/requires-recent-login' || e.code === 'auth/user-token-expired') {
+          window.showToast && window.showToast('Por seguridad, cierra sesión, vuelve a entrar e intenta de nuevo.', 'error');
         } else {
-          window.showToast && window.showToast('Error al eliminar: ' + e.message,'error');
+          window.showToast && window.showToast('Error: ' + e.message, 'error');
         }
       }
     });
