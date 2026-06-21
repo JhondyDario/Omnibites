@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registro — Omnibites</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
-    <div class="nav-links"><a href="explorar.html">Explorar</a><div id="nav-auth"></div></div>
+    <div class="nav-links">
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html">Explorar música</a>
+      <a href="subir.html">Crear Soundbite</a>
+      <div id="nav-auth"></div>
+    </div>
     <button class="hamburger" id="hamburger">&#9776;</button>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
+  </div>
 
   <main class="form-page">
     <div class="form-card">
-      <h1>🎮 Crear cuenta</h1>
+      <h1>Crear cuenta</h1>
       <p>Únete a la comunidad retro de Omnibites</p>
 
       <button class="btn-google" id="googleBtn">
@@ -26,81 +35,94 @@
         Registrarse con Google
       </button>
 
-      <div class="divider"><span>o con tu correo</span></div>
-
-      <div id="errorMsg" style="display:none;color:var(--danger);font-size:0.8rem;margin-bottom:1rem;padding:0.6rem;background:rgba(255,68,68,0.1);border-radius:4px;"></div>
+      <div class="divider"><span>o con correo</span></div>
+      <div id="errMsg" class="form-error"></div>
 
       <div class="form-group">
         <label>Nombre de jugador</label>
-        <input type="text" id="nombre" placeholder="RetroPlayer99" />
+        <input type="text" id="nombre" placeholder="RetroPlayer99"/>
       </div>
       <div class="form-group">
         <label>Correo electrónico</label>
-        <input type="email" id="email" placeholder="tu@correo.com" />
+        <input type="email" id="email" placeholder="tu@correo.com"/>
       </div>
       <div class="form-group">
-        <label>Contraseña (mínimo 6 caracteres)</label>
-        <input type="password" id="password" placeholder="••••••••" />
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="Mínimo 8 caracteres" oninput="checkPass(this.value)"/>
+        <ul class="pass-rules">
+          <li id="rule-len">Mínimo 8 caracteres</li>
+          <li id="rule-num">Al menos 1 número</li>
+          <li id="rule-let">Al menos 1 letra</li>
+        </ul>
       </div>
 
       <button class="btn-primary form-submit" id="registerBtn">Crear cuenta</button>
-      <p class="form-alt">¿Ya tienes cuenta? <a href="login.html">Entra aquí</a></p>
+      <p class="form-alt">¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
     </div>
   </main>
 
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
-    import {
-      createUserWithEmailAndPassword,
-      updateProfile,
-      GoogleAuthProvider,
-      signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, setDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const showError = (msg) => {
-      const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.style.display = 'block';
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+
+    window.checkPass = function(val) {
+      document.getElementById('rule-len').className = val.length >= 8 ? 'ok' : '';
+      document.getElementById('rule-num').className = /[0-9]/.test(val) ? 'ok' : '';
+      document.getElementById('rule-let').className = /[a-zA-Z]/.test(val) ? 'ok' : '';
     };
 
-    async function guardarUsuario(user, nombre) {
-      await setDoc(doc(db, 'usuarios', user.uid), {
+    function showErr(msg) { const e=document.getElementById('errMsg'); e.textContent=msg; e.style.display='block'; }
+
+    function validatePass(val) {
+      if (val.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+      if (!/[0-9]/.test(val)) return 'La contraseña debe contener al menos 1 número.';
+      if (!/[a-zA-Z]/.test(val)) return 'La contraseña debe contener al menos 1 letra.';
+      return null;
+    }
+
+    async function saveUser(user, nombre) {
+      await setDoc(doc(db,'usuarios',user.uid), {
         nombre: nombre || user.displayName || 'Jugador',
         email: user.email,
-        avatar: user.photoURL || '',
+        avatar: 'avatar1',
         creadoEn: serverTimestamp(),
         audiosSubidos: 0
-      });
+      }, { merge: true });
     }
 
     document.getElementById('registerBtn').addEventListener('click', async () => {
-      const nombre   = document.getElementById('nombre').value.trim();
-      const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      if (!nombre || !email || !password) return showError('Completa todos los campos.');
-      if (password.length < 6) return showError('La contraseña debe tener al menos 6 caracteres.');
+      const nombre = document.getElementById('nombre').value.trim();
+      const email  = document.getElementById('email').value.trim();
+      const pass   = document.getElementById('password').value;
+      if (!nombre || !email || !pass) return showErr('Completa todos los campos.');
+      const passErr = validatePass(pass);
+      if (passErr) return showErr(passErr);
       try {
-        const { user } = await createUserWithEmailAndPassword(auth, email, password);
+        const { user } = await createUserWithEmailAndPassword(auth, email, pass);
         await updateProfile(user, { displayName: nombre });
-        await guardarUsuario(user, nombre);
-        window.location.href = '../index.html';
+        await saveUser(user, nombre);
+        await sendEmailVerification(user);
+        window.location.href = ROOT + '/index.html';
       } catch (e) {
-        if (e.code === 'auth/email-already-in-use') showError('Ese correo ya está registrado.');
-        else showError('Error al crear la cuenta. Inténtalo de nuevo.');
+        if (e.code === 'auth/email-already-in-use') showErr('Ese correo ya está registrado.');
+        else showErr('Error: ' + e.message);
       }
     });
 
     document.getElementById('googleBtn').addEventListener('click', async () => {
       try {
         const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
-        await guardarUsuario(user, user.displayName);
-        window.location.href = '../index.html';
-      } catch {
-        showError('Error al registrarse con Google.');
-      }
+        await saveUser(user, user.displayName);
+        window.location.href = ROOT + '/index.html';
+      } catch (e) { showErr('Error con Google: ' + e.message); }
     });
   </script>
+  <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
 </body>
 </html>
