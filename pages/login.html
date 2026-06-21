@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Entrar — Omnibites</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="explorar.html">Explorar</a>
+      <a href="comunidad.html">Soundbites</a>
+      <a href="explorar.html">Explorar música</a>
+      <a href="subir.html">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
     <button class="hamburger" id="hamburger">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="explorar.html">Explorar</a>
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
   </div>
 
   <main class="form-page">
     <div class="form-card">
-      <h1>👾 Entrar</h1>
+      <h1>Entrar</h1>
       <p>Bienvenido de nuevo a Omnibites</p>
 
       <button class="btn-google" id="googleBtn">
@@ -32,60 +35,43 @@
         Continuar con Google
       </button>
 
-      <div class="divider"><span>o con tu correo</span></div>
+      <div class="divider"><span>o con correo</span></div>
+      <div id="errMsg" class="form-error"></div>
 
-      <div id="errorMsg" style="display:none;color:var(--danger);font-size:0.8rem;margin-bottom:1rem;padding:0.6rem;background:rgba(255,68,68,0.1);border-radius:4px;"></div>
-
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="email" placeholder="tu@correo.com" />
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="password" placeholder="••••••••" />
-      </div>
+      <div class="form-group"><label>Correo</label><input type="email" id="email" placeholder="tu@correo.com"/></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" id="password" placeholder="••••••••"/></div>
 
       <button class="btn-primary form-submit" id="loginBtn">Entrar</button>
-
-      <p class="form-alt">¿No tienes cuenta? <a href="registro.html">Regístrate gratis</a></p>
+      <p class="form-alt">¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
     </div>
   </main>
 
   <script type="module">
     import { auth } from '../js/firebase-config.js';
-    import {
-      signInWithEmailAndPassword,
-      GoogleAuthProvider,
-      signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const showError = (msg) => {
-      const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.style.display = 'block';
-    };
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    const showErr = msg => { const e=document.getElementById('errMsg'); e.textContent=msg; e.style.display='block'; };
 
     document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      if (!email || !password) return showError('Completa todos los campos.');
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('password').value;
+      if (!email || !pass) return showErr('Completa todos los campos.');
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = '../index.html';
-      } catch (e) {
-        showError('Correo o contraseña incorrectos.');
-      }
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.href = ROOT + '/index.html';
+      } catch { showErr('Correo o contraseña incorrectos.'); }
     });
 
     document.getElementById('googleBtn').addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
-        window.location.href = '../index.html';
-      } catch (e) {
-        showError('Error al iniciar con Google.');
-      }
+        window.location.href = ROOT + '/index.html';
+      } catch (e) { showErr('Error con Google: ' + e.message); }
     });
   </script>
+  <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
 </body>
 </html>
