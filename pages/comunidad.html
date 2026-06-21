@@ -55,14 +55,24 @@
   </style>
 </head>
 <body>
-  <nav class="navbar">
+    <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="comunidad.html" style="color:var(--neon)">Soundbites</a>
+      <a href="comunidad.html">Soundbites</a>
       <a href="explorar.html">Explorar música</a>
       <a href="subir.html">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Soundbites</a>
+    <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
+    <div id="mobile-auth"></div>
+  </div>
+
+</div>
     <button class="hamburger" id="hamburger">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -84,41 +94,57 @@
   <div class="filters">
     <div class="filter-group">
       <label>Consola:</label>
-      <div class="consoles-filter" id="consolaFilter">
-        <span class="chip active" data-val="">Todas</span>
-        <span class="chip" data-val="NES">NES</span>
-        <span class="chip" data-val="SNES">SNES</span>
-        <span class="chip" data-val="N64">N64</span>
-        <span class="chip" data-val="GBA">Game Boy</span>
-        <span class="chip" data-val="GameCube">GameCube</span>
-        <span class="chip" data-val="Wii">Wii</span>
-        <span class="chip" data-val="WiiU">Wii U</span>
-        <span class="chip" data-val="3DS">3DS</span>
-        <span class="chip" data-val="Switch">Switch</span>
-        <span class="chip" data-val="PS1">PS1</span>
-        <span class="chip" data-val="PS2">PS2</span>
-        <span class="chip" data-val="PS3">PS3</span>
-        <span class="chip" data-val="PS4">PS4</span>
-        <span class="chip" data-val="PSP">PSP</span>
-        <span class="chip" data-val="Genesis">Sega</span>
-        <span class="chip" data-val="Dreamcast">Dreamcast</span>
-        <span class="chip" data-val="Xbox360">Xbox 360</span>
-        <span class="chip" data-val="Arcade">Arcade</span>
-        <span class="chip" data-val="PC">PC</span>
-      </div>
+      <select id="consolaFilter">
+        <option value="">Todas las consolas</option>
+        <optgroup label="Nintendo">
+          <option value="NES">NES / Famicom</option>
+          <option value="SNES">Super Nintendo (SNES)</option>
+          <option value="N64">Nintendo 64</option>
+          <option value="GBA">Game Boy / GBA / DS</option>
+          <option value="GameCube">GameCube</option>
+          <option value="Wii">Wii</option>
+          <option value="WiiU">Wii U</option>
+          <option value="3DS">Nintendo 3DS</option>
+          <option value="Switch">Nintendo Switch</option>
+        </optgroup>
+        <optgroup label="PlayStation">
+          <option value="PS1">PlayStation 1</option>
+          <option value="PS2">PlayStation 2</option>
+          <option value="PS3">PlayStation 3</option>
+          <option value="PS4">PlayStation 4</option>
+          <option value="PSP">PSP / PS Vita</option>
+        </optgroup>
+        <optgroup label="Sega">
+          <option value="MasterSystem">Sega Master System</option>
+          <option value="Genesis">Sega Genesis / Mega Drive</option>
+          <option value="Saturn">Sega Saturn</option>
+          <option value="Dreamcast">Sega Dreamcast</option>
+        </optgroup>
+        <optgroup label="Xbox">
+          <option value="Xbox">Xbox Original</option>
+          <option value="Xbox360">Xbox 360</option>
+        </optgroup>
+        <optgroup label="Otros">
+          <option value="Arcade">Arcade</option>
+          <option value="AtariPNG">Atari</option>
+          <option value="Neo-Geo">Neo Geo</option>
+          <option value="PC">PC / DOS</option>
+          <option value="Otra">Otra</option>
+        </optgroup>
+      </select>
     </div>
     <div class="filter-group" style="margin-left:auto">
       <label>Categoría:</label>
       <select id="catFilter">
-        <option value="">Todas</option>
-        <option value="ost">OST</option>
-        <option value="soundtrack">Soundtrack</option>
-        <option value="bgm">BGM</option>
-        <option value="tema-batalla">Tema de batalla</option>
-        <option value="tema-titulo">Tema de título</option>
-        <option value="tema-creditos">Créditos</option>
-        <option value="personalizado">Personalizado</option>
-      </select>
+          <option value="">Todas las categorías</option>
+          <option value="orquestal">Orquestal e Instrumental</option>
+          <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+          <option value="rock-metal">Rock, Metal e Industrial</option>
+          <option value="jazz">Jazz y Dark Jazz / Noir</option>
+          <option value="hibrido">Soundtracks Híbridos</option>
+          <option value="licenciada">Música Licenciada</option>
+        </select>
     </div>
     <div class="filter-group">
       <label>Ordenar:</label>
@@ -329,14 +355,7 @@
     document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')render();});
     document.getElementById('catFilter').addEventListener('change',e=>{activeCat=e.target.value;render();});
     document.getElementById('sortFilter').addEventListener('change',e=>{activeSort=e.target.value;render();});
-    document.querySelectorAll('#consolaFilter .chip').forEach(chip=>{
-      chip.addEventListener('click',()=>{
-        document.querySelectorAll('#consolaFilter .chip').forEach(c=>c.classList.remove('active'));
-        chip.classList.add('active');
-        activeConsola=chip.dataset.val;
-        render();
-      });
-    });
+    document.getElementById('consolaFilter')?.addEventListener('change',e=>{activeConsola=e.target.value;render();});
 
     loadSoundbites();
   </script>
