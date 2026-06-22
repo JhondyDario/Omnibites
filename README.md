@@ -39,6 +39,8 @@ La música de los videojuegos es parte de la cultura popular y merece su propio 
 
 Omnibites nació para preservar esa música y hacerla accesible de una forma que ninguna otra plataforma ofrece hoy.
 
+[![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
+
 ---
 
 > [!NOTE]
