@@ -230,7 +230,6 @@
   </style>
 </head>
 <body>
-
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
@@ -239,7 +238,7 @@
       <a href="subir.html">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
-    <button class="hamburger" id="hamburger">&#9776;</button>
+    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
     <a href="comunidad.html">Soundbites</a>
@@ -247,32 +246,16 @@
     <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
-    <button class="hamburger" id="hamburger">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Subir Audio</a>
-  </div>
 
   <!-- BÚSQUEDA -->
   <div class="search-section">
-    <h1>🔍 Buscar Audios</h1>
+    <h1>Buscar música</h1>
     <div class="search-bar">
       <input type="text" id="searchInput"
         placeholder="Ej: Star Fox Assault, Zelda, Mario Kart..." />
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
-    <div id="searchHints">
-      <p class="search-hint">
-        Prueba con:
-        <span onclick="quickSearch('Star Fox Assault')">Star Fox: Assault</span>
-        <span onclick="quickSearch('Super Mario World')">Super Mario World</span>
-        <span onclick="quickSearch('Zelda Ocarina of Time')">Zelda: Ocarina of Time</span>
-        <span onclick="quickSearch('Sonic the Hedgehog')">Sonic the Hedgehog</span>
-        <span onclick="quickSearch('Metroid Prime')">Metroid Prime</span>
-        <span onclick="quickSearch('F-Zero GX')">F-Zero GX</span>
-      </p>
-    </div>
+
   </div>
 
   <!-- RESULTADOS -->
@@ -523,7 +506,7 @@
             </button>
             <a class="btn-sm btn-sm-outline"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
-              🗄️ Archive.org
+              Fuente del audio
             </a>
           </div>
         </div>
@@ -683,7 +666,8 @@
 
         const album = unescape(albumEsc);
         const title = unescape(titleEsc);
-        const filename = `${cleanAlbumForFilename(album)} - ${title} [Omnibites].mp3`
+        // Use album (game name) as primary identifier
+        const filename = `${cleanAlbumForFilename(album)} [Omnibites].mp3`
           .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
 
         const a = document.createElement('a');
@@ -821,6 +805,9 @@
       const q = document.getElementById('searchInput').value.trim();
       if (!q) return;
       stopActive();
+      // Hide hints after first search
+      const hints = document.getElementById('searchHints');
+      if (hints) hints.style.display = 'none';
       document.getElementById('relatedWrap').style.display = 'none';
       searchArchive(q);
     }
