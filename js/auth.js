@@ -4,63 +4,66 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc }
+import { doc, getDoc, setDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
 function goto(path) { window.location.href = ROOT + path; }
 
 onAuthStateChanged(auth, async user => {
-  // Cargar nombre y avatar desde Firestore si hay sesión
-  let firestoreNombre = null;
-  let firestoreAvatar = null;
+  let nombre = null;
+  let avatar = null;
+
   if (user) {
     try {
-      const snap = await getDoc(doc(db, 'usuarios', user.uid));
+      const ref  = doc(db, 'usuarios', user.uid);
+      const snap = await getDoc(ref);
+
       if (snap.exists()) {
-        firestoreNombre = snap.data().nombre || null;
-        firestoreAvatar = snap.data().avatar || null;
+        nombre = snap.data().nombre || null;
+        avatar = snap.data().avatar || null;
+      } else {
+        // Documento no existe (cuenta recreada o nuevo usuario de Google)
+        // Crearlo automáticamente
+        const newData = {
+          nombre:        user.displayName || user.email?.split('@')[0] || 'Jugador',
+          email:         user.email || '',
+          avatar:        'avatar1',
+          creadoEn:      serverTimestamp(),
+          audiosSubidos: 0
+        };
+        await setDoc(ref, newData);
+        nombre = newData.nombre;
+        avatar = 'avatar1';
       }
-    } catch {}
+    } catch (e) {
+      console.warn('Firestore read error:', e.message);
+    }
   }
-  renderNav(user, firestoreNombre, firestoreAvatar);
-  renderMobile(user, firestoreNombre);
+
+  renderNav(user, nombre, avatar);
+  renderMobile(user, nombre);
 });
 
 function renderNav(user, nombre, avatar) {
   const el = document.getElementById('nav-auth');
   if (!el) return;
+
   if (user) {
     const name    = nombre || user.displayName || user.email || 'Jugador';
     const initial = name.charAt(0).toUpperCase();
-    // Avatar: prioridad al de Firestore (PNG), si no hay usa inicial
     const avatarHTML = avatar
-      ? `<img class="nav-avatar" src="${ROOT}/assets/avatars/${avatar}.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"  /><div class="nav-avatar-fallback" style="display:none">${initial}</div>`
+      ? `<img class="nav-avatar" src="${ROOT}/assets/avatars/${avatar}.png" alt=""
+            onerror="this.style.display='none';document.getElementById('nav-av-fb').style.display='flex'"/>
+         <div class="nav-avatar-fallback" id="nav-av-fb" style="display:none">${initial}</div>`
       : `<div class="nav-avatar-fallback">${initial}</div>`;
 
+    // Click en nombre/avatar → ir a perfil directamente (sin dropdown)
     el.innerHTML = `
-      <div class="nav-user-btn" id="userMenuBtn">
+      <a href="${ROOT}/pages/perfil.html" class="nav-user-btn" style="text-decoration:none">
         ${avatarHTML}
         <span class="nav-user-name">${name.split(' ')[0]}</span>
-        <span class="nav-caret">▾</span>
-        <div class="user-dropdown" id="userDropdown">
-          <a href="${ROOT}/pages/perfil.html">Mi perfil</a>
-          <hr/>
-          <button id="logoutBtn">Cerrar sesión</button>
-        </div>
-      </div>`;
-
-    document.getElementById('userMenuBtn').addEventListener('click', e => {
-      e.stopPropagation();
-      document.getElementById('userDropdown').classList.toggle('open');
-    });
-    document.addEventListener('click', () =>
-      document.getElementById('userDropdown')?.classList.remove('open'));
-    document.getElementById('logoutBtn').addEventListener('click', async e => {
-      e.stopPropagation();
-      await signOut(auth);
-      goto('/index.html');
-    });
+      </a>`;
   } else {
     el.innerHTML = `<a href="${ROOT}/pages/login.html" class="nav-login-btn">Entrar</a>`;
   }
@@ -69,6 +72,7 @@ function renderNav(user, nombre, avatar) {
 function renderMobile(user, nombre) {
   const el = document.getElementById('mobile-auth');
   if (!el) return;
+
   if (user) {
     const name = nombre || user.displayName || user.email || 'Jugador';
     el.innerHTML = `
