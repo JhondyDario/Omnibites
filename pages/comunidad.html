@@ -55,7 +55,7 @@
   </style>
 </head>
 <body>
-    <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
       <a href="comunidad.html">Soundbites</a>
@@ -72,18 +72,8 @@
     <div id="mobile-auth"></div>
   </div>
 
-</div>
-    <button class="hamburger" id="hamburger">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
-    <div id="mobile-auth"></div>
-  </div>
-
   <div class="com-header">
-    <h1>🎮 Soundbites de la Comunidad</h1>
+    <h1>Soundbites de la Comunidad</h1>
     <div class="com-search">
       <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."/>
       <button class="btn-primary" id="searchBtn">Buscar</button>
@@ -204,7 +194,7 @@
 
       const grid = document.getElementById('sbGrid');
       if (items.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><div class="e-icon">🎮</div><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">¡Sube el primero!</a></div>';
+        grid.innerHTML = '<div class="empty-state"><div class="e-icon"></div><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">¡Sube el primero!</a></div>';
         return;
       }
       grid.innerHTML = items.map(a => sbCardHTML(a)).join('');
