@@ -28,7 +28,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 
 /* ── NAVBAR ── */
 .navbar {
-  position: sticky; top: 0; z-index: 100;
+  position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 1.5rem; height: 60px;
   background: rgba(10,10,15,0.95); backdrop-filter: blur(10px);
@@ -78,7 +78,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 }
 .user-dropdown.open { display: block; opacity: 1; transform: translateY(0); }
 .user-dropdown a, .user-dropdown button {
-  display: block; width: 100%; padding: 0.55rem 1rem;
+  display: block; width: 100%; padding: 0.6rem 1rem;
   font-size: 0.82rem; color: var(--text-dim); text-decoration: none;
   background: none; border: none; text-align: left; cursor: pointer;
   font-family: var(--font-body); transition: background 0.15s, color 0.15s;
