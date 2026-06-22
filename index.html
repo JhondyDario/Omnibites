@@ -72,34 +72,26 @@
         <div class="cc-glow"></div>
         <div class="cc-icon">⭐</div>
         <h3>Escucha y Califica</h3>
-        <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación.</p>
-        <div class="cc-expand" id="expand-rate" style="display:none">
-          <ul style="margin:.75rem 0 .75rem 1rem;font-size:.82rem;color:var(--text-dim);line-height:1.9">
-            <li>Busca por consola, categoría o nombre del juego</li>
-            <li>Preview de 15 segundos con fade in / fade out automático</li>
-            <li>Califica de 1 a 5 estrellas cada soundbite</li>
-            <li>Descarga en MP3 cualquier clip que te guste</li>
-          </ul>
+        <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación. Busca por consola, categoría o nombre del juego, califica de 1 a 5 estrellas y descarga en MP3 los que más te gusten.</p>
+        <div class="cc-tags">
+          <span>Preview 15s con fade</span>
+          <span>Sistema de estrellas</span>
+          <span>Descarga en MP3</span>
         </div>
-        <button class="cc-more-btn" onclick="toggleExpand('rate')">Ver más ▾</button>
-        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate" style="margin-top:.75rem">Ver Soundbites →</a>
+        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate">Ver Soundbites →</a>
       </div>
       <div class="community-card upload-card">
         <div class="cc-glow cc-glow-purple"></div>
         <div class="cc-icon">✂️</div>
         <h3>Crea y Comparte</h3>
-        <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro.</p>
-        <div class="cc-expand" id="expand-crear" style="display:none">
-          <ul style="margin:.75rem 0 .75rem 1rem;font-size:.82rem;color:var(--text-dim);line-height:1.9">
-            <li>Busca el soundtrack en Archive.org desde el explorador</li>
-            <li>Define el segundo exacto de inicio y fin del clip</li>
-            <li>El soundbite se exporta en MP3 de 15 segundos con fade</li>
-            <li>Publícalo y recibe calificaciones de la comunidad</li>
-          </ul>
+        <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro. Busca el soundtrack en Archive.org, define el segundo exacto de inicio y fin, y publícalo para que todos lo escuchen.</p>
+        <div class="cc-tags">
+          <span>Desde Archive.org</span>
+          <span>Recorte exacto</span>
+          <span>MP3 con fade automático</span>
         </div>
-        <button class="cc-more-btn" onclick="toggleExpand('crear')">Ver más ▾</button>
-        <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap;justify-content:center">
-          <a href="pages/explorar.html" class="cc-btn" style="background:var(--bg3);color:var(--neon);border:1px solid var(--neon)">Explorar música</a>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center">
+          <a href="pages/explorar.html" class="cc-btn cc-btn-rate" style="background:transparent;border:2px solid var(--gold);color:var(--gold)">Explorar música</a>
           <a href="pages/subir.html" class="cc-btn cc-btn-upload">Crear Soundbite →</a>
         </div>
       </div>
@@ -126,24 +118,14 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
-      <span class="logo">OMNI<span>BITES</span></span>
       <p>Hecho con amor para la comunidad retro</p>
       <div class="footer-links">
         <a href="#">Sobre el proyecto</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
       </div>
+      <span class="logo">OMNI<span>BITES</span></span>
     </div>
   </footer>
-
-  <script>
-    function toggleExpand(id) {
-      const el = document.getElementById('expand-' + id);
-      const btn = el.previousElementSibling;
-      const open = el.style.display === 'block';
-      el.style.display = open ? 'none' : 'block';
-      btn.textContent = open ? 'Ver más ▾' : 'Ver menos ▴';
-    }
-  </script>
   <script>
     // Mostrar mensaje si cuenta fue eliminada
     if (new URLSearchParams(location.search).get('deleted')) {
