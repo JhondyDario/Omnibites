@@ -48,14 +48,15 @@
     <div class="nav-links">
       <a href="comunidad.html">Soundbites</a>
       <a href="explorar.html">Explorar música</a>
-      <a href="subir.html" style="color:var(--neon)">Crear Soundbite</a>
+      <a href="subir.html" class="active">Crear Soundbite</a>
       <div id="nav-auth"></div>
     </div>
-    <button class="hamburger" id="hamburger">&#9776;</button>
+    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
     <a href="comunidad.html">Soundbites</a>
     <a href="explorar.html">Explorar música</a>
+    <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
 
@@ -74,7 +75,7 @@
 
   <!-- FORMULARIO (se muestra solo con sesión) -->
   <main id="mainForm" class="editor-page" style="display:none">
-    <h1>✂️ Crear Soundbite</h1>
+    <h1>Crear Soundbite</h1>
 
     <!-- PASO 1: FUENTE DEL AUDIO -->
     <div class="editor-box" style="margin-bottom:1.5rem">
@@ -86,16 +87,14 @@
 
       <!-- TAB: URL -->
       <div class="tab-panel active" id="tab-url">
-        <div class="source-chips" style="margin-bottom:.75rem">
-          <span class="source-chip" onclick="setUrlExample('archive')">Archive.org</span>
-          <span class="source-chip" onclick="setUrlExample('soundcloud')">SoundCloud</span>
-          <span class="source-chip" onclick="setUrlExample('directo')">Enlace directo MP3</span>
-        </div>
         <div class="url-wrap">
           <input type="url" id="audioUrl" class="form-group input" placeholder="https://archive.org/download/..."/>
           <button class="btn-primary" id="loadBtn">Cargar</button>
         </div>
-        <p style="font-size:.72rem;color:var(--text-dim);margin-top:.5rem">Recomendamos <a href="explorar.html" style="color:var(--neon)">Explorar música</a> — busca y usa "Compartir en Omnibites" para rellenar esto automáticamente.</p>
+        <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.7">
+          Fuentes compatibles: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong>, <strong style="color:var(--text)">VGMdownloads</strong>, <strong style="color:var(--text)">SoundCloud</strong> o cualquier enlace directo que termine en .mp3 o .ogg.<br/>
+          Lo más fácil: usa <a href="explorar.html" style="color:var(--neon);font-weight:600">Explorar música</a> y pulsa "Compartir en Omnibites".
+        </p>
         <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
       </div>
 
@@ -221,14 +220,6 @@
         document.getElementById('mainForm').style.display = 'none';
       }
     });
-
-    // ── EJEMPLOS URL ──
-    window.setUrlExample = function(tipo) {
-      const e = {
-        archive:    'https://archive.org/download/SuperMarioWorldSoundtrack/01-Title_Theme.mp3',
-        soundcloud: 'https://soundcloud.com/usuario/nombre-de-la-pista',
-        directo:    'https://ejemplo.com/audio.mp3'
-      };
       document.getElementById('audioUrl').value = e[tipo] || '';
       document.getElementById('audioUrl').focus();
     };
