@@ -43,19 +43,22 @@ function animCount(id, target) {
 }
 
 async function loadStats() {
+  // Show 0 immediately while loading
+  ['stat-audios','stat-juegos','stat-usuarios'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = '0';
+  });
   try {
     const [aSnap, uSnap] = await Promise.all([
       getDocs(collection(db, 'audios')),
       getDocs(collection(db, 'usuarios'))
     ]);
-    const juegos = new Set(aSnap.docs.map(d => d.data().juego)).size;
+    const juegos = new Set(aSnap.docs.map(d => d.data().juego).filter(Boolean)).size;
     animCount('stat-audios',   aSnap.size);
     animCount('stat-juegos',   juegos);
     animCount('stat-usuarios', uSnap.size);
-  } catch {
-    ['stat-audios','stat-juegos','stat-usuarios'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.textContent = '0';
-    });
+  } catch(e) {
+    console.error('Stats error:', e);
+    // Leave at 0 - means Firestore rules may need updating
   }
 }
 
