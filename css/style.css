@@ -60,8 +60,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   padding: 0.28rem 0.85rem 0.28rem 0.35rem;
   cursor: pointer; color: var(--text); font-size: 0.82rem; font-weight: 500;
   font-family: var(--font-body); transition: border-color var(--transition);
+  text-decoration: none;
 }
-.nav-user-btn:hover { border-color: var(--neon); }
+.nav-user-btn:hover { border-color: var(--neon); color: var(--text); }
 .nav-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg3); }
 .nav-avatar-fallback { width: 26px; height: 26px; border-radius: 50%; background: var(--neon); color: #000; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .nav-user-name { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
