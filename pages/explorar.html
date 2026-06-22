@@ -476,7 +476,7 @@
                 <span>🎮</span>${item.album}
                 ${item.year ? `· ${item.year}` : ''}
                 · ${item.duration}
-                <span class="fade-badge" style="margin-left:0.4rem">♫ Fade 15s</span>
+                <span class="fade-badge" style="margin-left:0.4rem">Fade 15s</span>
               </div>
             </div>
           </div>
@@ -533,7 +533,7 @@
       // Detener lo que estaba sonando
       stopActive();
 
-      btn.textContent = '⏳';
+      btn.textContent = '...';
       btn.disabled = true;
 
       try {
@@ -579,7 +579,7 @@
         activeGain   = gain;
         activeCard   = idx;
 
-        btn.textContent = '⏸';
+        btn.textContent = '||';
         btn.classList.add('playing');
         btn.disabled = false;
 
@@ -632,7 +632,7 @@
     // ── DESCARGAR CLIP DE 15s EN MP3 ──────────────────────────────
     window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
       const btn = document.getElementById(`dlBtn-${idx}`);
-      btn.textContent = '⏳ Convirtiendo...';
+      btn.textContent = '... Convirtiendo...';
       btn.classList.add('loading');
       try {
         const ctx = getAudioCtx();
@@ -676,11 +676,11 @@
         a.click();
         URL.revokeObjectURL(a.href);
 
-        btn.textContent = '✅ ¡Listo!';
+        btn.textContent = ' ¡Listo!';
         setTimeout(() => { btn.textContent = '⬇️ MP3'; btn.classList.remove('loading'); }, 3000);
       } catch (e) {
         console.error(e);
-        btn.textContent = '❌ Error';
+        btn.textContent = '✕ Error';
         btn.classList.remove('loading');
         setTimeout(() => { btn.textContent = '⬇️ MP3'; }, 2500);
       }
