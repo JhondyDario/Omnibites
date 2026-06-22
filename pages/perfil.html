@@ -7,32 +7,34 @@
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .profile-page { max-width:680px;margin:0 auto;padding:2.5rem 1.5rem; }
+    .profile-page { max-width:660px;margin:0 auto;padding:2.5rem 1.5rem; }
     .profile-page h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem; }
 
-    .verify-banner { background:rgba(255,215,0,.08);border:1px solid var(--gold);border-radius:8px;padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap; }
+    .verify-banner {
+      background:rgba(255,215,0,.08);border:1px solid var(--gold);border-radius:8px;
+      padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;
+      gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;
+    }
     .verify-banner p { font-size:.8rem;color:var(--gold);margin:0; }
     .verify-banner button { background:var(--gold);color:#000;border:none;border-radius:var(--radius);padding:.38rem .9rem;font-size:.75rem;font-weight:700;cursor:pointer; }
 
-    /* Avatar clickable */
-    .avatar-wrap { position:relative;width:96px;height:96px;margin:0 auto 1.5rem;cursor:pointer; }
+    .avatar-wrap { position:relative;width:96px;height:96px;margin:0 auto 1.25rem;cursor:pointer; }
     .avatar-wrap img { width:100%;height:100%;border-radius:50%;border:3px solid var(--neon);object-fit:cover;display:block; }
-    .avatar-wrap .avatar-fallback { width:100%;height:100%;border-radius:50%;border:3px solid var(--neon);background:var(--neon);color:#000;font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center; }
-    .avatar-edit-hint { position:absolute;bottom:0;right:0;background:var(--bg2);border:2px solid var(--neon);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.65rem; }
+    .avatar-fallback { width:100%;height:100%;border-radius:50%;border:3px solid var(--neon);background:var(--neon);color:#000;font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center; }
+    .avatar-edit-hint { position:absolute;bottom:0;right:0;background:var(--bg2);border:2px solid var(--neon);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--neon); }
 
-    /* Avatar picker modal */
-    .avatar-modal { position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
-    .avatar-modal-box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:2rem;max-width:380px;width:100%;text-align:center; }
-    .avatar-modal-box h3 { font-family:var(--font-pixel);font-size:.7rem;color:var(--neon);margin-bottom:1.25rem; }
+    .avatar-modal { position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:400;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
+    .avatar-modal-box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:2rem;max-width:360px;width:100%;text-align:center; }
+    .avatar-modal-box h3 { font-family:var(--font-pixel);font-size:.68rem;color:var(--neon);margin-bottom:1.25rem; }
     .avatar-grid-modal { display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem; }
-    .avatar-opt { width:72px;height:72px;border-radius:50%;border:3px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s; }
+    .avatar-opt { width:70px;height:70px;border-radius:50%;border:3px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s; }
     .avatar-opt:hover { transform:scale(1.08); }
-    .avatar-opt.selected { border-color:var(--neon);box-shadow:0 0 14px rgba(57,255,20,.4); }
+    .avatar-opt.selected { border-color:var(--neon);box-shadow:0 0 14px rgba(57,255,20,.35); }
     .avatar-opt img { width:100%;height:100%;object-fit:cover; }
     .modal-actions { display:flex;gap:.75rem;justify-content:center; }
 
     .profile-box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem; }
-    .profile-box h2 { font-family:var(--font-pixel);font-size:.6rem;color:var(--text-dim);margin-bottom:1.25rem; }
+    .profile-box h2 { font-family:var(--font-pixel);font-size:.58rem;color:var(--text-dim);margin-bottom:1.25rem; }
     .info-row { display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.875rem; }
     .info-row:last-child { border-bottom:none; }
     .info-row label { color:var(--text-dim); }
@@ -44,6 +46,8 @@
     .pstat span { font-size:.7rem;color:var(--text-dim); }
 
     .profile-actions { display:flex;gap:.75rem;flex-wrap:wrap; }
+    .btn-signout { background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius);padding:.5rem 1.2rem;font-size:.875rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .2s,color .2s; }
+    .btn-signout:hover { background:var(--danger);color:#fff; }
   </style>
 </head>
 <body>
@@ -67,25 +71,27 @@
   <main class="profile-page" id="profileMain" style="display:none">
     <h1>Mi Perfil</h1>
 
-    <!-- Verificación -->
+    <!-- Banner verificación — solo para email/password no verificado -->
     <div class="verify-banner" id="verifyBanner" style="display:none">
       <p>Tu correo aún no está verificado. Revisa tu bandeja de entrada.</p>
       <button id="resendVerify">Reenviar correo</button>
     </div>
 
-    <!-- Avatar clickable -->
+    <!-- Avatar -->
     <div style="text-align:center;margin-bottom:1.5rem">
       <div class="avatar-wrap" id="avatarWrap" title="Cambiar avatar">
-        <img id="avatarImg" src="../assets/avatars/avatar1.png" alt="Avatar"/>
-        <div class="avatar-edit-hint">✏️</div>
+        <img id="avatarImg" src="../assets/avatars/avatar1.png" alt="Avatar"
+             onerror="this.style.display='none';document.getElementById('avFallback').style.display='flex'"/>
+        <div class="avatar-fallback" id="avFallback" style="display:none"></div>
+        <div class="avatar-edit-hint">✏</div>
       </div>
-      <div id="userName" style="font-weight:600;font-size:1.05rem;margin-bottom:.25rem"></div>
+      <div id="userName" style="font-weight:700;font-size:1.05rem;margin-bottom:.2rem"></div>
       <div id="userEmail" style="font-size:.78rem;color:var(--text-dim)"></div>
     </div>
 
     <!-- Info -->
     <div class="profile-box">
-      <h2>Información de cuenta</h2>
+      <h2>Información</h2>
       <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
       <div class="info-row"><label>Cuenta creada</label><span id="infoFecha">—</span></div>
       <div class="info-row"><label>Correo verificado</label><span id="infoVerif">—</span></div>
@@ -94,17 +100,18 @@
     <!-- Stats -->
     <div class="profile-stats">
       <div class="pstat"><strong id="statAudios">0</strong><span>Soundbites subidos</span></div>
-      <div class="pstat"><strong id="statCalif">—</strong><span>Calificaciones dadas</span></div>
       <div class="pstat"><strong id="statLikes">—</strong><span>Me gusta recibidos</span></div>
+      <div class="pstat"><strong id="statCalif">—</strong><span>Calificaciones dadas</span></div>
     </div>
 
+    <!-- Acciones -->
     <div class="profile-actions">
       <a href="ajustes.html" class="btn-outline">Ajustes y seguridad</a>
-      <a href="comunidad.html" class="btn-primary">Ver soundbites</a>
+      <button class="btn-signout" id="signOutBtn">Cerrar sesión</button>
     </div>
   </main>
 
-  <!-- MODAL selector de avatar -->
+  <!-- Modal avatar -->
   <div class="avatar-modal" id="avatarModal" style="display:none">
     <div class="avatar-modal-box">
       <h3>Elige tu avatar</h3>
@@ -125,9 +132,9 @@
 
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
-    import { onAuthStateChanged, sendEmailVerification }
+    import { onAuthStateChanged, signOut, sendEmailVerification }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc, updateDoc, collection, getDocs, query, where }
+    import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
@@ -139,76 +146,108 @@
       currentUser = user;
       document.getElementById('profileMain').style.display = 'block';
 
-      // Mostrar banner verificación
-      if (!user.emailVerified) {
+      // Solo mostrar banner de verificación a usuarios de email/password no verificados
+      const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+      if (!isGoogle && !user.emailVerified) {
         document.getElementById('verifyBanner').style.display = 'flex';
       }
 
       // Info básica
       document.getElementById('userName').textContent  = user.displayName || 'Sin nombre';
       document.getElementById('userEmail').textContent = user.email || '';
+      document.getElementById('avFallback').textContent = (user.displayName || 'J').charAt(0).toUpperCase();
       document.getElementById('infoFecha').textContent =
         user.metadata.creationTime
           ? new Date(user.metadata.creationTime).toLocaleDateString('es-ES') : '—';
-      document.getElementById('infoVerif').textContent = user.emailVerified ? 'Sí ✓' : 'Pendiente ⚠️';
+      document.getElementById('infoVerif').textContent = user.emailVerified ? 'Sí' : 'Pendiente';
       document.getElementById('infoVerif').style.color = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
-      const providers = user.providerData.map(p => p.providerId);
-      document.getElementById('infoMetodo').textContent =
-        providers.includes('google.com') ? 'Google' : 'Correo y contraseña';
+      document.getElementById('infoMetodo').textContent = isGoogle ? 'Google' : 'Correo y contraseña';
 
-      // Cargar avatar y stats de Firestore
+      // Cargar desde Firestore — crear documento si no existe
       try {
-        const snap = await getDoc(doc(db, 'usuarios', user.uid));
+        const ref  = doc(db, 'usuarios', user.uid);
+        const snap = await getDoc(ref);
+
         if (snap.exists()) {
-          const data = snap.data();
-          selectedAvatar = data.avatar || 'avatar1';
-          applyAvatar(selectedAvatar);
+          selectedAvatar = snap.data().avatar || 'avatar1';
+        } else {
+          // Recrear documento si fue eliminado
+          await setDoc(ref, {
+            nombre:        user.displayName || 'Jugador',
+            email:         user.email || '',
+            avatar:        'avatar1',
+            creadoEn:      serverTimestamp(),
+            audiosSubidos: 0
+          });
+          selectedAvatar = 'avatar1';
         }
-        const q = query(collection(db, 'audios'), where('autorId', '==', user.uid));
+        applyAvatar(selectedAvatar);
+
+        // Stats
+        const q = query(collection(db,'audios'), where('autorId','==',user.uid));
         const aSnap = await getDocs(q);
         document.getElementById('statAudios').textContent = aSnap.size;
-        const totalLikes = aSnap.docs.reduce((s, d) => s + (d.data().likes || 0), 0);
-        document.getElementById('statLikes').textContent = totalLikes;
-      } catch (e) { console.error(e); }
+        document.getElementById('statLikes').textContent  =
+          aSnap.docs.reduce((s,d) => s+(d.data().likes||0), 0);
+      } catch(e) {
+        console.error('Perfil error:', e.message);
+        window.showToast && window.showToast('Error cargando perfil: ' + e.message, 'error');
+      }
     });
 
     function applyAvatar(name) {
-      document.getElementById('avatarImg').src = `../assets/avatars/${name}.png`;
+      const img = document.getElementById('avatarImg');
+      img.style.display = 'block';
+      document.getElementById('avFallback').style.display = 'none';
+      img.src = `../assets/avatars/${name}.png`;
       document.querySelectorAll('.avatar-opt').forEach(o =>
         o.classList.toggle('selected', o.dataset.avatar === name));
       selectedAvatar = name;
     }
 
-    // Abrir modal al hacer clic en avatar
+    // Abrir modal al click en avatar
     document.getElementById('avatarWrap').addEventListener('click', () => {
-      applyAvatar(selectedAvatar); // refresh selection
+      applyAvatar(selectedAvatar);
       document.getElementById('avatarModal').style.display = 'flex';
     });
-    document.getElementById('cancelAvatar').addEventListener('click', () => {
-      document.getElementById('avatarModal').style.display = 'none';
-    });
+    document.getElementById('cancelAvatar').addEventListener('click', () =>
+      document.getElementById('avatarModal').style.display = 'none');
 
-    // Seleccionar opción en modal
     document.querySelectorAll('.avatar-opt').forEach(opt => {
       opt.addEventListener('click', () => {
         document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         selectedAvatar = opt.dataset.avatar;
-        // Preview inmediato
-        document.getElementById('avatarImg').src = `../assets/avatars/${selectedAvatar}.png`;
+        // Preview en tiempo real
+        const img = document.getElementById('avatarImg');
+        img.style.display = 'block';
+        document.getElementById('avFallback').style.display = 'none';
+        img.src = `../assets/avatars/${selectedAvatar}.png`;
       });
     });
 
-    // Guardar avatar en Firestore
     document.getElementById('saveAvatar').addEventListener('click', async () => {
       if (!currentUser) return;
       try {
-        await updateDoc(doc(db, 'usuarios', currentUser.uid), { avatar: selectedAvatar });
+        await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
         document.getElementById('avatarModal').style.display = 'none';
         window.showToast && window.showToast('Avatar guardado');
-      } catch (e) {
-        window.showToast && window.showToast('Error al guardar avatar', 'error');
+      } catch(e) {
+        // Si falla updateDoc (doc no existe), intentar setDoc
+        try {
+          await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
+          document.getElementById('avatarModal').style.display = 'none';
+          window.showToast && window.showToast('Avatar guardado');
+        } catch(e2) {
+          window.showToast && window.showToast('Error: ' + e2.message, 'error');
+        }
       }
+    });
+
+    // Cerrar sesión desde perfil
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = ROOT + '/index.html';
     });
 
     // Reenviar verificación
@@ -216,7 +255,7 @@
       try {
         await sendEmailVerification(currentUser);
         window.showToast && window.showToast('Correo de verificación enviado');
-      } catch { window.showToast && window.showToast('Error al enviar correo', 'error'); }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
     });
   </script>
   <script type="module" src="../js/auth.js"></script>
