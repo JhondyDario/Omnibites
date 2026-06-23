@@ -1,45 +1,43 @@
 <div align="center">
 
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
+### The retro community for video game soundbites
 
-### La comunidad retro de soundbites de videojuegos
-
-[![Live](https://img.shields.io/badge/▶%20Entrar%20a%20Omnibites-39ff14?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
-[![PayPal](https://img.shields.io/badge/Donar-PayPal-003087?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-003087?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ)
+[![Live](https://img.shields.io/badge/%20Website%20-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
+[![YouTube](https://img.shields.io/badge/%20YouTube%20-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
 
 </div>
 
 ## OMNIBITES
 
-Omnibites es una comunidad web donde los jugadores pueden **encontrar, escuchar, calificar, descargar y compartir soundbites de sus videojuegos favoritos**.
+Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
 
-Un soundbite es un clip de 15 segundos con fade in y fade out automático — ese efecto que recordarás si alguna vez marcabas un juego en la pantalla de Nintendo y la música sonaba suavecito antes de entrar al menú.
+A soundbite is a 15-second clip with an automatic fade-in and fade-out — that classic effect you might remember from selecting a game on a Nintendo screen, where the music would play softly before jumping into the main menu.
 
-**¿Qué puedes hacer aquí?**
+**What can you do here?**
 
-- Buscar música de cualquier videojuego retro y escuchar un preview de 15 segundos al instante
-- Recortar el fragmento exacto que quieres y descargarlo en MP3
-- Subir tus propios soundbites y compartirlos con la comunidad
-- Calificar los soundbites de otros jugadores
-- Construir una biblioteca retro colectiva con los mejores momentos sonoros del gaming
-
-Sin apps. Sin instalaciones. Funciona directo en el navegador.
+* Search for music from any retro video game and instantly listen to a 15-second preview.
+* Trim the exact fragment you want and download it as an MP3.
+* Upload your own soundbites and share them with the community.
+* Rate soundbites from other players.
+* Build a collective retro library with gaming's finest audio moments.
 
 ---
 
 > [!IMPORTANT]
-> **Este es el repositorio oficial de Omnibites.**
-> No accedas al proyecto desde sitios de terceros, forks no autorizados ni enlaces externos. La única versión legítima y actualizada está en **[jhondydario.github.io/Omnibites](https://jhondydario.github.io/Omnibites/)**.
+> **This is the [official Omnibites](https://jhondydario.github.io/Omnibites/) repository.**
+> Do not access the project from third-party sites, unauthorized forks, or external links.
 
 ---
 
-## ¿Por qué Omnibites?
+## Why Omnibites?
 
-La música de los videojuegos es parte de la cultura popular y merece su propio espacio. Esos temas que tarareabas mientras jugabas, que te ponían nervioso antes del boss final, que siguen sonando en tu cabeza 20 años después — existen, son reales, y son de todos.
+Video game music is a core part of popular culture and deserves its own dedicated space. Those themes you used to hum while playing, the ones that made you nervous right before a final boss, the melodies that still play in your head 20 years later — they exist, they are real, and they belong to everyone.
 
-Omnibites nació para preservar esa música y hacerla accesible de una forma que ninguna otra plataforma ofrece hoy.
+Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
-[![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
+[![Omnibites](https://jhondydario.github.io/Omnibites/assets/website-home-1.png)](https://jhondydario.github.io/Omnibites/)
 
 ---
 

@@ -7,20 +7,25 @@
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .settings-page { max-width:580px;margin:0 auto;padding:2.5rem 1.5rem; }
-    .settings-page h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem; }
-    .sbox { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem; }
-    .sbox h2 { font-family:var(--font-pixel);font-size:.58rem;color:var(--text-dim);margin-bottom:1.25rem; }
-    .note { background:var(--bg3);border-radius:6px;padding:.7rem 1rem;font-size:.78rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.6; }
-    .field-ok  { color:var(--neon);font-size:.78rem;margin-top:.5rem; }
-    .field-err { color:var(--danger);font-size:.78rem;margin-top:.5rem; }
-    .btn-danger { background:var(--danger);color:#fff;border:none;border-radius:var(--radius);padding:.6rem 1.4rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:var(--font-body); }
-    .popup-overlay { position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem; }
-    .popup-box { background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:400px;width:100%;text-align:center; }
-    .popup-box h3 { font-family:var(--font-pixel);font-size:.65rem;color:var(--danger);margin-bottom:.75rem; }
-    .popup-box p { font-size:.85rem;color:var(--text-dim);margin-bottom:1.25rem;line-height:1.6; }
-    .popup-box .confirm-input { width:100%;margin-bottom:1rem; }
-    .popup-actions { display:flex;gap:.75rem;justify-content:center; }
+    .settings-page{max-width:580px;margin:0 auto;padding:2.5rem 1.5rem;}
+    .settings-page h1{font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem;}
+    .sbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem;}
+    .sbox h2{font-family:var(--font-pixel);font-size:.58rem;color:var(--text-dim);margin-bottom:1.25rem;}
+    .note{background:var(--bg3);border-radius:6px;padding:.7rem 1rem;font-size:.78rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.6;}
+    .field-ok{color:var(--neon);font-size:.78rem;margin-top:.5rem;}
+    .field-err{color:var(--danger);font-size:.78rem;margin-top:.5rem;}
+    .btn-danger{background:var(--danger);color:#fff;border:none;border-radius:var(--radius);padding:.6rem 1.4rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.875rem;}
+    .info-row:last-child{border-bottom:none;}
+    .info-row label{color:var(--text-dim);}
+    .info-row-edit{display:flex;gap:.5rem;align-items:center;}
+    .info-row-edit input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.4rem .7rem;font-size:.85rem;font-family:var(--font-body);outline:none;width:170px;}
+    .info-row-edit input:focus{border-color:var(--neon);}
+    .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+    .popup-box{background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:400px;width:100%;text-align:center;}
+    .popup-box h3{font-family:var(--font-pixel);font-size:.65rem;color:var(--danger);margin-bottom:.75rem;}
+    .popup-box p{font-size:.85rem;color:var(--text-dim);margin-bottom:1.25rem;line-height:1.6;}
+    .popup-actions{display:flex;gap:.75rem;justify-content:center;}
   </style>
 </head>
 <body>
@@ -42,14 +47,31 @@
   </div>
 
   <main class="settings-page" id="settingsMain" style="display:none">
+    <a href="perfil.html" class="btn-back">← Volver al perfil</a>
     <h1>Ajustes</h1>
+
+    <!-- INFORMACIÓN DE CUENTA -->
+    <div class="sbox">
+      <h2>Información de cuenta</h2>
+      <div class="info-row">
+        <label>Nombre de usuario</label>
+        <div class="info-row-edit">
+          <input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="30"/>
+          <button class="btn-primary" id="saveNombreBtn" style="padding:.4rem .85rem;font-size:.78rem">Guardar</button>
+        </div>
+      </div>
+      <div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
+      <div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Nombre actualizado.</div>
+      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
+      <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
+      <div class="info-row"><label>Cuenta creada</label><span id="infoFecha">—</span></div>
+      <div class="info-row"><label>Correo verificado</label><span id="infoVerif">—</span></div>
+    </div>
 
     <!-- CONTRASEÑA -->
     <div class="sbox">
       <h2>Contraseña</h2>
-      <div id="googleNote" class="note" style="display:none">
-        Tu cuenta usa Google. Puedes añadir una contraseña para entrar también con correo y contraseña.
-      </div>
+      <div id="googleNote" class="note" style="display:none">Tu cuenta usa Google. Puedes añadir una contraseña para entrar también con correo y contraseña.</div>
       <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Mínimo 8 caracteres"/></div>
       <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="confirmPass" placeholder="Repite la contraseña"/></div>
       <div id="passErr" class="field-err" style="display:none"></div>
@@ -59,19 +81,17 @@
 
     <!-- ELIMINAR CUENTA -->
     <div class="sbox">
-      <h2>Zona de peligro</h2>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Eliminar tu cuenta borrará todos tus datos de forma permanente. Esta acción no se puede deshacer.</p>
+      <h2>Eliminar cuenta</h2>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Esta acción eliminará todos tus datos permanentemente y no se puede deshacer.</p>
       <button class="btn-danger" id="deleteBtn">Eliminar mi cuenta</button>
     </div>
   </main>
 
-  <!-- POPUP confirmar eliminación -->
   <div class="popup-overlay" id="deletePopup" style="display:none">
     <div class="popup-box">
       <h3>Eliminar cuenta</h3>
       <p>Perderás todos tus soundbites y datos permanentemente.<br/>Escribe tu correo para confirmar:</p>
-      <input type="email" id="confirmEmail" class="confirm-input form-group input"
-             placeholder="tucorreo@ejemplo.com" style="width:100%;margin-bottom:1rem"/>
+      <input type="email" id="confirmEmail" style="width:100%;margin-bottom:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.6rem .9rem;font-size:.9rem;font-family:var(--font-body);outline:none;"/>
       <div id="deleteErr" style="color:var(--danger);font-size:.78rem;margin-bottom:.75rem;display:none"></div>
       <div class="popup-actions">
         <button class="btn-outline" id="cancelDelete">Cancelar</button>
@@ -87,111 +107,138 @@
       EmailAuthProvider, linkWithCredential,
       deleteUser, GoogleAuthProvider, reauthenticateWithPopup
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, deleteDoc, setDoc }
+    import { doc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let currentUser = null;
-    let isGoogle = false;
+    let currentUser = null, isGoogle = false;
 
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, async user => {
       if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
       currentUser = user;
       document.getElementById('settingsMain').style.display = 'block';
       isGoogle = user.providerData.some(p => p.providerId === 'google.com');
       if (isGoogle) document.getElementById('googleNote').style.display = 'block';
+
+      document.getElementById('infoEmail').textContent  = user.email || '—';
+      document.getElementById('infoMetodo').textContent = isGoogle ? 'Google' : 'Correo y contraseña';
+      document.getElementById('infoFecha').textContent  = user.metadata.creationTime
+        ? new Date(user.metadata.creationTime).toLocaleDateString('es-ES') : '—';
+      document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Sí' : 'Pendiente';
+      document.getElementById('infoVerif').style.color  = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
+
+      // Load current name
+      try {
+        const snap = await getDoc(doc(db,'usuarios',user.uid));
+        if (snap.exists()) document.getElementById('nombreInput').value = snap.data().nombre || '';
+      } catch {}
+    });
+
+    // ── CAMBIAR NOMBRE ──
+    document.getElementById('saveNombreBtn').addEventListener('click', async () => {
+      const raw   = document.getElementById('nombreInput').value.trim();
+      const errEl = document.getElementById('nombreErr');
+      const okEl  = document.getElementById('nombreOk');
+      errEl.style.display='none'; okEl.style.display='none';
+
+      if (!raw) { errEl.textContent='Escribe un nombre.'; errEl.style.display='block'; return; }
+      if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Solo letras, números y espacios.'; errEl.style.display='block'; return; }
+      if (raw.length < 3) { errEl.textContent='Mínimo 3 caracteres.'; errEl.style.display='block'; return; }
+
+      // Check if name already exists
+      try {
+        const snap = await getDocs(query(collection(db,'usuarios'), where('nombre','==',raw)));
+        const taken = snap.docs.some(d => d.id !== currentUser.uid);
+        if (taken) { errEl.textContent='Ese nombre ya está en uso. Elige otro.'; errEl.style.display='block'; return; }
+        await updateDoc(doc(db,'usuarios',currentUser.uid), { nombre: raw });
+        okEl.style.display='block';
+        setTimeout(()=>okEl.style.display='none',3000);
+      } catch(e) { errEl.textContent='Error: '+e.message; errEl.style.display='block'; }
     });
 
     // ── CONTRASEÑA ──
     document.getElementById('savePassBtn').addEventListener('click', async () => {
-      const np = document.getElementById('newPass').value;
-      const cp = document.getElementById('confirmPass').value;
-      const errEl = document.getElementById('passErr');
-      const okEl  = document.getElementById('passOk');
-      errEl.style.display = 'none'; okEl.style.display = 'none';
-
-      if (!np || !cp)       { errEl.textContent='Completa ambos campos.'; errEl.style.display='block'; return; }
-      if (np.length < 8)    { errEl.textContent='Mínimo 8 caracteres.'; errEl.style.display='block'; return; }
-      if (!/[0-9]/.test(np)){ errEl.textContent='Debe incluir al menos un número.'; errEl.style.display='block'; return; }
-      if (!/[a-zA-Z]/.test(np)){ errEl.textContent='Debe incluir al menos una letra.'; errEl.style.display='block'; return; }
-      if (np !== cp)        { errEl.textContent='Las contraseñas no coinciden.'; errEl.style.display='block'; return; }
-
+      const np=document.getElementById('newPass').value;
+      const cp=document.getElementById('confirmPass').value;
+      const errEl=document.getElementById('passErr');
+      const okEl=document.getElementById('passOk');
+      errEl.style.display='none'; okEl.style.display='none';
+      if(!np||!cp){errEl.textContent='Completa ambos campos.';errEl.style.display='block';return;}
+      if(np.length<8){errEl.textContent='Mínimo 8 caracteres.';errEl.style.display='block';return;}
+      if(!/[0-9]/.test(np)){errEl.textContent='Debe incluir al menos un número.';errEl.style.display='block';return;}
+      if(!/[a-zA-Z]/.test(np)){errEl.textContent='Debe incluir al menos una letra.';errEl.style.display='block';return;}
+      if(np!==cp){errEl.textContent='Las contraseñas no coinciden.';errEl.style.display='block';return;}
       try {
-        if (isGoogle) {
-          const cred = EmailAuthProvider.credential(currentUser.email, np);
-          await linkWithCredential(currentUser, cred);
+        if(isGoogle){
+          const cred=EmailAuthProvider.credential(currentUser.email,np);
+          await linkWithCredential(currentUser,cred);
         } else {
-          await updatePassword(currentUser, np);
+          await updatePassword(currentUser,np);
         }
-        okEl.style.display = 'block';
-        document.getElementById('newPass').value = '';
-        document.getElementById('confirmPass').value = '';
+        okEl.style.display='block';
+        document.getElementById('newPass').value='';
+        document.getElementById('confirmPass').value='';
       } catch(e) {
-        if (e.code === 'auth/provider-already-linked') {
-          try { await updatePassword(currentUser, np); okEl.style.display='block'; } catch(e2) {
-            errEl.textContent = e2.code === 'auth/requires-recent-login'
-              ? 'Por seguridad cierra sesión, vuelve a entrar y repite.' : e2.message;
-            errEl.style.display = 'block';
-          }
-        } else if (e.code === 'auth/requires-recent-login') {
-          errEl.textContent = 'Por seguridad cierra sesión, vuelve a entrar y repite.';
-          errEl.style.display = 'block';
+        if(e.code==='auth/provider-already-linked'){
+          try{await updatePassword(currentUser,np);okEl.style.display='block';}
+          catch(e2){errEl.textContent=e2.code==='auth/requires-recent-login'?'Cierra sesión, vuelve a entrar y repite.':e2.message;errEl.style.display='block';}
         } else {
-          errEl.textContent = e.message; errEl.style.display = 'block';
+          errEl.textContent=e.code==='auth/requires-recent-login'?'Cierra sesión, vuelve a entrar y repite.':e.message;
+          errEl.style.display='block';
         }
       }
     });
 
     // ── ELIMINAR CUENTA ──
-    document.getElementById('deleteBtn').addEventListener('click', () => {
-      document.getElementById('confirmEmail').value = '';
-      document.getElementById('deleteErr').style.display = 'none';
-      document.getElementById('deletePopup').style.display = 'flex';
+    document.getElementById('deleteBtn').addEventListener('click',()=>{
+      document.getElementById('confirmEmail').value='';
+      document.getElementById('deleteErr').style.display='none';
+      document.getElementById('deletePopup').style.display='flex';
     });
-    document.getElementById('cancelDelete').addEventListener('click', () =>
-      document.getElementById('deletePopup').style.display = 'none');
+    document.getElementById('cancelDelete').addEventListener('click',()=>
+      document.getElementById('deletePopup').style.display='none');
 
     document.getElementById('confirmDelete').addEventListener('click', async () => {
-      const typed = document.getElementById('confirmEmail').value.trim().toLowerCase();
-      const actual = (currentUser.email || '').toLowerCase();
-      const errEl = document.getElementById('deleteErr');
-
-      if (!typed) { errEl.textContent='Escribe tu correo para confirmar.'; errEl.style.display='block'; return; }
-      if (typed !== actual) { errEl.textContent='El correo no coincide con el de tu cuenta.'; errEl.style.display='block'; return; }
-
-      const btn = document.getElementById('confirmDelete');
-      btn.textContent = 'Eliminando...'; btn.disabled = true;
-
+      const typed=(document.getElementById('confirmEmail').value||'').trim().toLowerCase();
+      const actual=(currentUser.email||'').toLowerCase();
+      const errEl=document.getElementById('deleteErr');
+      if(!typed){errEl.textContent='Escribe tu correo.';errEl.style.display='block';return;}
+      if(typed!==actual){errEl.textContent='El correo no coincide.';errEl.style.display='block';return;}
+      const btn=document.getElementById('confirmDelete');
+      btn.textContent='Eliminando...';btn.disabled=true;
       try {
-        const uid   = currentUser.uid;
-        const email = currentUser.email;
-
-        // Borrar datos de Firestore primero
-        try { await deleteDoc(doc(db,'usuarios',uid)); } catch {}
-
-        // Eliminar cuenta de Firebase Auth
-        // Para usuarios de Google necesitamos reautenticar
-        if (isGoogle) {
-          await reauthenticateWithPopup(currentUser, new GoogleAuthProvider());
-        }
+        // Delete user's audios
+        const audiosSnap = await getDocs(query(collection(db,'audios'),where('autorId','==',currentUser.uid)));
+        for(const d of audiosSnap.docs) await deleteDoc(d.ref);
+        // Delete user doc
+        try{await deleteDoc(doc(db,'usuarios',currentUser.uid));}catch{}
+        // Re-auth if Google
+        if(isGoogle) await reauthenticateWithPopup(currentUser,new GoogleAuthProvider());
         await deleteUser(currentUser);
-
-        // Redirigir (cuenta ya no existe)
-        window.location.href = ROOT + '/index.html?deleted=1';
-
+        window.location.href=ROOT+'/index.html?deleted=1';
       } catch(e) {
-        btn.textContent = 'Sí, eliminar'; btn.disabled = false;
-        document.getElementById('deletePopup').style.display = 'none';
-
-        if (e.code === 'auth/requires-recent-login' || e.code === 'auth/user-token-expired') {
-          window.showToast && window.showToast('Por seguridad cierra sesión, vuelve a entrar e intenta de nuevo.','error');
-        } else {
-          window.showToast && window.showToast('Error: ' + e.message,'error');
-        }
+        btn.textContent='Sí, eliminar';btn.disabled=false;
+        document.getElementById('deletePopup').style.display='none';
+        window.showToast&&window.showToast(
+          e.code==='auth/requires-recent-login'
+            ? 'Cierra sesión, vuelve a entrar e intenta de nuevo.'
+            : 'Error: '+e.message, 'error');
       }
     });
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad retro</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <span class="logo">OMNI<span>BITES</span></span>
+    </div>
+  </footer>
 </body>
 </html>
