@@ -17,27 +17,27 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 
 **What can you do here?**
 
-* Search for music from any retro video game and instantly listen to a 15-second preview
-* Trim the exact fragment you want and download it as an MP3
-* Upload your own soundbites and share them with the community
-* Rate soundbites from other players
-* Build a collective retro library with gaming's finest audio moments
+* Search for music from any retro video game and instantly listen to a 15-second preview.
+* Trim the exact fragment you want and download it as an MP3.
+* Upload your own soundbites and share them with the community.
+* Rate soundbites from other players.
+* Build a collective retro library with gaming's finest audio moments.
 
----
+--
 
 > [!IMPORTANT]
 > **This is the [official Omnibites](https://jhondydario.github.io/Omnibites/) repository.**
 > Do not access the project from third-party sites, unauthorized forks, or external links.
 
----
+--
 
-## ¿Por qué Omnibites?
+## Why Omnibites?
 
-La música de los videojuegos es parte de la cultura popular y merece su propio espacio. Esos temas que tarareabas mientras jugabas, que te ponían nervioso antes del boss final, que siguen sonando en tu cabeza 20 años después — existen, son reales, y son de todos.
+Video game music is a core part of popular culture and deserves its own dedicated space. Those themes you used to hum while playing, the ones that made you nervous right before a final boss, the melodies that still play in your head 20 years later — they exist, they are real, and they belong to everyone.
 
-Omnibites nació para preservar esa música y hacerla accesible de una forma que ninguna otra plataforma ofrece hoy.
+Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
-[![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
+[![Omnibites](https://jhondydario.github.io/Omnibites/assets/website-home-1.png)](https://jhondydario.github.io/Omnibites/)
 
 ---
 
