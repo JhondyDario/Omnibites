@@ -284,6 +284,7 @@
     let activeGain   = null;
     let activeCard   = null;
     let progressInterval = null;
+    let pausedProgress   = {};  // {cardIdx: {pct, elapsed}} — saves position on pause
 
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -409,8 +410,12 @@
         const data = await res.json();
         const files = (data?.result || [])
           .filter(f => /\.(mp3|ogg|flac|wav)$/i.test(f.name))
-          .filter(f => !f.length || parseFloat(f.length) > 10)
-          .filter(f => !/\b(sfx|effect|jingle|short|voice|vo_|fx_)\b/i.test(f.name));
+          .filter(f => {
+            const secs = parseFloat(f.length) || 0;
+            // Must be between 10 seconds and 10 minutes (600 seconds)
+            return secs === 0 || (secs >= 10 && secs <= 600);
+          })
+          .filter(f => !/\b(sfx|effect|jingle|short|voice|vo_|fx_|podcast|interview|episode)\b/i.test(f.name));
 
         // Puntuar tracks por relevancia con las palabras buscadas
         const scored = files.map(f => {
@@ -498,11 +503,11 @@
           <div class="card-actions">
             <button class="btn-sm btn-sm-green"
               onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
-              📤 Compartir en Omnibites
+              Añadir Soundbite
             </button>
             <button class="btn-sm btn-sm-download" id="dlBtn-${i}"
               onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
-              ⬇️ Descargar MP3
+              Descargar Soundbite
             </button>
             <a class="btn-sm btn-sm-outline"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
@@ -524,14 +529,18 @@
     window.togglePlay = async function(idx, url, totalSecs) {
       const btn = document.getElementById(`playBtn-${idx}`);
 
-      // Si ya está sonando esta tarjeta → pausar
+      // Si ya está sonando esta tarjeta → pausar (guardar posición)
       if (activeCard === idx) {
-        stopActive();
+        const prog = document.getElementById(`prog-${idx}`);
+        const cur  = document.getElementById(`cur-${idx}`);
+        // Save current position before pausing
+        if (prog) pausedProgress[idx] = { pct: prog.style.width, time: cur?.textContent || '0:00' };
+        stopActive(true); // isPause = true
         return;
       }
 
-      // Detener lo que estaba sonando
-      stopActive();
+      // Detener lo que estaba sonando (full stop)
+      stopActive(false);
 
       btn.textContent = '...';
       btn.disabled = true;
@@ -592,7 +601,12 @@
           const curEl   = document.getElementById(`cur-${idx}`);
           if (progEl) progEl.style.width = pct + '%';
           if (curEl)  curEl.textContent  = formatTime(elapsed);
-          if (elapsed >= CLIP_DURATION) clearInterval(progressInterval);
+          // Live-save position for pause
+          pausedProgress[idx] = { pct: pct + '%', time: formatTime(elapsed) };
+          if (elapsed >= CLIP_DURATION) {
+            clearInterval(progressInterval);
+            delete pausedProgress[idx];
+          }
         }, 100);
 
       } catch (e) {
@@ -603,12 +617,12 @@
       }
     };
 
-    function stopActive() {
+    function stopActive(isPause = false) {
       if (activeSource) {
         try {
           activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
-          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
-          activeSource.stop(audioCtx.currentTime + 0.3);
+          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+          activeSource.stop(audioCtx.currentTime + 0.15);
         } catch {}
         activeSource = null;
         activeGain   = null;
@@ -619,8 +633,13 @@
         const prog = document.getElementById(`prog-${activeCard}`);
         const cur  = document.getElementById(`cur-${activeCard}`);
         if (btn)  { btn.textContent = '▶'; btn.classList.remove('playing'); btn.disabled = false; }
-        if (prog) prog.style.width = '0%';
-        if (cur)  cur.textContent  = '0:00';
+        if (!isPause) {
+          // Full stop: reset bar
+          if (prog) prog.style.width = '0%';
+          if (cur)  cur.textContent  = '0:00';
+          delete pausedProgress[activeCard];
+        }
+        // On pause: leave progress bar where it is
       }
       activeCard = null;
     }
@@ -677,12 +696,12 @@
         URL.revokeObjectURL(a.href);
 
         btn.textContent = ' ¡Listo!';
-        setTimeout(() => { btn.textContent = '⬇️ MP3'; btn.classList.remove('loading'); }, 3000);
+        setTimeout(() => { btn.textContent = 'Descargar Soundbite'; btn.classList.remove('loading'); }, 3000);
       } catch (e) {
         console.error(e);
         btn.textContent = '✕ Error';
         btn.classList.remove('loading');
-        setTimeout(() => { btn.textContent = '⬇️ MP3'; }, 2500);
+        setTimeout(() => { btn.textContent = 'Descargar Soundbite'; }, 2500);
       }
     };
 
