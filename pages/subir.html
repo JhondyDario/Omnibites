@@ -189,7 +189,7 @@
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null;
@@ -330,6 +330,24 @@
       btn.disabled = true; btn.textContent = 'Publicando...';
 
       try {
+        // Check for existing soundbite with same title+juego by this user
+        const dupeQ = query(collection(db,'audios'),
+          where('autorId','==',currentUser.uid),
+          where('titulo','==',titulo),
+          where('juego','==',juego));
+        const dupeSnap = await getDocs(dupeQ);
+        if (!dupeSnap.empty) {
+          // Update existing instead of creating duplicate
+          await updateDoc(doc(db,'audios',dupeSnap.docs[0].id), {
+            url, consola, categoria,
+            descripcion: document.getElementById('descripcion').value.trim(),
+            trimStart, trimEnd, duracion: fmt(trimEnd-trimStart),
+            creadoEn: serverTimestamp()
+          });
+          window.showToast('Soundbite actualizado (ya existía uno igual)');
+          setTimeout(()=>window.location.href=ROOT+'/pages/comunidad.html',1200);
+          return;
+        }
         await addDoc(collection(db,'audios'), {
           url, titulo, juego, consola, categoria,
           descripcion: document.getElementById('descripcion').value.trim(),
@@ -353,5 +371,17 @@
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad retro</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <span class="logo">OMNI<span>BITES</span></span>
+    </div>
+  </footer>
 </body>
 </html>
