@@ -3,9 +3,9 @@
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
 ### The retro community for video game soundbites
 
-[![Live](https://img.shields.io/badge/▶%20Enter%20Omnibites-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-003087?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ)
-[![YouTube](https://img.shields.io/badge/▶%20YouTube%20Channel-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
+[![Live](https://img.shields.io/badge/▶%20Enter%20Omnibites-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
+[![YouTube](https://img.shields.io/badge/▶%20YouTube%20-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
 
 </div>
 
