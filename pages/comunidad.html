@@ -3,62 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Soundbites de la Comunidad — Omnibites</title>
+  <title>Soundbites — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    .com-header { max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem 1rem; }
-    .com-header h1 { font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:1.25rem; }
-    .com-search { display:flex;gap:.75rem;margin-bottom:1rem; }
-    .com-search input { flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.75rem 1rem;font-size:.95rem;font-family:var(--font-body);outline:none; }
-    .com-search input:focus { border-color:var(--neon); }
-
-    .filters { max-width:1100px;margin:0 auto;padding:0 1.5rem 1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center; }
-    .filters select { background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.45rem .75rem;font-size:.82rem;font-family:var(--font-body);outline:none;cursor:pointer; }
-    .filters select:focus { border-color:var(--neon); }
-    .filters label { font-size:.75rem;color:var(--text-dim);margin-right:.25rem; }
-    .filter-group { display:flex;align-items:center;gap:.35rem; }
-
-    .com-grid { max-width:1100px;margin:0 auto;padding:0 1.5rem 4rem; }
-    .com-cards { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem; }
-
-    .sb-card { background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.25rem;transition:border-color .2s,transform .2s; }
-    .sb-card:hover { border-color:var(--neon);transform:translateY(-2px); }
-    .sb-tag { font-size:.65rem;font-weight:700;color:var(--neon);text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem; }
-    .sb-title { font-weight:700;font-size:.95rem;margin-bottom:.2rem; }
-    .sb-meta { font-size:.75rem;color:var(--text-dim);margin-bottom:.75rem; }
-    .sb-meta span { color:var(--purple); }
-
-    .sb-player { background:var(--bg3);border-radius:6px;padding:.75rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem; }
-    .sb-play { background:var(--neon);color:#000;border:none;border-radius:50%;width:34px;height:34px;font-size:.7rem;cursor:pointer;flex-shrink:0;font-weight:700;transition:background .2s; }
-    .sb-play.playing { background:var(--purple);color:#fff; }
-    .sb-prog-wrap { flex:1; }
-    .sb-prog-bar { height:4px;background:var(--border);border-radius:2px;overflow:hidden;cursor:pointer;margin-bottom:.3rem; }
-    .sb-prog-fill { height:100%;background:var(--neon);width:0%;transition:width .1s linear; }
-    .sb-time { font-family:var(--font-pixel);font-size:.42rem;color:var(--text-dim);display:flex;justify-content:space-between; }
-
-    .sb-footer { display:flex;align-items:center;justify-content:space-between; }
-    .sb-stars { color:var(--gold);font-size:.8rem;cursor:pointer; }
-    .sb-author { font-size:.72rem;color:var(--text-dim); }
-    .sb-dl { background:transparent;border:1px solid var(--cyan);color:var(--cyan);border-radius:var(--radius);padding:.3rem .7rem;font-size:.72rem;cursor:pointer;font-family:var(--font-body);transition:background .2s; }
-    .sb-dl:hover { background:var(--cyan);color:#000; }
-
-    .empty-state { text-align:center;padding:4rem 1rem;color:var(--text-dim); }
-    .empty-state .e-icon { font-size:3rem;margin-bottom:1rem; }
-    .spinner { width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    .consoles-filter { display:flex;gap:.5rem;flex-wrap:wrap; }
-    .chip { background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;color:var(--text-dim);cursor:pointer;transition:border-color .2s,color .2s; }
-    .chip.active,.chip:hover { border-color:var(--neon);color:var(--neon); }
-  </style>
 </head>
 <body>
   <nav class="navbar">
     <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
     <div class="nav-links">
-      <a href="comunidad.html">Soundbites</a>
+      <a href="comunidad.html" class="active">Soundbites</a>
       <a href="explorar.html">Explorar música</a>
       <a href="subir.html">Crear Soundbite</a>
       <div id="nav-auth"></div>
@@ -78,17 +31,17 @@
       <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."/>
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
+    <p class="reaction-hint">Vota cada soundbite: <strong style="color:var(--neon)">Me encanta</strong> si coincide y suena bien · <strong style="color:var(--gold)">Regular</strong> si la calidad o el nombre no convencen · <strong style="color:var(--danger)">No sirve</strong> si el audio es de mala calidad o no corresponde</p>
   </div>
 
-  <!-- FILTROS -->
   <div class="filters">
     <div class="filter-group">
       <label>Consola:</label>
       <select id="consolaFilter">
-        <option value="">Todas las consolas</option>
+        <option value="">Todas</option>
         <optgroup label="Nintendo">
           <option value="NES">NES / Famicom</option>
-          <option value="SNES">Super Nintendo (SNES)</option>
+          <option value="SNES">Super Nintendo</option>
           <option value="N64">Nintendo 64</option>
           <option value="GBA">Game Boy / GBA / DS</option>
           <option value="GameCube">GameCube</option>
@@ -106,9 +59,9 @@
         </optgroup>
         <optgroup label="Sega">
           <option value="MasterSystem">Sega Master System</option>
-          <option value="Genesis">Sega Genesis / Mega Drive</option>
+          <option value="Genesis">Sega Genesis</option>
           <option value="Saturn">Sega Saturn</option>
-          <option value="Dreamcast">Sega Dreamcast</option>
+          <option value="Dreamcast">Dreamcast</option>
         </optgroup>
         <optgroup label="Xbox">
           <option value="Xbox">Xbox Original</option>
@@ -116,32 +69,29 @@
         </optgroup>
         <optgroup label="Otros">
           <option value="Arcade">Arcade</option>
-          <option value="AtariPNG">Atari</option>
-          <option value="Neo-Geo">Neo Geo</option>
           <option value="PC">PC / DOS</option>
           <option value="Otra">Otra</option>
         </optgroup>
       </select>
     </div>
-    <div class="filter-group" style="margin-left:auto">
+    <div class="filter-group">
       <label>Categoría:</label>
       <select id="catFilter">
-          <option value="">Todas las categorías</option>
-          <option value="orquestal">Orquestal e Instrumental</option>
-          <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-          <option value="rock-metal">Rock, Metal e Industrial</option>
-          <option value="jazz">Jazz y Dark Jazz / Noir</option>
-          <option value="hibrido">Soundtracks Híbridos</option>
-          <option value="licenciada">Música Licenciada</option>
-        </select>
+        <option value="">Todas</option>
+        <option value="orquestal">Orquestal e Instrumental</option>
+        <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+        <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+        <option value="rock-metal">Rock, Metal e Industrial</option>
+        <option value="jazz">Jazz y Dark Jazz / Noir</option>
+        <option value="hibrido">Soundtracks Híbridos</option>
+        <option value="licenciada">Música Licenciada</option>
+      </select>
     </div>
-    <div class="filter-group">
+    <div class="filter-group" style="margin-left:auto">
       <label>Ordenar:</label>
       <select id="sortFilter">
         <option value="reciente">Más reciente</option>
-        <option value="likes">Más popular</option>
-        <option value="rating">Mejor calificado</option>
+        <option value="love">Más amados</option>
       </select>
     </div>
   </div>
@@ -154,61 +104,63 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
-    import { db, auth } from '../js/firebase-config.js';
-    import { collection, getDocs, query, orderBy, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, getDocs, query, orderBy, doc,
+      updateDoc, deleteDoc, increment, getDoc, setDoc, arrayUnion, arrayRemove
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null;
-    onAuthStateChanged(auth, u => currentUser = u);
-
     let allItems = [];
     let activeConsola = '', activeCat = '', activeSort = 'reciente';
 
-    // ── CARGAR DESDE FIRESTORE ──
+    onAuthStateChanged(auth, u => { currentUser = u; });
+
+    // ── LOAD ──
     async function loadSoundbites() {
       try {
-        const snap = await getDocs(collection(db, 'audios'));
+        const snap = await getDocs(collection(db,'audios'));
         allItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         render();
-      } catch (e) {
+      } catch(e) {
         document.getElementById('sbGrid').innerHTML =
-          '<div class="empty-state"><div class="e-icon">⚠️</div><p>Error al cargar. Recarga la página.</p></div>';
+          '<div class="empty-state"><p>Error al cargar. Recarga la página.</p></div>';
       }
     }
 
     function render() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       let items = allItems.filter(a => {
-        const matchConsola = !activeConsola || a.consola === activeConsola;
-        const matchCat     = !activeCat     || a.categoria === activeCat;
-        const matchSearch  = !search
+        const mc = !activeConsola || a.consola === activeConsola;
+        const mcat = !activeCat || a.categoria === activeCat;
+        const ms = !search
           || (a.titulo||'').toLowerCase().includes(search)
           || (a.juego||'').toLowerCase().includes(search)
           || (a.autorNombre||'').toLowerCase().includes(search);
-        return matchConsola && matchCat && matchSearch;
+        return mc && mcat && ms;
       });
-
-      if (activeSort === 'likes')  items.sort((a,b) => (b.likes||0)-(a.likes||0));
-      if (activeSort === 'rating') items.sort((a,b) => (b.rating||0)-(a.rating||0));
+      if (activeSort === 'love') items.sort((a,b) => (b.reactions?.love||0)-(a.reactions?.love||0));
       if (activeSort === 'reciente') items.sort((a,b) => (b.creadoEn?.seconds||0)-(a.creadoEn?.seconds||0));
 
       const grid = document.getElementById('sbGrid');
-      if (items.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><div class="e-icon"></div><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">¡Sube el primero!</a></div>';
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
         return;
       }
-      grid.innerHTML = items.map(a => sbCardHTML(a)).join('');
+      grid.innerHTML = items.map(a => sbCard(a)).join('');
     }
 
-    function sbCardHTML(a) {
-      const stars = [1,2,3,4,5].map(n =>
-        `<span onclick="rateItem('${a.id}',${n})" title="${n} estrella${n>1?'s':''}">${n <= Math.round(a.rating||0) ? '★' : '☆'}</span>`
-      ).join('');
+    function sbCard(a) {
+      const r = a.reactions || { love:0, mid:0, bad:0 };
+      const userReaction = a.userReaction || null; // set client-side
+      const isMine = currentUser && currentUser.uid === a.autorId;
       return `
         <div class="sb-card" id="card-${a.id}">
           <div class="sb-tag">${a.consola||'—'} · ${a.categoria||'soundbite'}</div>
           <div class="sb-title">${a.titulo||'Sin título'}</div>
-          <div class="sb-meta">${a.juego||'—'} · <span>por ${a.autorNombre||'Anónimo'}</span></div>
+          <div class="sb-meta">${a.juego||'—'} · <span class="sb-author">${a.autorNombre||'Anónimo'}</span></div>
           <div class="sb-player">
             <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
             <div class="sb-prog-wrap">
@@ -217,58 +169,141 @@
             </div>
           </div>
           <div class="sb-footer">
-            <div>
-              <div class="sb-stars" title="Calificar">${stars}</div>
-              <div class="sb-author">${a.autorNombre||'Anónimo'} · ${a.likes||0} ❤️</div>
+            <div class="sb-reactions">
+              <button class="reaction-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">✨ <span class="reaction-count">${r.love||0}</span></button>
+              <button class="reaction-btn" onclick="react('${a.id}','mid')"  id="r-mid-${a.id}"  title="Regular">😐 <span class="reaction-count">${r.mid||0}</span></button>
+              <button class="reaction-btn" onclick="react('${a.id}','bad')"  id="r-bad-${a.id}"  title="No sirve">👎 <span class="reaction-count">${r.bad||0}</span></button>
             </div>
-            <button class="sb-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">⬇️ MP3</button>
+            <div class="sb-actions">
+              <button class="fav-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Guardar en favoritos">☆</button>
+              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">MP3</button>
+              ${isMine ? `<button class="sb-delete-btn" onclick="deleteSB('${a.id}')" title="Eliminar">✕</button>` : ''}
+            </div>
           </div>
         </div>`;
     }
 
-    // ── PLAYER ──
-    let audioCtx=null, activeSource=null, activeGain=null, activeSBId=null, progIv=null;
-    const CLIP=15, FADE=2;
-    function getCtx() { if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
-
-    function stopSB() {
-      if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{} activeSource=activeGain=null;}
-      clearInterval(progIv);
-      if(activeSBId){
-        const btn=document.getElementById(`sbplay-${activeSBId}`);
-        const prog=document.getElementById(`sbprog-${activeSBId}`);
-        if(btn){btn.textContent='▶';btn.classList.remove('playing');btn.disabled=false;}
-        if(prog)prog.style.width='0%';
-      }
-      activeSBId=null;
+    // ── LOAD FAVORITES & REACTIONS from user doc ──
+    async function loadUserData() {
+      if (!currentUser) return;
+      try {
+        const snap = await getDoc(doc(db,'usuarios',currentUser.uid));
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const favs = data.favoritos || [];
+        const reacts = data.reacciones || {};
+        // Mark favorites
+        favs.forEach(id => {
+          const btn = document.getElementById(`fav-${id}`);
+          if (btn) { btn.textContent = '★'; btn.classList.add('active'); }
+        });
+        // Mark reactions
+        Object.entries(reacts).forEach(([id, type]) => {
+          const btn = document.getElementById(`r-${type}-${id}`);
+          if (btn) btn.classList.add(`active-${type}`);
+        });
+      } catch {}
     }
 
-    window.playSB = async function(id, url, trimStart, trimEnd) {
+    // ── REACTIONS ──
+    window.react = async function(id, type) {
+      if (!currentUser) { showAuthPrompt(); return; }
+      try {
+        const userRef = doc(db,'usuarios',currentUser.uid);
+        const snap = await getDoc(userRef);
+        const reacts = snap.exists() ? (snap.data().reacciones||{}) : {};
+        const prev = reacts[id];
+        const audioRef = doc(db,'audios',id);
+
+        // Remove previous reaction
+        if (prev) {
+          await updateDoc(audioRef, { [`reactions.${prev}`]: increment(-1) });
+          const prevBtn = document.getElementById(`r-${prev}-${id}`);
+          if (prevBtn) { prevBtn.classList.remove(`active-${prev}`); decCount(prevBtn); }
+        }
+
+        if (prev === type) {
+          // Toggle off
+          delete reacts[id];
+          await updateDoc(userRef, { reacciones: reacts });
+        } else {
+          // Set new
+          reacts[id] = type;
+          await updateDoc(userRef, { reacciones: reacts });
+          await updateDoc(audioRef, { [`reactions.${type}`]: increment(1) });
+          const newBtn = document.getElementById(`r-${type}-${id}`);
+          if (newBtn) { newBtn.classList.add(`active-${type}`); incCount(newBtn); }
+        }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
+    };
+
+    function incCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=parseInt(s.textContent||0)+1; }
+    function decCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=Math.max(0,parseInt(s.textContent||0)-1); }
+
+    // ── FAVORITES ──
+    window.toggleFav = async function(id) {
+      if (!currentUser) { showAuthPrompt(); return; }
+      const btn = document.getElementById(`fav-${id}`);
+      const isActive = btn?.classList.contains('active');
+      try {
+        const ref = doc(db,'usuarios',currentUser.uid);
+        if (isActive) {
+          await updateDoc(ref, { favoritos: arrayRemove(id) });
+          btn.textContent = '☆'; btn.classList.remove('active');
+          window.showToast && window.showToast('Eliminado de favoritos');
+        } else {
+          await updateDoc(ref, { favoritos: arrayUnion(id) });
+          btn.textContent = '★'; btn.classList.add('active');
+          window.showToast && window.showToast('Guardado en favoritos');
+        }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
+    };
+
+    // ── DELETE (solo el autor) ──
+    window.deleteSB = async function(id) {
+      if (!currentUser) return;
+      if (!confirm('¿Eliminar este soundbite? Esta acción no se puede deshacer.')) return;
+      try {
+        await deleteDoc(doc(db,'audios',id));
+        document.getElementById(`card-${id}`)?.remove();
+        allItems = allItems.filter(a => a.id !== id);
+        window.showToast && window.showToast('Soundbite eliminado');
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
+    };
+
+    // ── PLAYER ──
+    let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null;
+    const CLIP=15,FADE=2;
+    function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+    function stopSB(){
+      if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{}activeSource=activeGain=null;}
+      clearInterval(progIv);
+      if(activeSBId){const b=document.getElementById(`sbplay-${activeSBId}`);if(b){b.textContent='▶';b.classList.remove('playing');b.disabled=false;}const p=document.getElementById(`sbprog-${activeSBId}`);if(p)p.style.width='0%';}
+      activeSBId=null;
+    }
+    window.playSB=async function(id,url,ts,te){
       if(activeSBId===id){stopSB();return;}
       stopSB();
       const btn=document.getElementById(`sbplay-${id}`);
       if(!btn)return;
-      btn.textContent='⏳'; btn.disabled=true;
-      try {
-        const ctx=getCtx();
-        if(ctx.state==='suspended')await ctx.resume();
-        const res=await fetch(url);
-        if(!res.ok)throw new Error();
+      btn.textContent='...';btn.disabled=true;
+      try{
+        const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
+        const res=await fetch(url);if(!res.ok)throw new Error('fetch');
         const buf=await ctx.decodeAudioData(await res.arrayBuffer());
-        const start=Math.min(trimStart||0, buf.duration-1);
-        const dur=Math.min((trimEnd||15)-(trimStart||0), CLIP, buf.duration-start);
-        const source=ctx.createBufferSource();
-        source.buffer=buf;
+        const start=Math.min(ts||0,buf.duration-1);
+        const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-start);
+        const source=ctx.createBufferSource();source.buffer=buf;
         const gain=ctx.createGain();
         gain.gain.setValueAtTime(0,ctx.currentTime);
         gain.gain.linearRampToValueAtTime(1,ctx.currentTime+FADE);
         gain.gain.setValueAtTime(1,ctx.currentTime+dur-FADE);
         gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
-        source.connect(gain); gain.connect(ctx.destination);
+        source.connect(gain);gain.connect(ctx.destination);
         source.start(0,start,dur);
         source.onended=()=>{if(activeSBId===id)stopSB();};
-        activeSource=source; activeGain=gain; activeSBId=id;
-        btn.textContent='⏸'; btn.classList.add('playing'); btn.disabled=false;
+        activeSource=source;activeGain=gain;activeSBId=id;
+        btn.textContent='||';btn.classList.add('playing');btn.disabled=false;
         const t0=ctx.currentTime;
         progIv=setInterval(()=>{
           const el=ctx.currentTime-t0;
@@ -278,78 +313,78 @@
           if(c)c.textContent=fmt(el);
           if(el>=dur)clearInterval(progIv);
         },100);
-      } catch {
-        btn.textContent='❌'; btn.style.background='var(--danger)'; btn.disabled=false;
-        setTimeout(()=>{btn.textContent='▶';btn.style.background='';},3000);
+      }catch(e){
+        const b=document.getElementById(`sbplay-${id}`);
+        if(b){b.textContent='✕';b.style.background='var(--danger)';b.disabled=false;}
+        setTimeout(()=>{const b=document.getElementById(`sbplay-${id}`);if(b){b.textContent='▶';b.style.background='';b.disabled=false;}},3000);
       }
     };
 
-    // ── DESCARGAR CLIP EN MP3 ──
-    window.dlSB = async function(url, titulo) {
-      try {
-        const ctx=getCtx();
-        if(ctx.state==='suspended')await ctx.resume();
-        const res=await fetch(url);
-        if(!res.ok) throw new Error();
+    // ── DOWNLOAD MP3 ──
+    window.dlSB=async function(url,titulo){
+      try{
+        const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
+        const res=await fetch(url);if(!res.ok)throw new Error();
         const buf=await ctx.decodeAudioData(await res.arrayBuffer());
-        const dur=Math.min(15, buf.duration);
-        // Renderizar clip mono a 44100hz con fade
-        const offCtx=new OfflineAudioContext(1, Math.floor(dur*44100), 44100);
-        const src=offCtx.createBufferSource(); src.buffer=buf;
+        const dur=Math.min(15,buf.duration);
+        const offCtx=new OfflineAudioContext(1,Math.floor(dur*44100),44100);
+        const src=offCtx.createBufferSource();src.buffer=buf;
         const gain=offCtx.createGain();
-        gain.gain.setValueAtTime(0,0);
-        gain.gain.linearRampToValueAtTime(1,2);
-        gain.gain.setValueAtTime(1,dur-2);
-        gain.gain.linearRampToValueAtTime(0,dur);
-        src.connect(gain); gain.connect(offCtx.destination); src.start(0,0,dur);
+        gain.gain.setValueAtTime(0,0);gain.gain.linearRampToValueAtTime(1,2);
+        gain.gain.setValueAtTime(1,dur-2);gain.gain.linearRampToValueAtTime(0,dur);
+        src.connect(gain);gain.connect(offCtx.destination);src.start(0,0,dur);
         const rendered=await offCtx.startRendering();
-        // Encode to MP3
         const samples=rendered.getChannelData(0);
         const int16=new Int16Array(samples.length);
-        for(let i=0;i<samples.length;i++) int16[i]=Math.max(-32768,Math.min(32767,samples[i]*32767));
+        for(let i=0;i<samples.length;i++)int16[i]=Math.max(-32768,Math.min(32767,samples[i]*32767));
         const enc=new lamejs.Mp3Encoder(1,44100,128);
-        const mp3=[]; const bs=1152;
-        for(let i=0;i<int16.length;i+=bs){
-          const ch=int16.subarray(i,i+bs);
-          const d=enc.encodeBuffer(ch);
-          if(d.length>0) mp3.push(new Uint8Array(d));
-        }
-        const end=enc.flush(); if(end.length>0) mp3.push(new Uint8Array(end));
+        const mp3=[];const bs=1152;
+        for(let i=0;i<int16.length;i+=bs){const d=enc.encodeBuffer(int16.subarray(i,i+bs));if(d.length>0)mp3.push(new Uint8Array(d));}
+        const end=enc.flush();if(end.length>0)mp3.push(new Uint8Array(end));
         const blob=new Blob(mp3,{type:'audio/mp3'});
         const a=document.createElement('a');
         a.href=URL.createObjectURL(blob);
         a.download=`${titulo.slice(0,50)} [Omnibites].mp3`.replace(/[<>:"/\\|?*]/g,'');
-        a.click(); URL.revokeObjectURL(a.href);
-        window.showToast && window.showToast('Descargando MP3 — clip de 15 segundos');
-      } catch(e) {
-        console.error(e);
-        window.showToast && window.showToast('Error al descargar','error');
-      }
+        a.click();URL.revokeObjectURL(a.href);
+        window.showToast&&window.showToast('Descargando MP3');
+      }catch(e){window.showToast&&window.showToast('Error al descargar','error');}
     };
 
-
-    // ── CALIFICACIÓN ──
-    window.rateItem = async function(id, stars) {
-      if(!currentUser){window.showToast&&window.showToast('Inicia sesión para calificar','error');return;}
-      try {
-        await updateDoc(doc(db,'audios',id),{rating:stars,totalVotos:increment(1)});
-        window.showToast&&window.showToast(`⭐ Calificaste con ${stars} estrella${stars>1?'s':''}`);
-        loadSoundbites();
-      } catch { window.showToast&&window.showToast('Error al calificar','error'); }
-    };
+    function showAuthPrompt() {
+      const existing = document.querySelector('.auth-prompt');
+      if (existing) { existing.remove(); }
+      const el = document.createElement('div');
+      el.className = 'auth-prompt';
+      el.innerHTML = `Debes iniciar sesión para votar y guardar favoritos.<a href="${ROOT}/pages/login.html">Entrar</a>`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
 
     function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
 
-    // ── FILTROS ──
-    document.getElementById('searchBtn').addEventListener('click',render);
-    document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')render();});
-    document.getElementById('catFilter').addEventListener('change',e=>{activeCat=e.target.value;render();});
-    document.getElementById('sortFilter').addEventListener('change',e=>{activeSort=e.target.value;render();});
-    document.getElementById('consolaFilter')?.addEventListener('change',e=>{activeConsola=e.target.value;render();});
+    // ── FILTERS ──
+    document.getElementById('searchBtn').addEventListener('click', render);
+    document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') render(); });
+    document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; render(); });
+    document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; render(); });
+    document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; render(); });
 
-    loadSoundbites();
+    await loadSoundbites();
+    await loadUserData();
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad retro</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <span class="logo">OMNI<span>BITES</span></span>
+    </div>
+  </footer>
 </body>
 </html>
