@@ -11,25 +11,23 @@
 
 ## OMNIBITES
 
-Omnibites es una comunidad web donde los jugadores pueden **encontrar, escuchar, calificar, descargar y compartir soundbites de sus videojuegos favoritos**.
+Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
 
-Un soundbite es un clip de 15 segundos con fade in y fade out automático — ese efecto que recordarás si alguna vez marcabas un juego en la pantalla de Nintendo y la música sonaba suavecito antes de entrar al menú.
+A soundbite is a 15-second clip with an automatic fade-in and fade-out — that classic effect you might remember from selecting a game on a Nintendo screen, where the music would play softly before jumping into the main menu.
 
-**¿Qué puedes hacer aquí?**
+**What can you do here?**
 
-- Buscar música de cualquier videojuego retro y escuchar un preview de 15 segundos al instante
-- Recortar el fragmento exacto que quieres y descargarlo en MP3
-- Subir tus propios soundbites y compartirlos con la comunidad
-- Calificar los soundbites de otros jugadores
-- Construir una biblioteca retro colectiva con los mejores momentos sonoros del gaming
-
-Sin apps. Sin instalaciones. Funciona directo en el navegador.
+* Search for music from any retro video game and instantly listen to a 15-second preview
+* Trim the exact fragment you want and download it as an MP3
+* Upload your own soundbites and share them with the community
+* Rate soundbites from other players
+* Build a collective retro library with gaming's finest audio moments
 
 ---
 
 > [!IMPORTANT]
-> **Este es el repositorio oficial de Omnibites.**
-> No accedas al proyecto desde sitios de terceros, forks no autorizados ni enlaces externos. La única versión legítima y actualizada está en **[jhondydario.github.io/Omnibites](https://jhondydario.github.io/Omnibites/)**.
+> **This is the official Omnibites repository.**
+> Do not access the project from third-party sites, unauthorized forks, or external links. The only legitimate and updated version is available at **[jhondydario.github.io/Omnibites](https://jhondydario.github.io/Omnibites/)**.
 
 ---
 
