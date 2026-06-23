@@ -107,7 +107,7 @@
         await updateProfile(user, { displayName: nombre });
         await saveUser(user, nombre);
         await sendEmailVerification(user);
-        window.location.href = ROOT + '/index.html';
+        window.location.href = ROOT + '/pages/verificar.html';
       } catch (e) {
         if (e.code === 'auth/email-already-in-use') showErr('Ese correo ya está registrado.');
         else showErr('Error: ' + e.message);

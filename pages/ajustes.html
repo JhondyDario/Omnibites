@@ -151,6 +151,12 @@
         const taken = snap.docs.some(d => d.id !== currentUser.uid);
         if (taken) { errEl.textContent='Ese nombre ya está en uso. Elige otro.'; errEl.style.display='block'; return; }
         await updateDoc(doc(db,'usuarios',currentUser.uid), { nombre: raw });
+        // Update autorNombre in all audios by this user
+        try {
+          const audiosSnap = await getDocs(query(collection(db,'audios'), where('autorId','==',currentUser.uid)));
+          const updates = audiosSnap.docs.map(d => updateDoc(d.ref, { autorNombre: raw }));
+          await Promise.all(updates);
+        } catch(e2) { console.warn('Could not update audio names:', e2.message); }
         okEl.style.display='block';
         setTimeout(()=>okEl.style.display='none',3000);
       } catch(e) { errEl.textContent='Error: '+e.message; errEl.style.display='block'; }
