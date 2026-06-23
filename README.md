@@ -3,7 +3,7 @@
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
 ### The retro community for video game soundbites
 
-[![Live](https://img.shields.io/badge/▶%20Enter%20Omnibites-39ff14?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
+[![Live](https://img.shields.io/badge/▶%20Enter%20Omnibites-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-003087?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ)
 [![Home](https://img.shields.io/badge/%20Website%20-007acc?style=for-the-badge)](https://jhondydario.github.io/Omnibites/)
 
