@@ -1,7 +1,6 @@
 <div align="center">
 
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
-
 ### The retro community for video game soundbites
 
 [![Live](https://img.shields.io/badge/▶%20Enter%20Omnibites-39ff14?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
