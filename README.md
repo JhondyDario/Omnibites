@@ -7,6 +7,8 @@
 [![Live](https://img.shields.io/badge/%20Website%20-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
 [![YouTube](https://img.shields.io/badge/%20YouTube%20-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
 
+</div>
+
 ## OMNIBITES
 
 Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
@@ -21,7 +23,7 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 * Rate soundbites from other players.
 * Build a collective retro library with gaming's finest audio moments.
 
-</div>
+---
 
 > [!IMPORTANT]
 > **This is the [official Omnibites](https://jhondydario.github.io/Omnibites/) repository.**
