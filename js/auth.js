@@ -14,7 +14,19 @@ function goto(path) { window.location.href = ROOT + path; }
 
 onAuthStateChanged(auth, async user => {
   let nombre = null, avatar = null;
+
   if (user) {
+    const isGoogle  = user.providerData.some(p => p.providerId === 'google.com');
+    const onVerify  = location.pathname.includes('verificar.html');
+    const onLogin   = location.pathname.includes('login.html');
+    const onRegistro= location.pathname.includes('registro.html');
+
+    // Enforce email verification for email/password users only
+    if (!isGoogle && !user.emailVerified && !onVerify && !onLogin && !onRegistro) {
+      window.location.href = ROOT + '/pages/verificar.html';
+      return;
+    }
+
     try {
       const ref  = doc(db, 'usuarios', user.uid);
       const snap = await getDoc(ref);
@@ -58,12 +70,8 @@ function renderMobile(user, nombre) {
   if (!el) return;
   if (user) {
     const name = nombre || user.displayName || user.email || 'Jugador';
-    el.innerHTML = `
-      <a href="${ROOT}/pages/perfil.html" class="mobile-perfil-link">${name}</a>
-      <button id="mobileLogout" class="mobile-logout-btn">Cerrar sesión</button>`;
-    document.getElementById('mobileLogout')?.addEventListener('click', async () => {
-      await signOut(auth); goto('/index.html');
-    });
+    // Solo el nombre como link al perfil — sin botón de cerrar sesión (está en perfil.html)
+    el.innerHTML = `<a href="${ROOT}/pages/perfil.html" class="mobile-perfil-link">${name}</a>`;
   } else {
     el.innerHTML = `<a href="${ROOT}/pages/login.html">Entrar</a>`;
   }
