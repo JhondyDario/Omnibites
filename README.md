@@ -26,8 +26,8 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 ---
 
 > [!IMPORTANT]
-> **This is the official Omnibites repository.**
-> Do not access the project from third-party sites, unauthorized forks, or external links. The only legitimate and updated version is available at **[jhondydario.github.io/Omnibites](https://jhondydario.github.io/Omnibites/)**.
+> **This is the [official Omnibites](https://jhondydario.github.io/Omnibites/) repository.**
+> Do not access the project from third-party sites, unauthorized forks, or external links.
 
 ---
 
