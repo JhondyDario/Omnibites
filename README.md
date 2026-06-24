@@ -13,7 +13,7 @@
 </p>
 </div>
 
-## OMNIBITES
+### OMNIBITES
 
 Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
 
@@ -33,7 +33,7 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 
 ---
 
-## Why Omnibites?
+### Why Omnibites?
 
 Video game music is a core part of popular culture and deserves its own dedicated space. Those themes you used to hum while playing, the ones that made you nervous right before a final boss, the melodies that still play in your head 20 years later — they exist, they are real, and they belong to everyone.
 
@@ -46,7 +46,7 @@ Omnibites was born to preserve that music and make it accessible in a way that n
 
 ---
 
-## Roadmap: What’s Next
+### Roadmap: What’s Next
 
 Omnibites is growing fast, and with your support we can unlock even more features — from trivia challenges and achievements to playlists and community tools. Every contribution helps speed up the journey.
 
@@ -57,10 +57,20 @@ Omnibites is growing fast, and with your support we can unlock even more feature
 
 The mobile app is still in planning, and no official APK exists yet — any you find is fake. The native Android version will bring exclusive perks like smart search, offline downloads, notifications, and a waveform editor, all designed to make soundbites even more powerful on the go.
 
+**Compatibility**
+
+Omnibites integrates seamlessly with **iiSU** and other retro frontends that support custom soundbite playback.  
+Because all soundbites are stored in **MP3 format** and limited to **10–15 seconds**, they are extremely lightweight — typically between **200 and 300 kbps**, rarely exceeding **400 kpbs per clip**. This ensures fast loading, smooth playback, and excellent audio quality across compatible platforms.  
+  
+Using open formats and minimal metadata makes it easy to extend or embed soundbites into any frontend that supports custom audio hooks or media previews.
+
 ---
 
-Omnibites **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. We respect copyright and only work with openly accessible content.  
-Omnibites is free and ad‑free. If you enjoy what you see or simply want this project to keep growing, you can support the developer directly:  
+### Contribution
+
+The platform **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. Copyright is respected, and only openly accessible content is used.  
+  
+The service is free and ad‑free. If you enjoy what you see or simply want the project to keep growing, you can support the developer directly:  
 
 <div align="center">
 
