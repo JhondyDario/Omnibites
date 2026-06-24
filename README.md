@@ -1,7 +1,7 @@
 <div align="center">
 
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
-### The retro community for video game soundbites
+## The retro community for video game soundbites
 
 [![Live](https://img.shields.io/badge/%20Website%20-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
 [![YouTube](https://img.shields.io/badge/%20YouTube%20-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
@@ -13,7 +13,7 @@
 </p>
 </div>
 
-## OMNIBITES
+# OMNIBITES
 
 Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
 
@@ -46,7 +46,7 @@ Omnibites was born to preserve that music and make it accessible in a way that n
 
 ---
 
-## Roadmap: What’s Next
+# Roadmap: What’s Next
 
 Omnibites is growing fast, and with your support we can unlock even more features — from trivia challenges and achievements to playlists and community tools. Every contribution helps speed up the journey.
 
