@@ -22,11 +22,11 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 
 **What can you do here?**
 
-* Search for music from any retro video game and instantly listen to a 15-second preview.
-* Trim the exact fragment you want and download it as an MP3.
-* Upload your own soundbites and share them with the community.
-* Rate soundbites from other players.
-* Build a collective retro library with gaming's finest audio moments.
+💿 Search for music from any retro video game and instantly listen to a 15-second preview.  
+💿 Trim the exact fragment you want and download it as an MP3.  
+💿 Upload your own soundbites and share them with the community.  
+💿 Rate soundbites from other players.  
+💿 Build a collective retro library with gaming's finest audio moments.  
 
 ---
 
@@ -42,12 +42,12 @@ Video game music is a core part of popular culture and deserves its own dedicate
 
 Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
-[![Omnibites](https://jhondydario.github.io/Omnibites/assets/website-home-1.png)](https://jhondydario.github.io/Omnibites/)
+![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)
 
 ---
 
 > [!NOTE]
-> Omnibites es un proyecto independiente en desarrollo activo. Cada soundbite que sube la comunidad hace crecer la biblioteca. Si llegas aquí pronto, eres parte de algo que apenas empieza.
+> Omnibites is an independent project in active development, every soundbite uploaded by the community helps the library grow. If you’ve arrived here early, you’re part of something that’s just getting started.
 
 ---
 
