@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registro — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav class="navbar">
@@ -65,7 +65,7 @@
     import { auth, db } from '../js/firebase-config.js';
     import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, setDoc, serverTimestamp }
+    import { doc, setDoc, serverTimestamp, getDocs, query, where, collection }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
@@ -103,6 +103,10 @@
       const passErr = validatePass(pass);
       if (passErr) return showErr(passErr);
       try {
+        // Check name uniqueness before creating account
+        const nameCheck = await getDocs(query(collection(db,'usuarios'), where('nombre','==',nombre)));
+        if (!nameCheck.empty) return showErr('Ese nombre de usuario ya está en uso. Elige otro.');
+
         const { user } = await createUserWithEmailAndPassword(auth, email, pass);
         await updateProfile(user, { displayName: nombre });
         await saveUser(user, nombre);
