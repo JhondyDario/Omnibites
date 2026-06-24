@@ -21,11 +21,8 @@ onAuthStateChanged(auth, async user => {
     const onLogin   = location.pathname.includes('login.html');
     const onRegistro= location.pathname.includes('registro.html');
 
-    // Enforce email verification for email/password users only
-    if (!isGoogle && !user.emailVerified && !onVerify && !onLogin && !onRegistro) {
-      window.location.href = ROOT + '/pages/verificar.html';
-      return;
-    }
+    // Email verification: show verificar.html only on first login
+    // but don't block access - users can still use the app
 
     try {
       const ref  = doc(db, 'usuarios', user.uid);
