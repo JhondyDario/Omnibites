@@ -57,11 +57,18 @@ Omnibites is growing fast, and with your support we can unlock even more feature
 
 The mobile app is still in planning, and no official APK exists yet — any you find is fake. The native Android version will bring exclusive perks like smart search, offline downloads, notifications, and a waveform editor, all designed to make soundbites even more powerful on the go.
 
+**Compatibility**
+
+Omnibites integrates seamlessly with **iiSU** and other retro frontends that support custom soundbite playback.  
+Because all soundbites are stored in **MP3 format** and limited to **10–15 seconds**, they are extremely lightweight — typically between **200 and 300 kbps**, rarely exceeding **400 kpbs per clip**. This ensures fast loading, smooth playback, and excellent audio quality across compatible platforms.  
+  
+Using open formats and minimal metadata makes it easy to extend or embed soundbites into any frontend that supports custom audio hooks or media previews.
+
 ---
 
-Omnibites **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. We respect copyright and only work with openly accessible content.  
+The platform **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. Copyright is respected, and only openly accessible content is used.  
   
-Omnibites is free and ad‑free. If you enjoy what you see or simply want this project to keep growing, you can support the developer directly:  
+The service is free and ad‑free. If you enjoy what you see or simply want the project to keep growing, you can support the developer directly:  
 
 <div align="center">
 
