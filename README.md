@@ -42,7 +42,7 @@ Video game music is a core part of popular culture and deserves its own dedicate
 
 Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
-[![Omnibites](https://jhondydario.github.io/Omnibites/assets/website-home-1.png)](https://jhondydario.github.io/Omnibites/)
+[![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)]
 
 ---
 
