@@ -22,11 +22,11 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 
 **What can you do here?**
 
-[![Disc](https://i.giphy.com/U3D4DHR7trnOrh26uA.webp)] Search for music from any retro video game and instantly listen to a 15-second preview.
-* Trim the exact fragment you want and download it as an MP3.
-* Upload your own soundbites and share them with the community.
-* Rate soundbites from other players.
-* Build a collective retro library with gaming's finest audio moments.
+- 💿 Search for music from any retro video game and instantly listen to a 15-second preview.
+- 💿 Trim the exact fragment you want and download it as an MP3.
+- 💿 Upload your own soundbites and share them with the community.
+- 💿 Rate soundbites from other players.
+- 💿 Build a collective retro library with gaming's finest audio moments.
 
 ---
 
