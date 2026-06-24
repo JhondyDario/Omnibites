@@ -60,6 +60,7 @@ The mobile app is still in planning, and no official APK exists yet — any you 
 ---
 
 Omnibites **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. We respect copyright and only work with openly accessible content.  
+  
 Omnibites is free and ad‑free. If you enjoy what you see or simply want this project to keep growing, you can support the developer directly:  
 
 <div align="center">
