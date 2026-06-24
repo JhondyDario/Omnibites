@@ -28,8 +28,6 @@ A soundbite is a 15-second clip with an automatic fade-in and fade-out — that 
 💿 Rate soundbites from other players.  
 💿 Build a collective retro library with gaming's finest audio moments.  
 
----
-
 > [!IMPORTANT]
 > **This is the [official Omnibites](https://jhondydario.github.io/Omnibites/) repository.**
 > Do not access the project from third-party sites, unauthorized forks, or external links.
@@ -43,8 +41,6 @@ Video game music is a core part of popular culture and deserves its own dedicate
 Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
 ![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)
-
----
 
 > [!NOTE]
 > Omnibites is an independent project in active development, every soundbite uploaded by the community helps the library grow. If you’ve arrived here early, you’re part of something that’s just getting started.
