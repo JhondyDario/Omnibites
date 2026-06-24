@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ajustes — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     .settings-page{max-width:580px;margin:0 auto;padding:2.5rem 1.5rem;}
     .settings-page h1{font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem;}
@@ -127,10 +127,17 @@
       document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Sí' : 'Pendiente';
       document.getElementById('infoVerif').style.color  = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
 
-      // Load current name
+      // Load current name + store verification status
       try {
-        const snap = await getDoc(doc(db,'usuarios',user.uid));
-        if (snap.exists()) document.getElementById('nombreInput').value = snap.data().nombre || '';
+        const ref = doc(db,'usuarios',user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          document.getElementById('nombreInput').value = snap.data().nombre || '';
+        }
+        // Always sync emailVerified status to Firestore (point 8)
+        if (snap.exists()) {
+          await updateDoc(ref, { emailVerified: user.emailVerified });
+        }
       } catch {}
     });
 
