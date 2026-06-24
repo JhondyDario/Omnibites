@@ -47,7 +47,7 @@ Omnibites was born to preserve that music and make it accessible in a way that n
 ---
 
 > [!NOTE]
-> Omnibites es un proyecto independiente en desarrollo activo. Cada soundbite que sube la comunidad hace crecer la biblioteca. Si llegas aquí pronto, eres parte de algo que apenas empieza.
+> Omnibites is an independent project in active development, every soundbite uploaded by the community helps the library grow. If you’ve arrived here early, you’re part of something that’s just getting started.
 
 ---
 
