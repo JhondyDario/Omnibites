@@ -370,3 +370,45 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   .profile-stats{grid-template-columns:1fr 1fr;}
   .card-actions{gap:.4rem;}
 }
+
+/* ── NAV LOGO IMAGE ── */
+.nav-logo-img {
+  height: 36px;
+  width: 36px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+.logo { display: flex; align-items: center; text-decoration: none; }
+
+/* ── NAV RIGHT (auth + hamburger together) ── */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+/* ── SB CARD inline title + tag ── */
+.sb-tag-inline {
+  font-size: .65rem;
+  font-weight: 600;
+  color: var(--neon);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.sb-dot { color: var(--border); margin: 0 .2rem; }
+
+/* Fix sb-footer padding consistency (no delete btn gap) */
+.sb-actions { min-width: 0; }
+
+/* ── SCREEN LABEL styled like logo ── */
+.screen-label {
+  font-family: var(--font-head);
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .5px;
+  text-align: center;
+  margin-bottom: .75rem;
+}
+.screen-label span { color: var(--neon); }
