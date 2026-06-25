@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crear Soundbite — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     .tab-row { display:flex;gap:.5rem;margin-bottom:1.5rem; }
     .tab-btn { flex:1;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-dim);font-size:.82rem;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:border-color .2s,color .2s; }
@@ -36,14 +36,26 @@
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+    </a>
     <div class="nav-links">
-      <a href="comunidad.html">Soundbites</a>
-      <a href="explorar.html">Explorar música</a>
-      <a href="subir.html" class="active">Crear Soundbite</a>
-      <div id="nav-auth"></div>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
     </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
