@@ -10,18 +10,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="index.html" class="logo">OMNI<span>BITES</span></a>
+    <nav class="navbar">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+    </a>
     <div class="nav-links">
-      <a href="pages/comunidad.html">Soundbites</a>
-      <a href="pages/explorar.html">Explorar música</a>
-      <a href="pages/subir.html">Crear Soundbite</a>
-      <div id="nav-auth"></div>
+      <a href="pages/comunidad.html">Comunidad</a>
+      <a href="pages/explorar.html">Explorar</a>
+      <a href="pages/subir.html">Añadir</a>
     </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="pages/comunidad.html">Comunidad</a>
+    <a href="pages/explorar.html">Explorar</a>
+    <a href="pages/subir.html">Añadir</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="pages/comunidad.html">Soundbites</a>
+    <a href="pages/comunidad.html">Comunidad</a>
     <a href="pages/explorar.html">Explorar música</a>
     <a href="pages/subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
@@ -38,7 +50,7 @@
     <div class="hero-visual">
       <div class="pixel-art-screen">
         <div class="screen-scanlines"></div>
-        <div class="screen-label">OMNIBITES</div>
+        <div class="screen-label">OMNI<span>BITES</span></div>
         <div class="waveform-demo">
           <canvas id="demoWave" width="280" height="70"></canvas>
         </div>
@@ -135,6 +147,7 @@
       });
     }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/home.js"></script>
