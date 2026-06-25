@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mi Perfil — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     .profile-page{max-width:660px;margin:0 auto;padding:2.5rem 1.5rem;}
     .profile-page h1{font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem;}
@@ -53,14 +53,26 @@
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+    </a>
     <div class="nav-links">
-      <a href="comunidad.html">Soundbites</a>
-      <a href="explorar.html">Explorar música</a>
-      <a href="subir.html">Crear Soundbite</a>
-      <div id="nav-auth"></div>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
     </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -141,9 +153,6 @@
         </div>
         <div class="avatar-opt" data-avatar="avatar2" id="opt-avatar2">
           <img src="../assets/avatars/avatar2.png" alt="Avatar 2"/>
-        </div>
-                <div class="avatar-opt" data-avatar="avatar3" id="opt-avatar3">
-          <img src="../assets/avatars/avatar3.png" alt="Avatar 3"/>
         </div>
       </div>
       <div class="modal-actions">
