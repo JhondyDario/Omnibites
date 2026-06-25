@@ -8,14 +8,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+    </a>
     <div class="nav-links">
-      <a href="comunidad.html" class="active">Soundbites</a>
-      <a href="explorar.html">Explorar música</a>
-      <a href="subir.html">Crear Soundbite</a>
-      <div id="nav-auth"></div>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
     </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -158,8 +170,7 @@
       const isMine = currentUser && currentUser.uid === a.autorId;
       return `
         <div class="sb-card" id="card-${a.id}">
-          <div class="sb-tag">${a.consola||'—'} · ${a.categoria||'soundbite'}</div>
-          <div class="sb-title">${a.titulo||'Sin título'}</div>
+          <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
           <div class="sb-meta">${a.juego||'—'} · <span class="sb-author">${a.autorNombre||'Anónimo'}</span></div>
           <div class="sb-player">
             <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
@@ -176,8 +187,8 @@
             </div>
             <div class="sb-actions">
               <button class="fav-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Guardar en favoritos">☆</button>
-              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar MP3">↓</button>;</button>
-              ${isMine ? `<button class="sb-delete-btn" onclick="deleteSB('${a.id}')" title="Eliminar">✕</button>` : ''}
+              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar MP3">↓</button></button></button>
+              
             </div>
           </div>
         </div>`;
