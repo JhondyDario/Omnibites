@@ -8,14 +8,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+    </a>
     <div class="nav-links">
-      <a href="comunidad.html">Soundbites</a>
-      <a href="explorar.html">Explorar música</a>
-      <a href="subir.html">Crear Soundbite</a>
-      <div id="nav-auth"></div>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
     </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <div id="mobile-auth"></div>
+  </div>
     <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -36,7 +48,7 @@
       </button>
 
       <div class="divider"><span>o con correo</span></div>
-      <div id="errMsg" class="form-error"></div>
+      <div id="errMsg" class="form-error" style="display:none"></div>
 
       <div class="form-group">
         <label>Nombre de jugador</label>
