@@ -212,8 +212,7 @@ async function loadLatest() {
       return `
         <div class="sb-card" id="hcard-${d.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-          <div class="sb-meta">${a.juego||'—'} · <span class="sb-author">${a.autorNombre||'Anónimo'}</span></div>
-          <div class="sb-player">
+<div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="${ROOT}/pages/jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>          <div class="sb-player">
             <button class="sb-play" id="hp-${i}" onclick="homePlay(${i},'${a.url}')">▶</button>
             <div class="sb-prog-wrap">
               <div class="sb-prog-bar"><div class="sb-prog-fill" id="hprog-${i}"></div></div>
