@@ -10,11 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-        <nav class="navbar">
+  <nav class="navbar">
     <a href="index.html" class="logo">
-      <img src="assets/logo.png" alt="Omnibites" class="nav-logo-img"
-           onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
-      <span style="display:none">OMNI<span style="color:var(--neon)">BITES</span></span>
+      <img src="assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
     <div class="nav-links">
       <a href="pages/comunidad.html">Comunidad</a>
@@ -30,14 +28,6 @@
     <a href="pages/comunidad.html">Comunidad</a>
     <a href="pages/explorar.html">Explorar</a>
     <a href="pages/subir.html">Añadir</a>
-    <div id="mobile-auth"></div>
-  </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="pages/comunidad.html">Comunidad</a>
-    <a href="pages/explorar.html">Explorar música</a>
-    <a href="pages/subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
 
@@ -81,53 +71,35 @@
     <div class="community-header">
       <h2>¿Qué quieres hacer hoy?</h2>
     </div>
-
-    <div class="action-cards">
-
-      <!-- CARD 1: Comunidad -->
-      <div class="action-card">
-        <div class="action-card-img">
-          <img src="assets/card-comunidad.png" alt="Comunidad" onerror="this.style.display='none'"/>
+    <div class="community-grid">
+      <div class="community-card rate-card">
+        <div class="cc-glow"></div>
+        <div class="cc-icon">⭐</div>
+        <h3>Escucha y Califica</h3>
+        <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación. Busca por consola, categoría o nombre del juego, califica de 1 a 5 estrellas y descarga en MP3 los que más te gusten.</p>
+        <div class="cc-tags">
+          <span>Preview 15s con fade</span>
+          <span>Sistema de estrellas</span>
+          <span>Descarga en MP3</span>
         </div>
-        <div class="action-card-body">
-          <h3>Soundbites de la Comunidad</h3>
-          <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación.</p>
-        </div>
-        <a href="pages/comunidad.html" class="action-card-btn btn-card-green">
-          Ver Soundbites <span class="action-arrow">→</span>
-        </a>
+        <a href="pages/comunidad.html" class="cc-btn cc-btn-rate">Ver Soundbites</a>
       </div>
-
-      <!-- CARD 2: Explorar -->
-      <div class="action-card">
-        <div class="action-card-img">
-          <img src="assets/card-explorar.png" alt="Explorar" onerror="this.style.display='none'"/>
+      <div class="community-card upload-card">
+        <div class="cc-glow cc-glow-purple"></div>
+        <div class="cc-icon">✂️</div>
+        <h3>Crea y Comparte</h3>
+        <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro. Busca el soundtrack en Archive.org, define el segundo exacto de inicio y fin, y publícalo para que todos lo escuchen.</p>
+        <div class="cc-tags">
+          <span>Desde Archive.org</span>
+          <span>Recorte exacto</span>
+          <span>MP3 con fade automático</span>
         </div>
-        <div class="action-card-body">
-          <h3>Buscar en la Web</h3>
-          <p>Usa la herramienta de buscar pistas de audio, define el soundbite y publícalo para que todos lo escuchen.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center">
+          <a href="pages/explorar.html" class="cc-btn cc-btn-upload">Explorar música</a>
+          <a href="pages/subir.html" class="cc-btn cc-btn-upload">Crear Soundbite</a>
         </div>
-        <a href="pages/explorar.html" class="action-card-btn btn-card-purple">
-          Explorar Música <span class="action-arrow">→</span>
-        </a>
       </div>
-
-      <!-- CARD 3: Crear -->
-      <div class="action-card">
-        <div class="action-card-img">
-          <img src="assets/card-crear.png" alt="Crear" onerror="this.style.display='none'"/>
-        </div>
-        <div class="action-card-body">
-          <h3>Crea y Comparte</h3>
-          <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro.</p>
-        </div>
-        <a href="pages/subir.html" class="action-card-btn btn-card-gold">
-          Crear Soundbite <span class="action-arrow">→</span>
-        </a>
-      </div>
-
     </div>
-
     <div class="community-banner">
       <div class="cb-pixel">INSERT COIN</div>
       <p>Cada soundbite que subes o calificas hace crecer la biblioteca retro más completa en español. <strong>¿Cuántos puedes agregar hoy?</strong></p>
@@ -158,8 +130,8 @@
       <span class="logo">OMNI<span>BITES</span></span>
     </div>
   </footer>
+
   <script>
-    // Mostrar mensaje si cuenta fue eliminada
     if (new URLSearchParams(location.search).get('deleted')) {
       window.addEventListener('load', () => {
         setTimeout(() => window.showToast && window.showToast('Tu cuenta ha sido eliminada. ¡Hasta luego!'), 500);
