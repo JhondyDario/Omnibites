@@ -205,31 +205,69 @@
     }
 
     // ── REACTIONS ──
-    window.react = async function(id, type) {
-      if (!currentUser) { showAuthPrompt(); return; }
-      try {
-        const userRef = doc(db,'usuarios',currentUser.uid);
-        const snap = await getDoc(userRef);
-        const reacts = snap.exists() ? (snap.data().reacciones||{}) : {};
-        const prev = reacts[id];
-        const audioRef = doc(db,'audios',id);
-        if (prev) {
-          await updateDoc(audioRef, { [`reactions.${prev}`]: increment(-1) });
-          const prevBtn = document.getElementById(`r-${prev}-${id}`);
-          if (prevBtn) { prevBtn.classList.remove(`active-${prev}`); decCount(prevBtn); }
-        }
-        if (prev === type) {
-          delete reacts[id];
-          await updateDoc(userRef, { reacciones: reacts });
-        } else {
-          reacts[id] = type;
-          await updateDoc(userRef, { reacciones: reacts });
-          await updateDoc(audioRef, { [`reactions.${type}`]: increment(1) });
-          const newBtn = document.getElementById(`r-${type}-${id}`);
-          if (newBtn) { newBtn.classList.add(`active-${type}`); incCount(newBtn); }
-        }
-      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
-    };
+
+// En comunidad.html — reemplaza la función react completa
+
+window.react = async function(id, type) {
+  if (!currentUser) { showAuthPrompt(); return; }
+  try {
+    // 1. Leer estado actual del usuario
+    const userRef  = doc(db, 'usuarios', currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    const reacts   = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
+    const prev     = reacts[id]; // reacción anterior del usuario en este audio
+
+    // 2. Leer el doc de audio para saber los conteos reales
+    const audioRef  = doc(db, 'audios', id);
+    const audioSnap = await getDoc(audioRef);
+    const reactions = audioSnap.exists()
+      ? (audioSnap.data().reactions || {})
+      : {};
+
+    // 3. Calcular nuevos valores (nunca negativos)
+    const updates = {};
+
+    if (prev) {
+      // Quitar la reacción anterior — nunca dejar en negativo
+      updates[`reactions.${prev}`] =
+        Math.max(0, (reactions[prev] || 0) - 1);
+
+      // UI: bajar contador anterior
+      const prevBtn = document.getElementById(`r-${prev}-${id}`);
+      if (prevBtn) {
+        prevBtn.classList.remove(`active-${prev}`);
+        const s = prevBtn.querySelector('.reaction-count');
+        if (s) s.textContent = updates[`reactions.${prev}`];
+      }
+    }
+
+    if (prev === type) {
+      // Misma reacción → toggle off
+      delete reacts[id];
+      await updateDoc(userRef,  { reacciones: reacts });
+      await updateDoc(audioRef, updates);
+    } else {
+      // Nueva reacción distinta → sumar
+      updates[`reactions.${type}`] =
+        (reactions[type] || 0) + 1;
+
+      reacts[id] = type;
+      await updateDoc(userRef,  { reacciones: reacts });
+      await updateDoc(audioRef, updates);
+
+      // UI: subir contador nuevo
+      const newBtn = document.getElementById(`r-${type}-${id}`);
+      if (newBtn) {
+        newBtn.classList.add(`active-${type}`);
+        const s = newBtn.querySelector('.reaction-count');
+        if (s) s.textContent = updates[`reactions.${type}`];
+      }
+    }
+
+  } catch(e) {
+    window.showToast && window.showToast('Error: ' + e.message, 'error');
+  }
+};
 
     function incCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=parseInt(s.textContent||0)+1; }
     function decCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=Math.max(0,parseInt(s.textContent||0)-1); }
