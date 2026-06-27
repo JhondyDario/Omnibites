@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
       <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
@@ -26,14 +26,6 @@
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
     <a href="subir.html">Añadir</a>
-    <div id="mobile-auth"></div>
-  </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
 
@@ -98,7 +90,6 @@
       }
       try {
         await sendPasswordResetEmail(auth, email);
-        // Show success inline
         const errEl = document.getElementById('errMsg');
         errEl.style.display = 'block';
         errEl.style.color = 'var(--neon)';

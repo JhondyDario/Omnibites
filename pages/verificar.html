@@ -18,7 +18,7 @@
   </style>
 </head>
 <body>
-    <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
       <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
@@ -38,9 +38,6 @@
     <a href="subir.html">Añadir</a>
     <div id="mobile-auth"></div>
   </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu"><div id="mobile-auth"></div></div>
 
   <main class="verify-page">
     <div class="verify-card">
@@ -79,21 +76,17 @@
 
     onAuthStateChanged(auth, async user => {
       if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
-
-      // If already verified, send to home
       if (user.emailVerified) { window.location.href = ROOT + '/index.html'; return; }
-
       currentUser = user;
       document.getElementById('userEmail').textContent = user.email || '';
     });
 
-    // Check if verified now
     document.getElementById('checkBtn').addEventListener('click', async () => {
       if (!currentUser) return;
       const btn = document.getElementById('checkBtn');
       btn.textContent = 'Verificando...'; btn.disabled = true;
       try {
-        await reload(currentUser); // refresh auth state
+        await reload(currentUser);
         if (currentUser.emailVerified) {
           window.showToast && window.showToast('Correo verificado. ¡Bienvenido!');
           setTimeout(() => window.location.href = ROOT + '/index.html', 1000);
@@ -107,7 +100,6 @@
       }
     });
 
-    // Resend with cooldown
     document.getElementById('resendBtn').addEventListener('click', async () => {
       if (!currentUser || cooldownTimer) return;
       try {

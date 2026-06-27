@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
       <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
@@ -26,14 +26,6 @@
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
     <a href="subir.html">Añadir</a>
-    <div id="mobile-auth"></div>
-  </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
 
@@ -166,8 +158,6 @@
 
     function sbCard(a) {
       const r = a.reactions || { love:0, mid:0, bad:0 };
-      const userReaction = a.userReaction || null; // set client-side
-      const isMine = currentUser && currentUser.uid === a.autorId;
       return `
         <div class="sb-card" id="card-${a.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
@@ -187,8 +177,7 @@
             </div>
             <div class="sb-actions">
               <button class="fav-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Guardar en favoritos">☆</button>
-              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar MP3">↓</button></button></button>
-              
+              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar MP3">↓</button>
             </div>
           </div>
         </div>`;
@@ -203,12 +192,10 @@
         const data = snap.data();
         const favs = data.favoritos || [];
         const reacts = data.reacciones || {};
-        // Mark favorites
         favs.forEach(id => {
           const btn = document.getElementById(`fav-${id}`);
           if (btn) { btn.textContent = '★'; btn.classList.add('active'); }
         });
-        // Mark reactions
         Object.entries(reacts).forEach(([id, type]) => {
           const btn = document.getElementById(`r-${type}-${id}`);
           if (btn) btn.classList.add(`active-${type}`);
@@ -225,20 +212,15 @@
         const reacts = snap.exists() ? (snap.data().reacciones||{}) : {};
         const prev = reacts[id];
         const audioRef = doc(db,'audios',id);
-
-        // Remove previous reaction
         if (prev) {
           await updateDoc(audioRef, { [`reactions.${prev}`]: increment(-1) });
           const prevBtn = document.getElementById(`r-${prev}-${id}`);
           if (prevBtn) { prevBtn.classList.remove(`active-${prev}`); decCount(prevBtn); }
         }
-
         if (prev === type) {
-          // Toggle off
           delete reacts[id];
           await updateDoc(userRef, { reacciones: reacts });
         } else {
-          // Set new
           reacts[id] = type;
           await updateDoc(userRef, { reacciones: reacts });
           await updateDoc(audioRef, { [`reactions.${type}`]: increment(1) });
@@ -336,18 +318,13 @@
       const btn = event?.target;
       if(btn){btn.textContent='...';btn.disabled=true;}
       try{
-        // Fetch audio
         const response = await fetch(url, {mode:'cors'});
         if(!response.ok) throw new Error('HTTP '+response.status);
         const arrayBuf = await response.arrayBuffer();
-
-        // Decode
         const ctx=getCtx();
         if(ctx.state==='suspended') await ctx.resume();
         const buf = await ctx.decodeAudioData(arrayBuf);
         const dur = Math.min(15, buf.duration);
-
-        // Render clip with fade using OfflineAudioContext
         const sampleRate = Math.min(buf.sampleRate, 44100);
         const offCtx = new OfflineAudioContext(1, Math.floor(dur*sampleRate), sampleRate);
         const src = offCtx.createBufferSource();
@@ -359,13 +336,10 @@
         gain.gain.linearRampToValueAtTime(0, dur);
         src.connect(gain); gain.connect(offCtx.destination); src.start(0, 0, dur);
         const rendered = await offCtx.startRendering();
-
-        // Encode to MP3 with lamejs
         const samples = rendered.getChannelData(0);
         const int16 = new Int16Array(samples.length);
         for(let i=0;i<samples.length;i++)
           int16[i]=Math.max(-32768,Math.min(32767,Math.round(samples[i]*32767)));
-
         if(typeof lamejs === 'undefined') throw new Error('lamejs not loaded');
         const enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
         const mp3 = []; const bs = 1152;
@@ -376,7 +350,6 @@
         }
         const end = enc.flush();
         if(end.length>0) mp3.push(new Uint8Array(end));
-
         const blob = new Blob(mp3, {type:'audio/mpeg'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
