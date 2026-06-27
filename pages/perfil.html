@@ -32,7 +32,6 @@
     .profile-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;}
     .btn-signout{background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius);padding:.5rem 1.2rem;font-size:.875rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .2s,color .2s;}
     .btn-signout:hover{background:var(--danger);color:#fff;}
-    /* Collapse sections */
     .collapse-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;overflow:hidden;}
     .collapse-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;user-select:none;transition:background .2s;}
     .collapse-header:hover{background:var(--bg3);}
@@ -53,11 +52,9 @@
   </style>
 </head>
 <body>
-        <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
-      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"
-           onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
-      <span style="display:none">OMNI<span style="color:var(--neon)">BITES</span></span>
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
@@ -75,25 +72,15 @@
     <a href="subir.html">Añadir</a>
     <div id="mobile-auth"></div>
   </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
-    <div id="mobile-auth"></div>
-  </div>
 
   <main class="profile-page" id="profileMain" style="display:none">
     <h1>Mi Perfil</h1>
 
-    <!-- Banner verificación solo para email/password -->
     <div class="verify-banner" id="verifyBanner" style="display:none">
       <p>Tu correo aún no está verificado. Revisa tu bandeja de entrada.</p>
       <button id="resendVerify">Reenviar correo</button>
     </div>
 
-    <!-- Avatar -->
     <div style="text-align:center;margin-bottom:1.5rem">
       <div class="avatar-wrap" id="avatarWrap" title="Cambiar avatar">
         <img id="avatarImg" src="../assets/avatars/avatar1.png" alt="Avatar"
@@ -105,20 +92,17 @@
       <div id="userEmail" style="font-size:.78rem;color:var(--text-dim)"></div>
     </div>
 
-    <!-- Stats -->
     <div class="profile-stats">
       <div class="pstat"><strong id="statAudios">0</strong><span>Soundbites subidos</span></div>
       <div class="pstat"><strong id="statFavs">0</strong><span>Favoritos guardados</span></div>
       <div class="pstat"><strong id="statLove">0</strong><span>Me encanta recibidos</span></div>
     </div>
 
-    <!-- Actions -->
     <div class="profile-actions">
       <a href="ajustes.html" class="btn-outline">Ajustes</a>
       <button class="btn-signout" id="signOutBtn">Cerrar sesión</button>
     </div>
 
-    <!-- Soundbites subidos por mí -->
     <div class="collapse-section" id="sec-mios">
       <div class="collapse-header" onclick="toggleSection('mios')">
         <h3>Mis Soundbites</h3>
@@ -131,7 +115,6 @@
       </div>
     </div>
 
-    <!-- Favoritos -->
     <div class="collapse-section" id="sec-favs">
       <div class="collapse-header" onclick="toggleSection('favs')">
         <h3>Soundbites Favoritos</h3>
@@ -145,7 +128,6 @@
     </div>
   </main>
 
-  <!-- Modal avatar -->
   <div class="avatar-modal" id="avatarModal" style="display:none">
     <div class="avatar-modal-box">
       <h3>Elige tu avatar</h3>
@@ -208,7 +190,6 @@
         applyAvatar(selectedAvatar);
         document.getElementById('statFavs').textContent = favIds.length;
 
-        // Load mis soundbites
         const q = query(collection(db,'audios'), where('autorId','==',user.uid));
         const aSnap = await getDocs(q);
         document.getElementById('statAudios').textContent = aSnap.size;
@@ -216,7 +197,6 @@
         document.getElementById('statLove').textContent = totalLove;
         renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
 
-        // Load favoritos
         if (favIds.length > 0) {
           const favAudios = [];
           for (const fid of favIds) {
@@ -282,7 +262,6 @@
       } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
     };
 
-    // Collapse toggle
     window.toggleSection = function(key) {
       const body  = document.getElementById(`body-${key}`);
       const arrow = document.getElementById(`arrow-${key}`);
@@ -291,7 +270,6 @@
       arrow.classList.toggle('open',!open);
     };
 
-    // Avatar
     function applyAvatar(name) {
       const img = document.getElementById('avatarImg');
       img.style.display='block';
