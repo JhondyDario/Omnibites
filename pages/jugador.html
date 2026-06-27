@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <title>Perfil — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .pub-profile { max-width: 640px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    .pub-avatar-wrap { text-align: center; margin-bottom: 1.25rem; }
+    .pub-avatar {
+      width: 96px; height: 96px; border-radius: 50%;
+      border: 3px solid var(--cyan); object-fit: cover; display: block;
+      margin: 0 auto;
+    }
+    .pub-avatar-fallback {
+      width: 96px; height: 96px; border-radius: 50%;
+      border: 3px solid var(--cyan); background: var(--cyan); color: #000;
+      font-size: 2rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto;
+    }
+    .pub-name {
+      font-family: var(--font-head); font-size: 1.2rem; font-weight: 700;
+      text-align: center; margin-top: .75rem; margin-bottom: .25rem;
+    }
+    .pub-sub {
+      text-align: center; font-size: .78rem; color: var(--text-dim); margin-bottom: 1.5rem;
+    }
+
+    .pub-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .pstat { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; text-align: center; }
+    .pstat strong { display: block; font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--cyan); margin-bottom: .25rem; }
+    .pstat span { font-size: .72rem; color: var(--text-dim); }
+
+    .collapse-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: .875rem; overflow: hidden; }
+    .collapse-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; cursor: pointer; user-select: none; transition: background .2s; }
+    .collapse-header:hover { background: var(--bg3); }
+    .collapse-header h3 { font-family: var(--font-head); font-size: .9rem; font-weight: 600; }
+    .collapse-arrow { color: var(--cyan); font-size: .75rem; transition: transform .2s; }
+    .collapse-arrow.open { transform: rotate(180deg); }
+    .collapse-body { display: none; padding: 0 1.25rem 1.25rem; }
+    .collapse-body.open { display: block; }
+
+    .mini-sb-card { background: var(--bg3); border-radius: 8px; padding: .75rem 1rem; margin-bottom: .5rem; }
+    .mini-sb-title { font-size: .85rem; font-weight: 600; }
+    .mini-sb-meta { font-size: .72rem; color: var(--text-dim); margin-top: .2rem; }
+    .empty-mini { font-size: .82rem; color: var(--text-dim); text-align: center; padding: 1.25rem 0; }
+
+    .state-msg { text-align: center; padding: 4rem 1rem; color: var(--text-dim); }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      OMNI<span>BITES</span>
+    </a>
+    <div class="nav-links">
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
+      <a href="jugadores.html" style="color:var(--cyan)">Jugadores</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <a href="jugadores.html" style="color:var(--cyan)">Jugadores</a>
+    <div id="mobile-auth"></div>
+  </div>
+
+  <main class="pub-profile" id="pubMain">
+    <a href="jugadores.html" class="btn-back">← Jugadores</a>
+
+    <div id="loadingState" class="state-msg">
+      <div class="spinner"></div>
+      <p>Cargando perfil...</p>
+    </div>
+
+    <div id="profileContent" style="display:none">
+      <div class="pub-avatar-wrap">
+        <img id="pubAvatar" src="../assets/avatars/avatar1.png" alt="Avatar" class="pub-avatar"
+             onerror="this.style.display='none';document.getElementById('pubAvatarFallback').style.display='flex'"/>
+        <div class="pub-avatar-fallback" id="pubAvatarFallback" style="display:none"></div>
+      </div>
+      <div class="pub-name" id="pubName"></div>
+      <div class="pub-sub">Miembro de la comunidad Omnibites</div>
+
+      <div class="pub-stats">
+        <div class="pstat"><strong id="pubStatAudios">0</strong><span>Soundbites</span></div>
+        <div class="pstat"><strong id="pubStatFavs">0</strong><span>Favoritos</span></div>
+        <div class="pstat"><strong id="pubStatLove">0</strong><span>Me encanta</span></div>
+      </div>
+
+      <div class="collapse-section">
+        <div class="collapse-header" onclick="toggleSec('mios')">
+          <h3>Soundbites subidos</h3>
+          <span class="collapse-arrow open" id="arrow-mios">▾</span>
+        </div>
+        <div class="collapse-body open" id="body-mios">
+          <div id="list-mios"><div class="empty-mini">Cargando...</div></div>
+        </div>
+      </div>
+
+      <div class="collapse-section">
+        <div class="collapse-header" onclick="toggleSec('favs')">
+          <h3>Favoritos</h3>
+          <span class="collapse-arrow" id="arrow-favs">▾</span>
+        </div>
+        <div class="collapse-body" id="body-favs">
+          <div id="list-favs"><div class="empty-mini">Cargando...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notFound" style="display:none" class="state-msg">
+      <p>No se encontró este jugador.</p>
+      <a href="jugadores.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Volver a Jugadores</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db } from '../js/firebase-config.js';
+    import { doc, getDoc, collection, getDocs, query, where }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    const uid = new URLSearchParams(location.search).get('uid');
+
+    if (!uid) {
+      window.location.href = ROOT + '/pages/jugadores.html';
+    } else {
+      loadProfile(uid);
+    }
+
+    async function loadProfile(uid) {
+      try {
+        const ref  = doc(db, 'usuarios', uid);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('notFound').style.display = 'block';
+          return;
+        }
+
+        const data   = snap.data();
+        const nombre = data.nombre || 'Jugador';
+        const avatar = data.avatar || 'avatar1';
+        const favIds = data.favoritos || [];
+
+        // Avatar
+        document.getElementById('pubAvatar').src = `${ROOT}/assets/avatars/${avatar}.png`;
+        document.getElementById('pubAvatarFallback').textContent = nombre.charAt(0).toUpperCase();
+        document.getElementById('pubName').textContent = nombre;
+        document.title = `${nombre} — Omnibites`;
+
+        // Stats favoritos
+        document.getElementById('pubStatFavs').textContent = favIds.length;
+
+        // Audios del usuario
+        const audiosSnap = await getDocs(
+          query(collection(db, 'audios'), where('autorId', '==', uid))
+        );
+        const audios = audiosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        document.getElementById('pubStatAudios').textContent = audios.length;
+
+        const totalLove = audios.reduce((s, a) => s + (a.reactions?.love || 0), 0);
+        document.getElementById('pubStatLove').textContent = totalLove;
+
+        // Lista de soundbites
+        const listMios = document.getElementById('list-mios');
+        if (audios.length) {
+          listMios.innerHTML = audios.map(a => `
+            <div class="mini-sb-card">
+              <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
+              <div class="mini-sb-meta">${a.juego || '—'} · ${a.consola || '—'}</div>
+            </div>`).join('');
+        } else {
+          listMios.innerHTML = '<div class="empty-mini">Este jugador aún no ha subido soundbites.</div>';
+        }
+
+        // Favoritos
+        const listFavs = document.getElementById('list-favs');
+        if (favIds.length > 0) {
+          const favAudios = [];
+          for (const fid of favIds) {
+            try {
+              const fs = await getDoc(doc(db, 'audios', fid));
+              if (fs.exists()) favAudios.push({ id: fs.id, ...fs.data() });
+            } catch {}
+          }
+          if (favAudios.length) {
+            listFavs.innerHTML = favAudios.map(a => `
+              <div class="mini-sb-card">
+                <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
+                <div class="mini-sb-meta">${a.juego || '—'} · ${a.autorNombre || '—'}</div>
+              </div>`).join('');
+          } else {
+            listFavs.innerHTML = '<div class="empty-mini">No se encontraron favoritos.</div>';
+          }
+        } else {
+          listFavs.innerHTML = '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>';
+        }
+
+        document.getElementById('loadingState').style.display  = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+
+      } catch(e) {
+        document.getElementById('loadingState').innerHTML =
+          '<p>Error al cargar el perfil.</p>';
+        console.error(e);
+      }
+    }
+
+    window.toggleSec = function(key) {
+      const body  = document.getElementById(`body-${key}`);
+      const arrow = document.getElementById(`arrow-${key}`);
+      const open  = body.classList.contains('open');
+      body.classList.toggle('open', !open);
+      arrow.classList.toggle('open', !open);
+    };
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>

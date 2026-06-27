@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <title>Jugadores — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .players-page { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .players-page h1 { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+    .players-search {
+      display: flex; gap: .75rem; margin-bottom: 2rem;
+    }
+    .players-search input {
+      flex: 1; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); padding: .85rem 1rem;
+      font-size: .95rem; font-family: var(--font-body); outline: none;
+      transition: border-color .2s;
+    }
+    .players-search input:focus { border-color: var(--cyan); }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .player-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .75rem; text-align: center;
+      transition: border-color .2s, transform .2s;
+      text-decoration: none; color: var(--text);
+      cursor: pointer;
+    }
+    .player-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+
+    .player-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 2px solid var(--border); object-fit: cover;
+      background: var(--bg3);
+    }
+    .player-avatar-fallback {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--cyan); color: #000;
+      font-size: 1.4rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .player-name {
+      font-family: var(--font-head); font-size: .9rem; font-weight: 700;
+    }
+    .player-stats {
+      display: flex; gap: 1rem;
+      font-size: .72rem; color: var(--text-dim);
+    }
+    .player-stats span strong {
+      display: block; color: var(--cyan);
+      font-family: var(--font-head); font-size: .9rem;
+    }
+
+    .state-msg { text-align: center; padding: 4rem 1rem; color: var(--text-dim); }
+    .state-msg p { font-size: .9rem; }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      OMNI<span>BITES</span>
+    </a>
+    <div class="nav-links">
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
+      <a href="jugadores.html" class="active" style="color:var(--cyan)">Jugadores</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <a href="jugadores.html" style="color:var(--cyan)">Jugadores</a>
+    <div id="mobile-auth"></div>
+  </div>
+
+  <main class="players-page">
+    <h1>Jugadores</h1>
+    <div class="players-search">
+      <input type="text" id="searchInput" placeholder="Buscar jugador por nombre..."/>
+      <button class="btn-primary" id="searchBtn" style="background:var(--cyan);color:#000">Buscar</button>
+    </div>
+    <div id="playersGrid" class="players-grid">
+      <div class="state-msg" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <p>Cargando jugadores...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <a href="../index.html" class="logo">OMNI<span>BITES</span></a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db } from '../js/firebase-config.js';
+    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    let allPlayers = [];
+    let audioCountMap = {};
+
+    async function loadPlayers() {
+      try {
+        const [usersSnap, audiosSnap] = await Promise.all([
+          getDocs(collection(db, 'usuarios')),
+          getDocs(collection(db, 'audios'))
+        ]);
+
+        // Contar audios por usuario
+        audiosSnap.docs.forEach(d => {
+          const uid = d.data().autorId;
+          if (uid) audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+        });
+
+        allPlayers = usersSnap.docs.map(d => ({
+          uid: d.id,
+          ...d.data(),
+          audios: audioCountMap[d.id] || 0
+        }));
+
+        render('');
+      } catch(e) {
+        document.getElementById('playersGrid').innerHTML =
+          '<div class="state-msg" style="grid-column:1/-1"><p>Error al cargar jugadores.</p></div>';
+      }
+    }
+
+    function render(search) {
+      const grid = document.getElementById('playersGrid');
+      const q = search.toLowerCase().trim();
+      const filtered = q
+        ? allPlayers.filter(p => (p.nombre || '').toLowerCase().includes(q))
+        : allPlayers;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No se encontró ningún jugador.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const name = p.nombre || 'Jugador';
+        const initial = name.charAt(0).toUpperCase();
+        const favs = (p.favoritos || []).length;
+        const avatarHTML = p.avatar
+          ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
+               onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
+             <div class="player-avatar-fallback" style="display:none">${initial}</div>`
+          : `<div class="player-avatar-fallback">${initial}</div>`;
+
+        return `
+          <a class="player-card" href="jugador.html?uid=${p.uid}">
+            ${avatarHTML}
+            <div class="player-name">${name}</div>
+            <div class="player-stats">
+              <span><strong>${p.audios}</strong>Soundbites</span>
+              <span><strong>${favs}</strong>Favoritos</span>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      render(document.getElementById('searchInput').value);
+    });
+    document.getElementById('searchInput').addEventListener('input', e => {
+      render(e.target.value);
+    });
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') render(e.target.value);
+    });
+
+    loadPlayers();
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
