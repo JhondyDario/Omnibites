@@ -90,7 +90,7 @@
         <div class="avatar-edit-hint">✏</div>
       </div>
       <div id="userName" style="font-weight:700;font-size:1.1rem;margin-bottom:.2rem"></div>
-      <div id="userEmail" style="font-size:.78rem;color:var(--text-dim)"></div>
+      <div id="userEmail" style="font-size:.78rem;color:var(--text-dim);display:none"></div>
     </div>
 
     <div class="profile-stats">
@@ -133,7 +133,6 @@
     <div class="avatar-modal-box">
       <h3>Elige tu avatar</h3>
       <div class="avatar-grid-modal" id="avatarGrid">
-        <!-- se llena automáticamente por JS -->
       </div>
       <div class="modal-actions">
         <button class="btn-outline" id="cancelAvatar">Cancelar</button>
@@ -149,7 +148,8 @@
     import {
       doc, getDoc, setDoc, updateDoc, deleteDoc,
       collection, getDocs, query, where, arrayRemove, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null, selectedAvatar = 'avatar1';
@@ -165,7 +165,6 @@
 
       document.getElementById('avFallback').textContent =
         (user.displayName||'J').charAt(0).toUpperCase();
-      document.getElementById('userEmail').textContent = user.email||'';
 
       try {
         const ref  = doc(db,'usuarios',user.uid);
@@ -175,9 +174,9 @@
 
         if (snap.exists()) {
           const d = snap.data();
-          nombre         = d.nombre || nombre;
+          nombre = d.nombre || nombre;
           selectedAvatar = d.avatar || 'avatar1';
-          favIds         = d.favoritos || [];
+          favIds = d.favoritos || [];
         } else {
           await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
         }
@@ -207,163 +206,8 @@
         }
       } catch(e) {
         console.error('Perfil error:',e.message);
-        window.showToast&&window.showToast('Error: '+e.message,'error');
       }
-    });
-
-    function renderMios(items) {
-      const el = document.getElementById('list-mios');
-      if (!items.length) { el.innerHTML = '<div class="empty-mini">No has subido soundbites aún.</div>'; return; }
-      el.innerHTML = items.map(a => `
-        <div class="mini-sb-card" id="mini-${a.id}">
-          <div class="mini-sb-info">
-            <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
-            <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
-          </div>
-          <div class="mini-sb-actions">
-            <button class="btn-xs btn-xs-danger" onclick="deleteMio('${a.id}')">Eliminar</button>
-          </div>
-        </div>`).join('');
-    }
-
-    function renderFavs(items, uid) {
-      const el = document.getElementById('list-favs');
-      if (!items.length) { el.innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>'; return; }
-      el.innerHTML = items.map(a => `
-        <div class="mini-sb-card" id="fav-mini-${a.id}">
-          <div class="mini-sb-info">
-            <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
-            <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
-          </div>
-          <div class="mini-sb-actions">
-            <button class="btn-xs btn-xs-fav" onclick="removeFav('${a.id}')">Quitar</button>
-          </div>
-        </div>`).join('');
-    }
-
-    window.deleteMio = async function(id) {
-      if (!confirm('¿Eliminar este soundbite?')) return;
-      try {
-        await deleteDoc(doc(db,'audios',id));
-        document.getElementById(`mini-${id}`)?.remove();
-        window.showToast&&window.showToast('Soundbite eliminado');
-      } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
-    };
-
-    window.removeFav = async function(id) {
-      try {
-        await updateDoc(doc(db,'usuarios',currentUser.uid),{favoritos:arrayRemove(id)});
-        document.getElementById(`fav-mini-${id}`)?.remove();
-        window.showToast&&window.showToast('Eliminado de favoritos');
-      } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
-    };
-
-    window.toggleSection = function(key) {
-      const body  = document.getElementById(`body-${key}`);
-      const arrow = document.getElementById(`arrow-${key}`);
-      const open  = body.classList.contains('open');
-      body.classList.toggle('open',!open);
-      arrow.classList.toggle('open',!open);
-    };
-
-    // ── AVATARES DINÁMICOS ──
-    // Detecta automáticamente cuántos avatares existen en assets/avatars/
-    // Para añadir más: sube avatar4.png, avatar5.png, etc. a GitHub. Sin tocar código.
-    async function discoverAvatars() {
-      const avatars = [];
-      let i = 1;
-      while (true) {
-        const name = `avatar${i}`;
-        const url  = `../assets/avatars/${name}.png`;
-        try {
-          const res = await fetch(url, { method: 'HEAD' });
-          if (!res.ok) break;
-          avatars.push(name);
-          i++;
-        } catch { break; }
-      }
-      // Fallback: si no carga ninguno (offline, etc.) usar al menos avatar1 y avatar2
-      return avatars.length > 0 ? avatars : ['avatar1', 'avatar2'];
-    }
-
-    function buildAvatarGrid(avatars) {
-      const grid = document.getElementById('avatarGrid');
-      grid.innerHTML = avatars.map(name => `
-        <div class="avatar-opt" data-avatar="${name}" id="opt-${name}">
-          <img src="../assets/avatars/${name}.png" alt="${name}"/>
-        </div>`).join('');
-      // Bind click listeners
-      grid.querySelectorAll('.avatar-opt').forEach(opt => {
-        opt.addEventListener('click', () => {
-          grid.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
-          opt.classList.add('selected');
-          selectedAvatar = opt.dataset.avatar;
-          const img = document.getElementById('avatarImg');
-          img.style.display = 'block';
-          document.getElementById('avFallback').style.display = 'none';
-          img.src = `../assets/avatars/${selectedAvatar}.png`;
-        });
-      });
-    }
-
-    function applyAvatar(name) {
-      const img = document.getElementById('avatarImg');
-      img.style.display = 'block';
-      document.getElementById('avFallback').style.display = 'none';
-      img.src = `../assets/avatars/${name}.png`;
-      document.querySelectorAll('.avatar-opt').forEach(o =>
-        o.classList.toggle('selected', o.dataset.avatar === name));
-      selectedAvatar = name;
-    }
-
-    document.getElementById('avatarWrap').addEventListener('click', async () => {
-      // Construir el grid cada vez que se abre (por si se añadieron nuevos avatares)
-      const avatars = await discoverAvatars();
-      buildAvatarGrid(avatars);
-      applyAvatar(selectedAvatar);
-      document.getElementById('avatarModal').style.display = 'flex';
-    });
-
-    document.getElementById('cancelAvatar').addEventListener('click', () =>
-      document.getElementById('avatarModal').style.display = 'none');
-
-    document.getElementById('saveAvatar').addEventListener('click', async () => {
-      if (!currentUser) return;
-      try {
-        await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
-        document.getElementById('avatarModal').style.display = 'none';
-        window.showToast && window.showToast('Avatar guardado');
-      } catch {
-        try {
-          await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
-          document.getElementById('avatarModal').style.display = 'none';
-          window.showToast && window.showToast('Avatar guardado');
-        } catch(e2) { window.showToast && window.showToast('Error: ' + e2.message, 'error'); }
-      }
-    });
-
-    document.getElementById('signOutBtn').addEventListener('click', async()=>{
-      await signOut(auth);
-      window.location.href=ROOT+'/index.html';
-    });
-    document.getElementById('resendVerify')?.addEventListener('click', async()=>{
-      try { await sendEmailVerification(currentUser); window.showToast&&window.showToast('Correo enviado'); }
-      catch(e){ window.showToast&&window.showToast('Error: '+e.message,'error'); }
     });
   </script>
-  <script type="module" src="../js/auth.js"></script>
-  <script src="../js/ui.js"></script>
-
-  <footer class="footer">
-    <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
-      <div class="footer-links">
-        <a href="comunidad.html">Soundbites</a>
-        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
-      </div>
-      <span class="logo">OMNI<span>BITES</span></span>
-    </div>
-  </footer>
 </body>
 </html>
