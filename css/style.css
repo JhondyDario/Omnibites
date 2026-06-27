@@ -145,7 +145,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   height:68px;
   border-radius:10px;
   overflow:hidden;
-  background:var(--bg3);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -437,7 +436,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── NAV LOGO IMAGE ── */
 .nav-logo-img{height:36px;width:36px;object-fit:contain;border-radius:50%;display:block;}
-.logo{display:flex;align-items:center;text-decoration:none;}
+.logo{display:flex;align-items:center;text-decoration:none;gap:.5rem;}
+.logo span{margin-left:0;}
 
 /* ── NAV RIGHT ── */
 .nav-right{display:flex;align-items:center;gap:.75rem;}

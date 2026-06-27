@@ -200,7 +200,7 @@ async function loadLatest() {
   const grid = document.getElementById('featuredGrid');
   if (!grid) return;
   try {
-    const q = query(collection(db, 'audios'), orderBy('creadoEn', 'desc'), limit(3));
+    const q = query(collection(db, 'audios'), orderBy('creadoEn', 'desc'), limit(2));
     const snap = await getDocs(q);
     if (snap.empty) {
       grid.innerHTML = '<p style="color:var(--text-dim);font-size:.85rem;grid-column:1/-1;padding:2rem 0">Aún no hay soundbites. ¡Sé el primero en subir uno!</p>';
