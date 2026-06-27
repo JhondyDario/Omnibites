@@ -19,7 +19,7 @@
     .avatar-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:400;display:flex;align-items:center;justify-content:center;padding:1.5rem;}
     .avatar-modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:2rem;max-width:360px;width:100%;text-align:center;}
     .avatar-modal-box h3{font-family:var(--font-pixel);font-size:.68rem;color:var(--neon);margin-bottom:1.25rem;}
-    .avatar-grid-modal{display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;}
+    .avatar-grid-modal{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-bottom:1.5rem;max-height:220px;overflow-y:auto;}
     .avatar-opt{width:70px;height:70px;border-radius:50%;border:3px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;}
     .avatar-opt:hover{transform:scale(1.08);}
     .avatar-opt.selected{border-color:var(--neon);box-shadow:0 0 14px rgba(57,255,20,.35);}
@@ -131,13 +131,8 @@
   <div class="avatar-modal" id="avatarModal" style="display:none">
     <div class="avatar-modal-box">
       <h3>Elige tu avatar</h3>
-      <div class="avatar-grid-modal">
-        <div class="avatar-opt" data-avatar="avatar1" id="opt-avatar1">
-          <img src="../assets/avatars/avatar1.png" alt="Avatar 1"/>
-        </div>
-        <div class="avatar-opt" data-avatar="avatar2" id="opt-avatar2">
-          <img src="../assets/avatars/avatar2.png" alt="Avatar 2"/>
-        </div>
+      <div class="avatar-grid-modal" id="avatarGrid">
+        <!-- se llena automáticamente por JS -->
       </div>
       <div class="modal-actions">
         <button class="btn-outline" id="cancelAvatar">Cancelar</button>
@@ -270,44 +265,79 @@
       arrow.classList.toggle('open',!open);
     };
 
+    // ── AVATARES DINÁMICOS ──
+    // Detecta automáticamente cuántos avatares existen en assets/avatars/
+    // Para añadir más: sube avatar4.png, avatar5.png, etc. a GitHub. Sin tocar código.
+    async function discoverAvatars() {
+      const avatars = [];
+      let i = 1;
+      while (true) {
+        const name = `avatar${i}`;
+        const url  = `../assets/avatars/${name}.png`;
+        try {
+          const res = await fetch(url, { method: 'HEAD' });
+          if (!res.ok) break;
+          avatars.push(name);
+          i++;
+        } catch { break; }
+      }
+      // Fallback: si no carga ninguno (offline, etc.) usar al menos avatar1 y avatar2
+      return avatars.length > 0 ? avatars : ['avatar1', 'avatar2'];
+    }
+
+    function buildAvatarGrid(avatars) {
+      const grid = document.getElementById('avatarGrid');
+      grid.innerHTML = avatars.map(name => `
+        <div class="avatar-opt" data-avatar="${name}" id="opt-${name}">
+          <img src="../assets/avatars/${name}.png" alt="${name}"/>
+        </div>`).join('');
+      // Bind click listeners
+      grid.querySelectorAll('.avatar-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+          grid.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
+          opt.classList.add('selected');
+          selectedAvatar = opt.dataset.avatar;
+          const img = document.getElementById('avatarImg');
+          img.style.display = 'block';
+          document.getElementById('avFallback').style.display = 'none';
+          img.src = `../assets/avatars/${selectedAvatar}.png`;
+        });
+      });
+    }
+
     function applyAvatar(name) {
       const img = document.getElementById('avatarImg');
-      img.style.display='block';
-      document.getElementById('avFallback').style.display='none';
-      img.src=`../assets/avatars/${name}.png`;
-      document.querySelectorAll('.avatar-opt').forEach(o=>
-        o.classList.toggle('selected', o.dataset.avatar===name));
-      selectedAvatar=name;
+      img.style.display = 'block';
+      document.getElementById('avFallback').style.display = 'none';
+      img.src = `../assets/avatars/${name}.png`;
+      document.querySelectorAll('.avatar-opt').forEach(o =>
+        o.classList.toggle('selected', o.dataset.avatar === name));
+      selectedAvatar = name;
     }
-    document.getElementById('avatarWrap').addEventListener('click',()=>{
+
+    document.getElementById('avatarWrap').addEventListener('click', async () => {
+      // Construir el grid cada vez que se abre (por si se añadieron nuevos avatares)
+      const avatars = await discoverAvatars();
+      buildAvatarGrid(avatars);
       applyAvatar(selectedAvatar);
-      document.getElementById('avatarModal').style.display='flex';
+      document.getElementById('avatarModal').style.display = 'flex';
     });
-    document.getElementById('cancelAvatar').addEventListener('click',()=>
-      document.getElementById('avatarModal').style.display='none');
-    document.querySelectorAll('.avatar-opt').forEach(opt=>{
-      opt.addEventListener('click',()=>{
-        document.querySelectorAll('.avatar-opt').forEach(o=>o.classList.remove('selected'));
-        opt.classList.add('selected');
-        selectedAvatar=opt.dataset.avatar;
-        const img=document.getElementById('avatarImg');
-        img.style.display='block';
-        document.getElementById('avFallback').style.display='none';
-        img.src=`../assets/avatars/${selectedAvatar}.png`;
-      });
-    });
-    document.getElementById('saveAvatar').addEventListener('click', async()=>{
-      if(!currentUser)return;
+
+    document.getElementById('cancelAvatar').addEventListener('click', () =>
+      document.getElementById('avatarModal').style.display = 'none');
+
+    document.getElementById('saveAvatar').addEventListener('click', async () => {
+      if (!currentUser) return;
       try {
-        await updateDoc(doc(db,'usuarios',currentUser.uid),{avatar:selectedAvatar});
-        document.getElementById('avatarModal').style.display='none';
-        window.showToast&&window.showToast('Avatar guardado');
+        await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
+        document.getElementById('avatarModal').style.display = 'none';
+        window.showToast && window.showToast('Avatar guardado');
       } catch {
         try {
-          await setDoc(doc(db,'usuarios',currentUser.uid),{avatar:selectedAvatar},{merge:true});
-          document.getElementById('avatarModal').style.display='none';
-          window.showToast&&window.showToast('Avatar guardado');
-        } catch(e2){ window.showToast&&window.showToast('Error: '+e2.message,'error'); }
+          await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
+          document.getElementById('avatarModal').style.display = 'none';
+          window.showToast && window.showToast('Avatar guardado');
+        } catch(e2) { window.showToast && window.showToast('Error: ' + e2.message, 'error'); }
       }
     });
 
