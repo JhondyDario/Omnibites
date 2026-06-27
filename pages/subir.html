@@ -36,11 +36,9 @@
   </style>
 </head>
 <body>
-        <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
-      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"
-           onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
-      <span style="display:none">OMNI<span style="color:var(--neon)">BITES</span></span>
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
@@ -56,14 +54,6 @@
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
     <a href="subir.html">Añadir</a>
-    <div id="mobile-auth"></div>
-  </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
     <div id="mobile-auth"></div>
   </div>
 
@@ -83,7 +73,6 @@
   <main id="mainForm" class="editor-page" style="display:none">
     <h1>Crear Soundbite</h1>
 
-    <!-- PASO 1 -->
     <div class="editor-box" style="margin-bottom:1.5rem">
       <p class="step-label">PASO 1 — Fuente del audio</p>
       <div class="tab-row">
@@ -98,7 +87,7 @@
         </div>
         <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.8">
           Fuentes compatibles: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong>, <strong style="color:var(--text)">VGMdownloads</strong>, <strong style="color:var(--text)">SoundCloud</strong> o cualquier enlace directo a .mp3 / .ogg.<br/>
-          Lo más fácil: usa <a href="explorar.html" style="color:var(--neon);font-weight:600">Explorar música</a> y pulsa "Compartir en Omnibites".
+          Lo más fácil: usa <a href="explorar.html" style="color:var(--neon);font-weight:600">Explorar música</a> y pulsa "Añadir Soundbite".
         </p>
         <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
       </div>
@@ -114,7 +103,6 @@
       </div>
     </div>
 
-    <!-- PASO 2 -->
     <div id="previewSection" style="display:none" class="editor-box">
       <p class="step-label">PASO 2 — Escucha y define el recorte</p>
       <div class="preview-box">
@@ -136,7 +124,6 @@
       </div>
     </div>
 
-    <!-- PASO 3 -->
     <div class="editor-box">
       <p class="step-label">PASO 3 — Información</p>
       <div class="form-group"><label>Título del soundbite *</label><input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/></div>
@@ -231,7 +218,6 @@
       if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
     }
 
-    // Tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeTab = btn.dataset.tab;
@@ -243,7 +229,6 @@
       });
     });
 
-    // URL tab
     document.getElementById('loadBtn').addEventListener('click', () =>
       loadAudioUrl(document.getElementById('audioUrl').value.trim()));
 
@@ -284,7 +269,6 @@
     });
     document.getElementById('stopBtn').addEventListener('click', () => audioPlayer.pause());
 
-    // File tab
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     dropZone.addEventListener('click', () => fileInput.click());
@@ -317,7 +301,6 @@
       };
     }
 
-    // Publicar
     document.getElementById('submitBtn').addEventListener('click', async () => {
       if (!currentUser) { window.showToast('Inicia sesión primero.','error'); return; }
       const titulo   = document.getElementById('titulo').value.trim();
@@ -344,14 +327,12 @@
       btn.disabled = true; btn.textContent = 'Publicando...';
 
       try {
-        // Check for existing soundbite with same title+juego by this user
         const dupeQ = query(collection(db,'audios'),
           where('autorId','==',currentUser.uid),
           where('titulo','==',titulo),
           where('juego','==',juego));
         const dupeSnap = await getDocs(dupeQ);
         if (!dupeSnap.empty) {
-          // Update existing instead of creating duplicate
           await updateDoc(doc(db,'audios',dupeSnap.docs[0].id), {
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
