@@ -74,7 +74,7 @@ The service is free and ad‑free. If you enjoy what you see or simply want the 
 
 <div align="center">
 
-[![PayPal](https://img.shields.io/badge/Omnibites-PayPal-003087?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ)
+[![PayPal](https://img.shields.io/badge/Omnibites-PayPal-003087?style=for-the-badge&logo=paypal&logoColor=white)]([https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ](https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ))
 
 *Your support helps cover development, improvements, and eventually the server for upcoming features.*  
 
