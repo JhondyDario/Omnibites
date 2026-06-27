@@ -436,8 +436,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── NAV LOGO IMAGE ── */
 .nav-logo-img{height:36px;width:36px;object-fit:contain;border-radius:50%;display:block;}
-.logo span, .logo {gap: .5rem;}
-.logo{display:flex;align-items:center;text-decoration:none;}
+.logo{display:flex;align-items:center;text-decoration:none;gap:.5rem;}
+.logo span{margin-left:0;}
 
 /* ── NAV RIGHT ── */
 .nav-right{display:flex;align-items:center;gap:.75rem;}
