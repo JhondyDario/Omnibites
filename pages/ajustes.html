@@ -29,11 +29,9 @@
   </style>
 </head>
 <body>
-        <nav class="navbar">
+  <nav class="navbar">
     <a href="../index.html" class="logo">
-      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"
-           onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
-      <span style="display:none">OMNI<span style="color:var(--neon)">BITES</span></span>
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
     </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
@@ -51,20 +49,11 @@
     <a href="subir.html">Añadir</a>
     <div id="mobile-auth"></div>
   </div>
-    <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Soundbites</a>
-    <a href="explorar.html">Explorar música</a>
-    <a href="subir.html">Crear Soundbite</a>
-    <div id="mobile-auth"></div>
-  </div>
 
   <main class="settings-page" id="settingsMain" style="display:none">
     <a href="perfil.html" class="btn-back">← Volver al perfil</a>
     <h1>Ajustes</h1>
 
-    <!-- INFORMACIÓN DE CUENTA -->
     <div class="sbox">
       <h2>Información de cuenta</h2>
       <div class="info-row">
@@ -82,7 +71,6 @@
       <div class="info-row"><label>Correo verificado</label><span id="infoVerif">—</span></div>
     </div>
 
-    <!-- CONTRASEÑA -->
     <div class="sbox">
       <h2>Contraseña</h2>
       <div id="googleNote" class="note" style="display:none">Tu cuenta usa Google. Puedes añadir una contraseña para entrar también con correo y contraseña.</div>
@@ -93,7 +81,6 @@
       <button class="btn-primary" id="savePassBtn" style="margin-top:.5rem">Guardar contraseña</button>
     </div>
 
-    <!-- ELIMINAR CUENTA -->
     <div class="sbox">
       <h2>Eliminar cuenta</h2>
       <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Esta acción eliminará todos tus datos permanentemente y no se puede deshacer.</p>
@@ -141,38 +128,29 @@
       document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Sí' : 'Pendiente';
       document.getElementById('infoVerif').style.color  = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
 
-      // Load current name + store verification status
       try {
         const ref = doc(db,'usuarios',user.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           document.getElementById('nombreInput').value = snap.data().nombre || '';
-        }
-        // Always sync emailVerified status to Firestore (point 8)
-        if (snap.exists()) {
           await updateDoc(ref, { emailVerified: user.emailVerified });
         }
       } catch {}
     });
 
-    // ── CAMBIAR NOMBRE ──
     document.getElementById('saveNombreBtn').addEventListener('click', async () => {
       const raw   = document.getElementById('nombreInput').value.trim();
       const errEl = document.getElementById('nombreErr');
       const okEl  = document.getElementById('nombreOk');
       errEl.style.display='none'; okEl.style.display='none';
-
       if (!raw) { errEl.textContent='Escribe un nombre.'; errEl.style.display='block'; return; }
       if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Solo letras, números y espacios.'; errEl.style.display='block'; return; }
       if (raw.length < 3) { errEl.textContent='Mínimo 3 caracteres.'; errEl.style.display='block'; return; }
-
-      // Check if name already exists
       try {
         const snap = await getDocs(query(collection(db,'usuarios'), where('nombre','==',raw)));
         const taken = snap.docs.some(d => d.id !== currentUser.uid);
         if (taken) { errEl.textContent='Ese nombre ya está en uso. Elige otro.'; errEl.style.display='block'; return; }
         await updateDoc(doc(db,'usuarios',currentUser.uid), { nombre: raw });
-        // Update autorNombre in all audios by this user
         try {
           const audiosSnap = await getDocs(query(collection(db,'audios'), where('autorId','==',currentUser.uid)));
           const updates = audiosSnap.docs.map(d => updateDoc(d.ref, { autorNombre: raw }));
@@ -183,7 +161,6 @@
       } catch(e) { errEl.textContent='Error: '+e.message; errEl.style.display='block'; }
     });
 
-    // ── CONTRASEÑA ──
     document.getElementById('savePassBtn').addEventListener('click', async () => {
       const np=document.getElementById('newPass').value;
       const cp=document.getElementById('confirmPass').value;
@@ -216,7 +193,6 @@
       }
     });
 
-    // ── ELIMINAR CUENTA ──
     document.getElementById('deleteBtn').addEventListener('click',()=>{
       document.getElementById('confirmEmail').value='';
       document.getElementById('deleteErr').style.display='none';
@@ -234,12 +210,9 @@
       const btn=document.getElementById('confirmDelete');
       btn.textContent='Eliminando...';btn.disabled=true;
       try {
-        // Delete user's audios
         const audiosSnap = await getDocs(query(collection(db,'audios'),where('autorId','==',currentUser.uid)));
         for(const d of audiosSnap.docs) await deleteDoc(d.ref);
-        // Delete user doc
         try{await deleteDoc(doc(db,'usuarios',currentUser.uid));}catch{}
-        // Re-auth if Google
         if(isGoogle) await reauthenticateWithPopup(currentUser,new GoogleAuthProvider());
         await deleteUser(currentUser);
         window.location.href=ROOT+'/index.html?deleted=1';
