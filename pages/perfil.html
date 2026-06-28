@@ -13,6 +13,29 @@
     .verify-banner{background:rgba(255,215,0,.08);border:1px solid var(--gold);border-radius:8px;padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
     .verify-banner p{font-size:.8rem;color:var(--gold);margin:0;}
     .verify-banner button{background:var(--gold);color:#000;border:none;border-radius:var(--radius);padding:.38rem .9rem;font-size:.75rem;font-weight:700;cursor:pointer;}
+    @keyframes wave-ring {
+  0%   { transform: scale(1);   opacity: .7; }
+  50%  { transform: scale(1.13); opacity: .3; }
+  100% { transform: scale(1);   opacity: .7; }
+}
+
+.avatar-wrap::before,
+.avatar-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--neon);
+  animation: wave-ring 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.avatar-wrap::after {
+  inset: -12px;
+  border-width: 1.5px;
+  opacity: .4;
+  animation-delay: .6s;
+}
     .avatar-wrap{position:relative;width:96px;height:96px;margin:0 auto 1.25rem;cursor:pointer;}
     .avatar-wrap img{width:100%;height:100%;border-radius:50%;border:3px solid var(--neon);object-fit:cover;display:block;}
     .avatar-fallback{width:100%;height:100%;border-radius:50%;border:3px solid var(--neon);background:var(--neon);color:#000;font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
@@ -50,6 +73,10 @@
     .btn-xs-danger{background:transparent;border:1px solid var(--danger)!important;border:none;color:var(--danger);}
     .btn-xs-fav{background:transparent;border:1px solid var(--border)!important;border:none;color:var(--gold);}
     .empty-mini{font-size:.8rem;color:var(--text-dim);text-align:center;padding:1.5rem 0;}
+    .profile-actions {
+  justify-content: center;
+  gap: 1rem;
+}
   </style>
 </head>
 <body>
@@ -125,10 +152,22 @@
       </div>
     </div>
 
-        <div class="profile-actions">
-      <a href="ajustes.html" class="btn-outline">Ajustes</a>
-      <button class="btn-signout" id="signOutBtn">Cerrar sesión</button>
-    </div>
+<div class="profile-actions">
+  <a href="ajustes.html" class="btn-outline" style="
+    display:flex; align-items:center; gap:.5rem;
+    padding:.6rem 1.4rem; border-radius:20px;
+    font-size:.85rem;
+  ">
+    ⚙ Ajustes
+  </a>
+  <button class="btn-signout" id="signOutBtn" style="
+    display:flex; align-items:center; gap:.5rem;
+    padding:.6rem 1.4rem; border-radius:20px;
+    font-size:.85rem;
+  ">
+    ⏻ Cerrar sesión
+  </button>
+</div>
   </main>
 
   <div class="avatar-modal" id="avatarModal" style="display:none">
@@ -356,7 +395,7 @@
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
 
-  <footer class="footer">
+    <footer class="footer">
     <div class="footer-inner">
       <p>Hecho con amor para la comunidad</p>
       <div class="footer-links">
@@ -364,7 +403,9 @@
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
         <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
       </div>
-  <span class="logo-text">OMNI<span>BITES</span></span>
+      <a href="../index.html" class="logo">
+        <span class="logo-text">OMNI<span>BITES</span></span>
+      </a>
     </div>
   </footer>
 </body>
