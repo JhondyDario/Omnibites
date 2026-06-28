@@ -184,6 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   white-space:nowrap;
   transition:opacity .2s,transform .2s;
   font-family:var(--font-body);
+ color: #000;
 }
 .action-card-btn:hover{opacity:.85;transform:translateX(2px);}
 .action-arrow{font-size:.95rem;}
