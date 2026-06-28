@@ -12,12 +12,13 @@
   <nav class="navbar">
 <a href="../index.html" class="logo">
   <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
-  OMNI<span>BITES</span>
+  <span class="logo-text">OMNI<span>BITES</span></span>
 </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="explorar.html">Explorar</a>
       <a href="subir.html">Añadir</a>
+      <a href="jugadores.html">Jugadores</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
@@ -28,7 +29,7 @@
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
     <a href="subir.html">Añadir</a>
-    <div id="mobile-auth"></div>
+    <a href="jugadores.html">Jugadores</a>
   </div>
 
   <div class="com-header">
@@ -163,7 +164,7 @@
       return `
         <div class="sb-card" id="card-${a.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-          <div class="sb-meta">${a.juego||'—'} · <span class="sb-author">${a.autorNombre||'Anónimo'}</span></div>
+          <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
           <div class="sb-player">
             <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
             <div class="sb-prog-wrap">

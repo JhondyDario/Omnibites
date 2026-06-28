@@ -32,8 +32,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── NAVBAR ── */
 .navbar{position:relative;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:58px;background:rgba(13,13,18,0.97);border-bottom:1px solid var(--border);}
-.logo{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.5px;}
-.logo span{color:var(--neon);}
+.logo{
+  font-family:var(--font-head);
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--text);
+  text-decoration:none;
+  letter-spacing:.5px;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+.logo-text span{color:var(--neon);}
+.logo-text{color:var(--text);} 
 .nav-links{display:flex;align-items:center;gap:1.5rem;}
 .nav-links a{color:var(--text-dim);text-decoration:none;font-size:.875rem;font-weight:500;transition:color var(--transition);}
 .nav-links a:hover,.nav-links a.active{color:var(--text);}
@@ -184,12 +195,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   white-space:nowrap;
   transition:opacity .2s,transform .2s;
   font-family:var(--font-body);
+ color: #000;
 }
 .action-card-btn:hover{opacity:.85;transform:translateX(2px);}
 .action-arrow{font-size:.95rem;}
 
 .btn-card-green  {background:var(--neon);  color:#000;}
-.btn-card-purple {background:var(--purple); color:#fff;}
+.btn-card-purple {background:var(--purple); color:#000;}
 .btn-card-gold   {background:var(--gold);   color:#000;}
 
 /* ── SOUNDBITE CARD ── */
@@ -201,7 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .sb-meta .sb-author{color:var(--purple);}
 .sb-player{background:var(--bg3);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;}
 .sb-play{background:var(--neon);color:#000;border:none;border-radius:50%;width:32px;height:32px;font-size:.75rem;cursor:pointer;flex-shrink:0;font-weight:700;transition:background .2s;}
-.sb-play.playing{background:var(--purple);color:#fff;}
+.sb-play.playing{background:var(--purple);color:#000;}
 .sb-prog-wrap{flex:1;}
 .sb-prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:.3rem;}
 .sb-prog-fill{height:100%;background:var(--neon);width:0%;transition:width .1s linear;}
@@ -436,8 +448,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── NAV LOGO IMAGE ── */
 .nav-logo-img{height:36px;width:36px;object-fit:contain;border-radius:50%;display:block;}
-.logo{display:flex;align-items:center;text-decoration:none;gap:.5rem;}
-.logo span{margin-left:0;}
 
 /* ── NAV RIGHT ── */
 .nav-right{display:flex;align-items:center;gap:.75rem;}

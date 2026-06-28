@@ -124,27 +124,44 @@ window.homeReact = async function(audioId, type) {
   if (!homeUser) { window.location.href = ROOT + '/pages/login.html'; return; }
   try {
     const userRef  = doc(db, 'usuarios', homeUser.uid);
-    const snap     = await getDoc(userRef);
-    const reacts   = snap.exists() ? (snap.data().reacciones || {}) : {};
+    const userSnap = await getDoc(userRef);
+    const reacts   = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
     const prev     = reacts[audioId];
-    const audioRef = doc(db, 'audios', audioId);
+
+    const audioRef  = doc(db, 'audios', audioId);
+    const audioSnap = await getDoc(audioRef);
+    const reactions = audioSnap.exists() ? (audioSnap.data().reactions || {}) : {};
+
+    const updates = {};
+
     if (prev) {
-      await updateDoc(audioRef, { [`reactions.${prev}`]: increment(-1) });
-      document.getElementById(`hr-${prev}-${audioId}`)?.classList.remove(`active-${prev}`);
-      const cnt = document.querySelector(`#hr-${prev}-${audioId} .reaction-count`);
-      if (cnt) cnt.textContent = Math.max(0, parseInt(cnt.textContent||0)-1);
+      updates[`reactions.${prev}`] = Math.max(0, (reactions[prev] || 0) - 1);
+      const prevBtn = document.getElementById(`hr-${prev}-${audioId}`);
+      if (prevBtn) {
+        prevBtn.classList.remove(`active-${prev}`);
+        const s = prevBtn.querySelector('.reaction-count');
+        if (s) s.textContent = updates[`reactions.${prev}`];
+      }
     }
-    if (prev !== type) {
-      reacts[audioId] = type;
-      await updateDoc(userRef, { reacciones: reacts });
-      await updateDoc(audioRef, { [`reactions.${type}`]: increment(1) });
-      document.getElementById(`hr-${type}-${audioId}`)?.classList.add(`active-${type}`);
-      const cnt2 = document.querySelector(`#hr-${type}-${audioId} .reaction-count`);
-      if (cnt2) cnt2.textContent = parseInt(cnt2.textContent||0)+1;
-    } else {
+
+    if (prev === type) {
       delete reacts[audioId];
-      await updateDoc(userRef, { reacciones: reacts });
+      await updateDoc(userRef,  { reacciones: reacts });
+      await updateDoc(audioRef, updates);
+    } else {
+      updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
+      reacts[audioId] = type;
+      await updateDoc(userRef,  { reacciones: reacts });
+      await updateDoc(audioRef, updates);
+
+      const newBtn = document.getElementById(`hr-${type}-${audioId}`);
+      if (newBtn) {
+        newBtn.classList.add(`active-${type}`);
+        const s = newBtn.querySelector('.reaction-count');
+        if (s) s.textContent = updates[`reactions.${type}`];
+      }
     }
+
   } catch(e) { console.error('homeReact:', e); }
 };
 
@@ -212,8 +229,7 @@ async function loadLatest() {
       return `
         <div class="sb-card" id="hcard-${d.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-          <div class="sb-meta">${a.juego||'—'} · <span class="sb-author">${a.autorNombre||'Anónimo'}</span></div>
-          <div class="sb-player">
+<div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="${ROOT}/pages/jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>          <div class="sb-player">
             <button class="sb-play" id="hp-${i}" onclick="homePlay(${i},'${a.url}')">▶</button>
             <div class="sb-prog-wrap">
               <div class="sb-prog-bar"><div class="sb-prog-fill" id="hprog-${i}"></div></div>
