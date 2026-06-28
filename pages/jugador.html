@@ -85,6 +85,27 @@
   opacity: .4;
   animation-delay: .6s;
 }
+
+    .paginator {
+  display: flex;
+  gap: .4rem;
+  justify-content: center;
+  margin-top: .75rem;
+  flex-wrap: wrap;
+}
+.page-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: .3rem .65rem;
+  font-size: .72rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: border-color .2s, color .2s;
+}
+.page-btn:hover { border-color: var(--neon); color: var(--neon); }
+.page-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(74,222,128,.08); }
   </style>
 </head>
 <body>
