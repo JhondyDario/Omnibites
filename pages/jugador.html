@@ -10,7 +10,11 @@
   <style>
     .pub-profile { max-width: 640px; margin: 0 auto; padding: 2.5rem 1.5rem; }
 
-    .pub-avatar-wrap { text-align: center; margin-bottom: 1.25rem; }
+    .pub-avatar-wrap {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  position: relative;
+    }
     .pub-avatar {
       width: 96px; height: 96px; border-radius: 50%;
       border: 3px solid var(--cyan); object-fit: cover; display: block;
@@ -56,6 +60,30 @@
     .state-msg { text-align: center; padding: 4rem 1rem; color: var(--text-dim); }
     .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes wave-ring {
+  0%   { transform: scale(1);    opacity: .7; }
+  50%  { transform: scale(1.13); opacity: .3; }
+  100% { transform: scale(1);    opacity: .7; }
+}
+
+.pub-avatar-wrap::before,
+.pub-avatar-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  animation: wave-ring 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.pub-avatar-wrap::after {
+  inset: -12px;
+  border-width: 1.5px;
+  opacity: .4;
+  animation-delay: .6s;
+}
   </style>
 </head>
 <body>
