@@ -304,16 +304,12 @@ if (dataMios.length) {
               const fs = await getDoc(doc(db, 'audios', fid));
               if (fs.exists()) favAudios.push({ id: fs.id, ...fs.data() });
             } catch {}
-          }
           if (favAudios.length) {
-            listFavs.innerHTML = favAudios.map(a => `
-              <div class="mini-sb-card">
-                <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
-                <div class="mini-sb-meta">${a.juego || '—'} · ${a.autorNombre || '—'}</div>
-              </div>`).join('');
-          } else {
-            listFavs.innerHTML = '<div class="empty-mini">No se encontraron favoritos.</div>';
-          }
+  dataFavs = favAudios;
+  renderFavsPage();
+} else {
+  listFavs.innerHTML = '<div class="empty-mini">No se encontraron favoritos.</div>';
+                                               }
         } else {
           listFavs.innerHTML = '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>';
         }
