@@ -58,13 +58,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .nav-avatar-fallback{width:26px;height:26px;border-radius:50%;background:var(--neon);color:#000;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-user-name{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-.logo-text{
-  color: var(--text);
-}
-.logo-text span{
-  color: var(--neon);
-}
-
 /* Hamburger */
 .hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:.25rem;}
 .mobile-menu{display:none;flex-direction:column;background:var(--bg2);border-bottom:1px solid var(--border);}
