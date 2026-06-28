@@ -246,16 +246,54 @@
         document.getElementById('pubStatLove').textContent = totalLove;
 
         // Lista de soundbites
-        const listMios = document.getElementById('list-mios');
-        if (audios.length) {
-          listMios.innerHTML = audios.map(a => `
-            <div class="mini-sb-card">
-              <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
-              <div class="mini-sb-meta">${a.juego || '—'} · ${a.consola || '—'}</div>
-            </div>`).join('');
-        } else {
-          listMios.innerHTML = '<div class="empty-mini">Este jugador aún no ha subido soundbites.</div>';
-        }
+        const PAGE_SIZE = 5;
+let pageMios = 0, pageFavs = 0;
+let dataMios = audios;
+let dataFavs = [];
+
+function renderMiosPage() {
+  const el = document.getElementById('list-mios');
+  const slice = dataMios.slice(pageMios * PAGE_SIZE, (pageMios + 1) * PAGE_SIZE);
+  const total = Math.ceil(dataMios.length / PAGE_SIZE);
+  el.innerHTML = slice.map(a => `
+    <div class="mini-sb-card">
+      <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+      <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
+    </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
+}
+
+function renderFavsPage() {
+  const el = document.getElementById('list-favs');
+  if (!dataFavs.length) { el.innerHTML = '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>'; return; }
+  const slice = dataFavs.slice(pageFavs * PAGE_SIZE, (pageFavs + 1) * PAGE_SIZE);
+  const total = Math.ceil(dataFavs.length / PAGE_SIZE);
+  el.innerHTML = slice.map(a => `
+    <div class="mini-sb-card">
+      <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+      <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
+    </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
+}
+
+function paginatorHTML(current, total, key) {
+  if (total <= 1) return '';
+  let html = '<div class="paginator">';
+  for (let i = 0; i < total; i++) {
+    html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goPage('${key}',${i})">${i + 1}</button>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+window.goPage = function(key, page) {
+  if (key === 'mios') { pageMios = page; renderMiosPage(); }
+  if (key === 'favs') { pageFavs = page; renderFavsPage(); }
+};
+
+if (dataMios.length) {
+  renderMiosPage();
+} else {
+  document.getElementById('list-mios').innerHTML = '<div class="empty-mini">Este jugador aún no ha subido soundbites.</div>';
+}
 
         // Favoritos
         const listFavs = document.getElementById('list-favs');
