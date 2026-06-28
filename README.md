@@ -57,6 +57,8 @@ Omnibites is growing fast, and with your support we can unlock even more feature
 
 The mobile app is still in planning, and no official APK exists yet — any you find is fake. The native Android version will bring exclusive perks like smart search, offline downloads, notifications, and a waveform editor, all designed to make soundbites even more powerful on the go.
 
+![Tools](https://jhondydario.github.io/Omnibites/assets/tools-banner.png)
+
 **Compatibility**
 
 Omnibites integrates seamlessly with **iiSU** and other retro frontends that support custom soundbite playback.  
