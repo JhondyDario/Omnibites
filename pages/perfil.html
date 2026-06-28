@@ -204,264 +204,243 @@
   </div>
 
   <script type="module">
-    import { auth, db } from '../js/firebase-config.js';
-    import { onAuthStateChanged, signOut, sendEmailVerification }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      doc, getDoc, setDoc, updateDoc, deleteDoc,
-      collection, getDocs, query, where, arrayRemove, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { auth, db } from '../js/firebase-config.js';
+  import { onAuthStateChanged, signOut, sendEmailVerification }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    doc, getDoc, setDoc, updateDoc, deleteDoc,
+    collection, getDocs, query, where, arrayRemove, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let currentUser = null, selectedAvatar = 'avatar1';
+  const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+  let currentUser = null, selectedAvatar = 'avatar1';
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
-      currentUser = user;
-      document.getElementById('profileMain').style.display = 'block';
+  const PAGE_SIZE = 5;
+  let pageMios = 0, pageFavs = 0;
+  let dataMios = [], dataFavs = [];
 
-      const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
-      if (!isGoogle && !user.emailVerified)
-        document.getElementById('verifyBanner').style.display = 'flex';
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
+    currentUser = user;
+    document.getElementById('profileMain').style.display = 'block';
 
-      document.getElementById('avFallback').textContent =
-        (user.displayName||'J').charAt(0).toUpperCase();
-      document.getElementById('userEmail').textContent = user.email||'';
+    const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+    if (!isGoogle && !user.emailVerified)
+      document.getElementById('verifyBanner').style.display = 'flex';
 
-      try {
-        const ref  = doc(db,'usuarios',user.uid);
-        const snap = await getDoc(ref);
-        let nombre = user.displayName || 'Jugador';
-        let favIds = [];
+    document.getElementById('avFallback').textContent =
+      (user.displayName||'J').charAt(0).toUpperCase();
+    document.getElementById('userEmail').textContent = user.email||'';
 
-        if (snap.exists()) {
-          const d = snap.data();
-          nombre         = d.nombre || nombre;
-          selectedAvatar = d.avatar || 'avatar1';
-          favIds         = d.favoritos || [];
-        } else {
-          await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
-        }
+    try {
+      const ref  = doc(db,'usuarios',user.uid);
+      const snap = await getDoc(ref);
+      let nombre = user.displayName || 'Jugador';
+      let favIds = [];
 
-        document.getElementById('userName').textContent = nombre;
-        applyAvatar(selectedAvatar);
-        document.getElementById('statFavs').textContent = favIds.length;
-
-        const q = query(collection(db,'audios'), where('autorId','==',user.uid));
-        const aSnap = await getDocs(q);
-        document.getElementById('statAudios').textContent = aSnap.size;
-        const totalLove = aSnap.docs.reduce((s,d)=>s+(d.data().reactions?.love||0),0);
-        document.getElementById('statLove').textContent = totalLove;
-        renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
-
-        if (favIds.length > 0) {
-          const favAudios = [];
-          for (const fid of favIds) {
-            try {
-              const fs = await getDoc(doc(db,'audios',fid));
-              if (fs.exists()) favAudios.push({id:fs.id,...fs.data()});
-            } catch {}
-          }
-          renderFavs(favAudios, user.uid);
-        } else {
-          document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>';
-        }
-      } catch(e) {
-        console.error('Perfil error:',e.message);
-        window.showToast&&window.showToast('Error: '+e.message,'error');
+      if (snap.exists()) {
+        const d = snap.data();
+        nombre         = d.nombre || nombre;
+        selectedAvatar = d.avatar || 'avatar1';
+        favIds         = d.favoritos || [];
+      } else {
+        await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
       }
-    });
 
-    const PAGE_SIZE = 5;
-let pageMios = 0, pageFavs = 0;
-let dataMios = [], dataFavs = [];
-
-function renderMios(items) {
-  dataMios = items;
-  pageMios = 0;
-  renderMiosPage();
-}
-
-function renderMiosPage() {
-  const el = document.getElementById('list-mios');
-  if (!dataMios.length) { el.innerHTML = '<div class="empty-mini">No has subido soundbites aún.</div>'; return; }
-  const slice = dataMios.slice(pageMios * PAGE_SIZE, (pageMios + 1) * PAGE_SIZE);
-  const total = Math.ceil(dataMios.length / PAGE_SIZE);
-  el.innerHTML = slice.map(a => `
-    <div class="mini-sb-card" id="mini-${a.id}">
-      <div class="mini-sb-info">
-        <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
-        <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
-      </div>
-      <div class="mini-sb-actions">
-        <button class="btn-xs btn-xs-danger" onclick="deleteMio('${a.id}')">Eliminar</button>
-      </div>
-    </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
-}
-
-function renderFavs(items, uid) {
-  dataFavs = items;
-  pageFavs = 0;
-  renderFavsPage();
-}
-
-function renderFavsPage() {
-  const el = document.getElementById('list-favs');
-  if (!dataFavs.length) { el.innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>'; return; }
-  const slice = dataFavs.slice(pageFavs * PAGE_SIZE, (pageFavs + 1) * PAGE_SIZE);
-  const total = Math.ceil(dataFavs.length / PAGE_SIZE);
-  el.innerHTML = slice.map(a => `
-    <div class="mini-sb-card" id="fav-mini-${a.id}">
-      <div class="mini-sb-info">
-        <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
-        <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
-      </div>
-      <div class="mini-sb-actions">
-        <button class="btn-xs btn-xs-fav" onclick="removeFav('${a.id}')">Quitar</button>
-      </div>
-    </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
-}
-
-function paginatorHTML(current, total, key) {
-  if (total <= 1) return '';
-  let html = '<div class="paginator">';
-  for (let i = 0; i < total; i++) {
-    html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goPage('${key}',${i})">${i + 1}</button>`;
-  }
-  html += '</div>';
-  return html;
-}
-
-window.goPage = function(key, page) {
-  if (key === 'mios') { pageMios = page; renderMiosPage(); }
-  if (key === 'favs') { pageFavs = page; renderFavsPage(); }
-};
-
-    function renderFavs(items, uid) {
-      const el = document.getElementById('list-favs');
-      if (!items.length) { el.innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>'; return; }
-      el.innerHTML = items.map(a => `
-        <div class="mini-sb-card" id="fav-mini-${a.id}">
-          <div class="mini-sb-info">
-            <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
-            <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
-          </div>
-          <div class="mini-sb-actions">
-            <button class="btn-xs btn-xs-fav" onclick="removeFav('${a.id}')">Quitar</button>
-          </div>
-        </div>`).join('');
-    }
-
-    window.deleteMio = async function(id) {
-      if (!confirm('¿Eliminar este soundbite?')) return;
-      try {
-        await deleteDoc(doc(db,'audios',id));
-        document.getElementById(`mini-${id}`)?.remove();
-        window.showToast&&window.showToast('Soundbite eliminado');
-      } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
-    };
-
-    window.removeFav = async function(id) {
-      try {
-        await updateDoc(doc(db,'usuarios',currentUser.uid),{favoritos:arrayRemove(id)});
-        document.getElementById(`fav-mini-${id}`)?.remove();
-        window.showToast&&window.showToast('Eliminado de favoritos');
-      } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
-    };
-
-    window.toggleSection = function(key) {
-      const body  = document.getElementById(`body-${key}`);
-      const arrow = document.getElementById(`arrow-${key}`);
-      const open  = body.classList.contains('open');
-      body.classList.toggle('open',!open);
-      arrow.classList.toggle('open',!open);
-    };
-
-    // ── AVATARES DINÁMICOS ──
-    // Detecta automáticamente cuántos avatares existen en assets/avatars/
-    // Para añadir más: sube avatar4.png, avatar5.png, etc. a GitHub. Sin tocar código.
-    async function discoverAvatars() {
-      const avatars = [];
-      let i = 1;
-      while (true) {
-        const name = `avatar${i}`;
-        const url  = `../assets/avatars/${name}.png`;
-        try {
-          const res = await fetch(url, { method: 'HEAD' });
-          if (!res.ok) break;
-          avatars.push(name);
-          i++;
-        } catch { break; }
-      }
-      // Fallback: si no carga ninguno (offline, etc.) usar al menos avatar1 y avatar2
-      return avatars.length > 0 ? avatars : ['avatar1', 'avatar2'];
-    }
-
-    function buildAvatarGrid(avatars) {
-      const grid = document.getElementById('avatarGrid');
-      grid.innerHTML = avatars.map(name => `
-        <div class="avatar-opt" data-avatar="${name}" id="opt-${name}">
-          <img src="../assets/avatars/${name}.png" alt="${name}"/>
-        </div>`).join('');
-      // Bind click listeners
-      grid.querySelectorAll('.avatar-opt').forEach(opt => {
-        opt.addEventListener('click', () => {
-          grid.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
-          opt.classList.add('selected');
-          selectedAvatar = opt.dataset.avatar;
-          const img = document.getElementById('avatarImg');
-          img.style.display = 'block';
-          document.getElementById('avFallback').style.display = 'none';
-          img.src = `../assets/avatars/${selectedAvatar}.png`;
-        });
-      });
-    }
-
-    function applyAvatar(name) {
-      const img = document.getElementById('avatarImg');
-      img.style.display = 'block';
-      document.getElementById('avFallback').style.display = 'none';
-      img.src = `../assets/avatars/${name}.png`;
-      document.querySelectorAll('.avatar-opt').forEach(o =>
-        o.classList.toggle('selected', o.dataset.avatar === name));
-      selectedAvatar = name;
-    }
-
-    document.getElementById('avatarWrap').addEventListener('click', async () => {
-      // Construir el grid cada vez que se abre (por si se añadieron nuevos avatares)
-      const avatars = await discoverAvatars();
-      buildAvatarGrid(avatars);
+      document.getElementById('userName').textContent = nombre;
       applyAvatar(selectedAvatar);
-      document.getElementById('avatarModal').style.display = 'flex';
-    });
+      document.getElementById('statFavs').textContent = favIds.length;
 
-    document.getElementById('cancelAvatar').addEventListener('click', () =>
-      document.getElementById('avatarModal').style.display = 'none');
+      const q = query(collection(db,'audios'), where('autorId','==',user.uid));
+      const aSnap = await getDocs(q);
+      document.getElementById('statAudios').textContent = aSnap.size;
+      const totalLove = aSnap.docs.reduce((s,d)=>s+(d.data().reactions?.love||0),0);
+      document.getElementById('statLove').textContent = totalLove;
+      renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
 
-    document.getElementById('saveAvatar').addEventListener('click', async () => {
-      if (!currentUser) return;
+      if (favIds.length > 0) {
+        const favAudios = [];
+        for (const fid of favIds) {
+          try {
+            const fs = await getDoc(doc(db,'audios',fid));
+            if (fs.exists()) favAudios.push({id:fs.id,...fs.data()});
+          } catch {}
+        }
+        renderFavs(favAudios);
+      } else {
+        document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>';
+      }
+    } catch(e) {
+      console.error('Perfil error:',e.message);
+      window.showToast&&window.showToast('Error: '+e.message,'error');
+    }
+  });
+
+  function renderMios(items) {
+    dataMios = items; pageMios = 0; renderMiosPage();
+  }
+
+  function renderMiosPage() {
+    const el = document.getElementById('list-mios');
+    if (!dataMios.length) { el.innerHTML = '<div class="empty-mini">No has subido soundbites aún.</div>'; return; }
+    const slice = dataMios.slice(pageMios * PAGE_SIZE, (pageMios + 1) * PAGE_SIZE);
+    const total = Math.ceil(dataMios.length / PAGE_SIZE);
+    el.innerHTML = slice.map(a => `
+      <div class="mini-sb-card" id="mini-${a.id}">
+        <div class="mini-sb-info">
+          <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+          <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
+        </div>
+        <div class="mini-sb-actions">
+          <button class="btn-xs btn-xs-danger" onclick="deleteMio('${a.id}')">Eliminar</button>
+        </div>
+      </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
+  }
+
+  function renderFavs(items) {
+    dataFavs = items; pageFavs = 0; renderFavsPage();
+  }
+
+  function renderFavsPage() {
+    const el = document.getElementById('list-favs');
+    if (!dataFavs.length) { el.innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>'; return; }
+    const slice = dataFavs.slice(pageFavs * PAGE_SIZE, (pageFavs + 1) * PAGE_SIZE);
+    const total = Math.ceil(dataFavs.length / PAGE_SIZE);
+    el.innerHTML = slice.map(a => `
+      <div class="mini-sb-card" id="fav-mini-${a.id}">
+        <div class="mini-sb-info">
+          <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+          <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
+        </div>
+        <div class="mini-sb-actions">
+          <button class="btn-xs btn-xs-fav" onclick="removeFav('${a.id}')">Quitar</button>
+        </div>
+      </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
+  }
+
+  function paginatorHTML(current, total, key) {
+    if (total <= 1) return '';
+    let html = '<div class="paginator">';
+    for (let i = 0; i < total; i++) {
+      html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goPage('${key}',${i})">${i + 1}</button>`;
+    }
+    return html + '</div>';
+  }
+
+  window.goPage = function(key, page) {
+    if (key === 'mios') { pageMios = page; renderMiosPage(); }
+    if (key === 'favs') { pageFavs = page; renderFavsPage(); }
+  };
+
+  window.deleteMio = async function(id) {
+    if (!confirm('¿Eliminar este soundbite?')) return;
+    try {
+      await deleteDoc(doc(db,'audios',id));
+      dataMios = dataMios.filter(a => a.id !== id);
+      if (pageMios > 0 && pageMios >= Math.ceil(dataMios.length / PAGE_SIZE)) pageMios--;
+      renderMiosPage();
+      window.showToast&&window.showToast('Soundbite eliminado');
+    } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
+  };
+
+  window.removeFav = async function(id) {
+    try {
+      await updateDoc(doc(db,'usuarios',currentUser.uid),{favoritos:arrayRemove(id)});
+      dataFavs = dataFavs.filter(a => a.id !== id);
+      if (pageFavs > 0 && pageFavs >= Math.ceil(dataFavs.length / PAGE_SIZE)) pageFavs--;
+      renderFavsPage();
+      window.showToast&&window.showToast('Eliminado de favoritos');
+    } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
+  };
+
+  window.toggleSection = function(key) {
+    const body  = document.getElementById(`body-${key}`);
+    const arrow = document.getElementById(`arrow-${key}`);
+    const open  = body.classList.contains('open');
+    body.classList.toggle('open',!open);
+    arrow.classList.toggle('open',!open);
+  };
+
+  async function discoverAvatars() {
+    const avatars = [];
+    let i = 1;
+    while (true) {
+      const url = `../assets/avatars/avatar${i}.png`;
       try {
-        await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
+        const res = await fetch(url, { method: 'HEAD' });
+        if (!res.ok) break;
+        avatars.push(`avatar${i}`);
+        i++;
+      } catch { break; }
+    }
+    return avatars.length > 0 ? avatars : ['avatar1', 'avatar2'];
+  }
+
+  function buildAvatarGrid(avatars) {
+    const grid = document.getElementById('avatarGrid');
+    grid.innerHTML = avatars.map(name => `
+      <div class="avatar-opt" data-avatar="${name}" id="opt-${name}">
+        <img src="../assets/avatars/${name}.png" alt="${name}"/>
+      </div>`).join('');
+    grid.querySelectorAll('.avatar-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        grid.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedAvatar = opt.dataset.avatar;
+        const img = document.getElementById('avatarImg');
+        img.style.display = 'block';
+        document.getElementById('avFallback').style.display = 'none';
+        img.src = `../assets/avatars/${selectedAvatar}.png`;
+      });
+    });
+  }
+
+  function applyAvatar(name) {
+    const img = document.getElementById('avatarImg');
+    img.style.display = 'block';
+    document.getElementById('avFallback').style.display = 'none';
+    img.src = `../assets/avatars/${name}.png`;
+    document.querySelectorAll('.avatar-opt').forEach(o =>
+      o.classList.toggle('selected', o.dataset.avatar === name));
+    selectedAvatar = name;
+  }
+
+  document.getElementById('avatarWrap').addEventListener('click', async () => {
+    const avatars = await discoverAvatars();
+    buildAvatarGrid(avatars);
+    applyAvatar(selectedAvatar);
+    document.getElementById('avatarModal').style.display = 'flex';
+  });
+
+  document.getElementById('cancelAvatar').addEventListener('click', () =>
+    document.getElementById('avatarModal').style.display = 'none');
+
+  document.getElementById('saveAvatar').addEventListener('click', async () => {
+    if (!currentUser) return;
+    try {
+      await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
+      document.getElementById('avatarModal').style.display = 'none';
+      window.showToast && window.showToast('Avatar guardado');
+    } catch {
+      try {
+        await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
         document.getElementById('avatarModal').style.display = 'none';
         window.showToast && window.showToast('Avatar guardado');
-      } catch {
-        try {
-          await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
-          document.getElementById('avatarModal').style.display = 'none';
-          window.showToast && window.showToast('Avatar guardado');
-        } catch(e2) { window.showToast && window.showToast('Error: ' + e2.message, 'error'); }
-      }
-    });
+      } catch(e2) { window.showToast && window.showToast('Error: ' + e2.message, 'error'); }
+    }
+  });
 
-    document.getElementById('signOutBtn').addEventListener('click', async()=>{
-      await signOut(auth);
-      window.location.href=ROOT+'/index.html';
-    });
-    document.getElementById('resendVerify')?.addEventListener('click', async()=>{
-      try { await sendEmailVerification(currentUser); window.showToast&&window.showToast('Correo enviado'); }
-      catch(e){ window.showToast&&window.showToast('Error: '+e.message,'error'); }
-    });
-  </script>
+  document.getElementById('signOutBtn').addEventListener('click', async()=>{
+    await signOut(auth);
+    window.location.href=ROOT+'/index.html';
+  });
+
+  document.getElementById('resendVerify')?.addEventListener('click', async()=>{
+    try { await sendEmailVerification(currentUser); window.showToast&&window.showToast('Correo enviado'); }
+    catch(e){ window.showToast&&window.showToast('Error: '+e.message,'error'); }
+  });
+    </script>
+
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
 
