@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <title>Legal & Transparencia — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .legal-hero {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legal-page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    .legal-page h1 {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .legal-page .subtitle {
+      color: var(--text-dim);
+      font-size: .9rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    .legal-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .legal-section h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--neon);
+      margin-bottom: .75rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .legal-section h2::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 1.1rem;
+      background: var(--neon);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legal-section p {
+      color: var(--text-dim);
+      font-size: .9rem;
+      line-height: 1.8;
+      margin-bottom: .75rem;
+    }
+
+    .legal-section p strong {
+      color: var(--text);
+    }
+
+    .legal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .legal-box.neon {
+      border-color: var(--neon);
+      background: rgba(74,222,128,.04);
+    }
+
+    .legal-box.gold {
+      border-color: var(--gold);
+      background: rgba(251,191,36,.04);
+    }
+
+    .legal-box.danger {
+      border-color: var(--danger);
+      background: rgba(248,113,113,.04);
+    }
+
+    .legal-box p {
+      margin: 0;
+      font-size: .85rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .legal-box p strong {
+      color: var(--text);
+    }
+
+    .legal-box p + p {
+      margin-top: .6rem;
+    }
+
+    .legal-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    .tools-banner {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+      display: block;
+      margin-top: 3rem;
+      border: 1px solid var(--border);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 1rem;
+    }
+
+    .badge {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: .35rem .9rem;
+      font-size: .75rem;
+      color: var(--text-dim);
+    }
+
+    .badge strong {
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      <span class="logo-text">OMNI<span>BITES</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>
+      <a href="jugadores.html">Jugadores</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>
+    <a href="jugadores.html">Jugadores</a>
+  </div>
+
+  <img src="../assets/og-banner.png" alt="Omnibites" class="legal-hero"/>
+
+  <main class="legal-page">
+    <h1>Transparencia y Marco Legal</h1>
+    <p class="subtitle">Todo lo que necesitas saber sobre cómo opera Omnibites, qué herramientas usa y cuáles son las responsabilidades de cada parte.</p>
+
+    <div class="legal-section">
+      <h2>¿Qué es Omnibites?</h2>
+      <p>
+        Omnibites es una <strong>plataforma comunitaria independiente</strong> sin fines de lucro dedicada a preservar y compartir soundbites de videojuegos retro. No está afiliada, patrocinada ni asociada con ninguna compañía de videojuegos, distribuidora de contenido ni plataforma de streaming.
+      </p>
+      <p>
+        El proyecto nació como una iniciativa personal con el objetivo de crear un espacio donde la comunidad retro pueda encontrar, escuchar y compartir esos momentos sonoros que definieron una generación.
+      </p>
+    </div>
+
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h2>Modelo de financiamiento</h2>
+      <p>Omnibites opera <strong>exclusivamente mediante donaciones voluntarias</strong> de la comunidad. No existe ningún otro modelo de ingresos.</p>
+      <div class="legal-box neon">
+        <p><strong>Sin publicidad.</strong> Omnibites no muestra anuncios de ningún tipo, no vende espacios publicitarios y no recibe pagos de anunciantes o patrocinadores.</p>
+        <p><strong>Sin suscripciones.</strong> Todas las funciones de la plataforma son gratuitas y accesibles para cualquier usuario registrado.</p>
+        <p><strong>Solo donaciones.</strong> Quienes deseen apoyar el proyecto pueden hacerlo voluntariamente a través de PayPal. Ninguna funcionalidad está bloqueada detrás de un pago.</p>
+      </div>
+    </div>
+
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h2>Fuentes de audio y Archive.org</h2>
+      <p>
+        La herramienta de búsqueda de Omnibites se conecta a <strong>Archive.org</strong>, una biblioteca digital sin fines de lucro reconocida internacionalmente que preserva material de acceso libre y público. Omnibites no descarga, almacena ni redistribuye estos archivos en sus propios servidores.
+      </p>
+      <p>
+        Cuando un usuario reproduce o descarga un audio desde la sección Explorar, el archivo proviene <strong>directamente de los servidores de Archive.org</strong>. Omnibites actúa como un buscador que facilita el acceso a contenido ya disponible públicamente en internet.
+      </p>
+      <div class="legal-box">
+        <p>Las herramientas de Omnibites <strong>no interactúan con servidores oficiales de compañías de videojuegos</strong>, no extraen ni copian audio protegido de plataformas comerciales, y no realizan ningún tipo de scraping sobre contenido propietario.</p>
+      </div>
+      <div class="badge-row">
+        <span class="badge">Fuente: <strong>Archive.org</strong></span>
+        <span class="badge">Sin almacenamiento propio de audio</span>
+        <span class="badge">Sin acceso a APIs comerciales</span>
+        <span class="badge">Solo contenido de acceso público</span>
+      </div>
+    </div>
+
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h2>Responsabilidad del usuario al subir contenido</h2>
+      <p>
+        Omnibites permite a los usuarios registrados subir sus propios soundbites. Al crear una cuenta, el usuario acepta que <strong>es el único responsable del contenido que publica</strong>.
+      </p>
+      <div class="legal-box gold">
+        <p>Todo audio subido por un usuario identificado queda bajo <strong>su exclusiva responsabilidad legal</strong>. Omnibites no verifica ni audita el origen de los archivos subidos por la comunidad.</p>
+        <p>Al publicar un soundbite, el usuario declara implícitamente que tiene los derechos necesarios para compartir ese contenido o que dicho contenido es de distribución libre.</p>
+      </div>
+      <p style="margin-top:1rem">
+        Omnibites se reserva el derecho de eliminar cualquier contenido que sea reportado como violatorio de derechos de autor, sin previo aviso y sin que ello implique responsabilidad alguna de la plataforma.
+      </p>
+    </div>
+
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h2>Lo que Omnibites no hace</h2>
+      <div class="legal-box danger">
+        <p>Omnibites <strong>no extrae, descarga ni roba</strong> audio de plataformas oficiales como Nintendo eShop, PlayStation Store, Steam u otras tiendas digitales.</p>
+        <p>Omnibites <strong>no se hace pasar</strong> por una plataforma oficial ni representa a ninguna compañía de videojuegos.</p>
+        <p>Omnibites <strong>no almacena</strong> archivos de audio en sus propios servidores. Todo el contenido referenciado apunta a fuentes externas públicas.</p>
+        <p>Omnibites <strong>no monetiza</strong> el contenido subido por la comunidad ni por terceros.</p>
+      </div>
+    </div>
+
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h2>Contacto y reportes</h2>
+      <p>
+        Si eres titular de derechos sobre algún contenido publicado en Omnibites y consideras que se está vulnerando tu propiedad intelectual, puedes contactar al desarrollador a través del repositorio oficial en GitHub para solicitar la eliminación del contenido en cuestión.
+      </p>
+      <p>
+        Respondemos a todas las solicitudes legítimas de retirada de contenido a la mayor brevedad posible.
+      </p>
+      <div class="badge-row">
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank" class="badge" style="text-decoration:none;color:inherit">
+          <strong>GitHub</strong> — Repositorio oficial
+        </a>
+      </div>
+    </div>
+
+    <img src="../assets/tools-banner.png" alt="Herramientas de Omnibites" class="tools-banner"/>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad</p>
+      <div class="footer-links">
+        <a href="comunidad.html">Soundbites</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=9LUK8Y35X9JZJ" target="_blank">Donar</a>
+      </div>
+      <a href="../index.html" class="logo">
+        <span class="logo-text">OMNI<span>BITES</span></span>
+      </a>
+    </div>
+  </footer>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
