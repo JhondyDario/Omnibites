@@ -110,7 +110,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── SECTIONS ── */
 .section{max-width:1200px;margin:0 auto;padding:4rem 1.5rem;border-top:1px solid var(--border);}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;gap:1rem;}
 .section-header h2{font-family:var(--font-head);font-size:1.1rem;font-weight:700;}
 .link-more{color:var(--neon);text-decoration:none;font-size:.85rem;font-weight:600;}
 
