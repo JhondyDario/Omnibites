@@ -225,11 +225,12 @@ async function loadLatest() {
     }
     grid.innerHTML = snap.docs.map((d, i) => {
       const a = d.data();
-const r = a.reactions || { love:0, meh:0 };
+      const r = a.reactions || { love:0, mid:0, bad:0 };
       return `
         <div class="sb-card" id="hcard-${d.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-<div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="${ROOT}/pages/jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>          <div class="sb-player">
+          <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="${ROOT}/pages/jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
+          <div class="sb-player">
             <button class="sb-play" id="hp-${i}" onclick="homePlay(${i},'${a.url}')">▶</button>
             <div class="sb-prog-wrap">
               <div class="sb-prog-bar"><div class="sb-prog-fill" id="hprog-${i}"></div></div>
@@ -237,31 +238,58 @@ const r = a.reactions || { love:0, meh:0 };
             </div>
           </div>
           <div class="sb-footer">
-<div class="sb-reactions">
-  <button class="icon-btn" onclick="homeReact('${d.id}','love')" id="hr-love-${d.id}" title="Me encanta">
-    <img src="${ROOT}/assets/reactions/love.png" alt="Me encanta"/>
-    <span class="icon-count">${r.love||0}</span>
-  </button>
-  <button class="icon-btn" onclick="homeReact('${d.id}','meh')" id="hr-meh-${d.id}" title="Regular">
-    <img src="${ROOT}/assets/reactions/meh.png" alt="Regular"/>
-    <span class="icon-count">${r.meh||0}</span>
-  </button>
-</div>
-<div class="sb-actions">
-  <button class="icon-btn" id="hfav-${d.id}" onclick="homeFav('${d.id}')" title="Favorito">
-    <img src="${ROOT}/assets/reactions/fav.png" alt="Favorito"/>
-  </button>
-  <button class="icon-btn" onclick="homeDl('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">
-    <img src="${ROOT}/assets/reactions/download.png" alt="Descargar"/>
-  </button>
-</div>
+            <div class="sb-reactions">
+              <button class="reaction-btn" onclick="homeReact('${d.id}','love')" id="hr-love-${d.id}" title="Me encanta">✨ <span class="reaction-count">${r.love||0}</span></button>
+              <button class="reaction-btn" onclick="homeReact('${d.id}','mid')"  id="hr-mid-${d.id}"  title="Regular">😐 <span class="reaction-count">${r.mid||0}</span></button>
+              <button class="reaction-btn" onclick="homeReact('${d.id}','bad')"  id="hr-bad-${d.id}"  title="No sirve">👎 <span class="reaction-count">${r.bad||0}</span></button>
+            </div>
+            <div class="sb-actions">
+              <button class="fav-btn" id="hfav-${d.id}" onclick="homeFav('${d.id}')" title="Favorito">☆</button>
+              <button class="btn-sm btn-sm-download" onclick="homeDl('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">↓</button>
+            </div>
           </div>
         </div>`;
     }).join('');
+
+    // ── Aplicar reacciones y favoritos del usuario ──
+    await loadHomeUserData(snap.docs.map(d => d.id));
+
   } catch(e) {
     grid.innerHTML = '<p style="color:var(--text-dim);font-size:.85rem;grid-column:1/-1">Error al cargar.</p>';
   }
 }
 
+async function loadHomeUserData(audioIds) {
+  if (!homeUser) return;
+  try {
+    const snap = await getDoc(doc(db, 'usuarios', homeUser.uid));
+    if (!snap.exists()) return;
+    const data   = snap.data();
+    const reacts = data.reacciones  || {};
+    const favs   = data.favoritos   || [];
+
+    audioIds.forEach(id => {
+      const type = reacts[id];
+      if (type) {
+        const btn = document.getElementById(`hr-${type}-${id}`);
+        if (btn) btn.classList.add(`active-${type}`);
+      }
+      if (favs.includes(id)) {
+        const btn = document.getElementById(`hfav-${id}`);
+        if (btn) { btn.textContent = '★'; btn.classList.add('active'); }
+      }
+    });
+  } catch {}
+}
+
 loadStats();
 loadLatest();
+
+// Re-aplicar cuando Auth resuelva (por si loadLatest corrió antes)
+onAuthStateChanged(auth, async u => {
+  homeUser = u;
+  const grid = document.getElementById('featuredGrid');
+  if (!grid || !u) return;
+  const ids = [...grid.querySelectorAll('[id^="hcard-"]')].map(el => el.id.replace('hcard-',''));
+  if (ids.length) await loadHomeUserData(ids);
+});
