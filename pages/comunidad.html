@@ -38,7 +38,6 @@
       <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."/>
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
-    <p class="reaction-hint">Vota cada soundbite: <strong style="color:var(--neon)">Me encanta</strong> si coincide y suena bien · <strong style="color:var(--gold)">Regular</strong> si la calidad o el nombre no convencen · <strong style="color:var(--danger)">No sirve</strong> si el audio es de mala calidad o no corresponde</p>
   </div>
 
   <div class="filters">
@@ -162,28 +161,40 @@
     function sbCard(a) {
       const r = a.reactions || { love:0, mid:0, bad:0 };
       return `
-        <div class="sb-card" id="card-${a.id}">
-          <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-          <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
-          <div class="sb-player">
-            <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
-            <div class="sb-prog-wrap">
-              <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
-              <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
-            </div>
-          </div>
-          <div class="sb-footer">
-            <div class="sb-reactions">
-              <button class="reaction-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">✨ <span class="reaction-count">${r.love||0}</span></button>
-              <button class="reaction-btn" onclick="react('${a.id}','mid')"  id="r-mid-${a.id}"  title="Regular">😐 <span class="reaction-count">${r.mid||0}</span></button>
-              <button class="reaction-btn" onclick="react('${a.id}','bad')"  id="r-bad-${a.id}"  title="No sirve">👎 <span class="reaction-count">${r.bad||0}</span></button>
-            </div>
-            <div class="sb-actions">
-              <button class="fav-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Guardar en favoritos">☆</button>
-              <button class="btn-sm btn-sm-download" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar MP3">↓</button>
-            </div>
-          </div>
-        </div>`;
+function sbCard(a) {
+  const r = a.reactions || { love:0, meh:0 };
+  return `
+    <div class="sb-card" id="card-${a.id}">
+      <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
+      <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
+      <div class="sb-player">
+        <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
+        <div class="sb-prog-wrap">
+          <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
+          <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
+        </div>
+      </div>
+      <div class="sb-footer">
+        <div class="sb-reactions">
+          <button class="icon-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
+            <img src="../assets/reactions/love.png" alt="Me encanta"/>
+            <span class="icon-count">${r.love||0}</span>
+          </button>
+          <button class="icon-btn" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
+            <img src="../assets/reactions/meh.png" alt="Regular"/>
+            <span class="icon-count">${r.meh||0}</span>
+          </button>
+        </div>
+        <div class="sb-actions">
+          <button class="icon-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+            <img src="../assets/reactions/fav.png" alt="Favorito"/>
+          </button>
+          <button class="icon-btn" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
+            <img src="../assets/reactions/download.png" alt="Descargar"/>
+          </button>
+        </div>
+      </div>
+    </div>`;
     }
 
     // ── LOAD FAVORITES & REACTIONS from user doc ──
@@ -199,73 +210,63 @@
           const btn = document.getElementById(`fav-${id}`);
           if (btn) { btn.textContent = '★'; btn.classList.add('active'); }
         });
-        Object.entries(reacts).forEach(([id, type]) => {
-          const btn = document.getElementById(`r-${type}-${id}`);
-          if (btn) btn.classList.add(`active-${type}`);
-        });
+// DESPUÉS
+Object.entries(reacts).forEach(([id, type]) => {
+  const btn = document.getElementById(`r-${type}-${id}`);
+  if (btn) btn.classList.add(`active-${type}`);
+});
+// favoritos
+favs.forEach(id => {
+  const btn = document.getElementById(`fav-${id}`);
+  if (btn) btn.classList.add('active-fav');
+});
       } catch {}
     }
 
     // ── REACTIONS ──
 
 // En comunidad.html — reemplaza la función react completa
-
 window.react = async function(id, type) {
   if (!currentUser) { showAuthPrompt(); return; }
   try {
-    // 1. Leer estado actual del usuario
     const userRef  = doc(db, 'usuarios', currentUser.uid);
     const userSnap = await getDoc(userRef);
     const reacts   = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
-    const prev     = reacts[id]; // reacción anterior del usuario en este audio
+    const prev     = reacts[id];
 
-    // 2. Leer el doc de audio para saber los conteos reales
     const audioRef  = doc(db, 'audios', id);
     const audioSnap = await getDoc(audioRef);
-    const reactions = audioSnap.exists()
-      ? (audioSnap.data().reactions || {})
-      : {};
+    const reactions = audioSnap.exists() ? (audioSnap.data().reactions || {}) : {};
 
-    // 3. Calcular nuevos valores (nunca negativos)
     const updates = {};
 
     if (prev) {
-      // Quitar la reacción anterior — nunca dejar en negativo
-      updates[`reactions.${prev}`] =
-        Math.max(0, (reactions[prev] || 0) - 1);
-
-      // UI: bajar contador anterior
+      updates[`reactions.${prev}`] = Math.max(0, (reactions[prev] || 0) - 1);
       const prevBtn = document.getElementById(`r-${prev}-${id}`);
       if (prevBtn) {
         prevBtn.classList.remove(`active-${prev}`);
-        const s = prevBtn.querySelector('.reaction-count');
+        const s = prevBtn.querySelector('.icon-count');
         if (s) s.textContent = updates[`reactions.${prev}`];
       }
     }
 
     if (prev === type) {
-      // Misma reacción → toggle off
       delete reacts[id];
       await updateDoc(userRef,  { reacciones: reacts });
       await updateDoc(audioRef, updates);
     } else {
-      // Nueva reacción distinta → sumar
-      updates[`reactions.${type}`] =
-        (reactions[type] || 0) + 1;
-
+      updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
       reacts[id] = type;
       await updateDoc(userRef,  { reacciones: reacts });
       await updateDoc(audioRef, updates);
 
-      // UI: subir contador nuevo
       const newBtn = document.getElementById(`r-${type}-${id}`);
       if (newBtn) {
         newBtn.classList.add(`active-${type}`);
-        const s = newBtn.querySelector('.reaction-count');
+        const s = newBtn.querySelector('.icon-count');
         if (s) s.textContent = updates[`reactions.${type}`];
       }
     }
-
   } catch(e) {
     window.showToast && window.showToast('Error: ' + e.message, 'error');
   }
@@ -275,23 +276,23 @@ window.react = async function(id, type) {
     function decCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=Math.max(0,parseInt(s.textContent||0)-1); }
 
     // ── FAVORITES ──
-    window.toggleFav = async function(id) {
-      if (!currentUser) { showAuthPrompt(); return; }
-      const btn = document.getElementById(`fav-${id}`);
-      const isActive = btn?.classList.contains('active');
-      try {
-        const ref = doc(db,'usuarios',currentUser.uid);
-        if (isActive) {
-          await updateDoc(ref, { favoritos: arrayRemove(id) });
-          btn.textContent = '☆'; btn.classList.remove('active');
-          window.showToast && window.showToast('Eliminado de favoritos');
-        } else {
-          await updateDoc(ref, { favoritos: arrayUnion(id) });
-          btn.textContent = '★'; btn.classList.add('active');
-          window.showToast && window.showToast('Guardado en favoritos');
-        }
-      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
-    };
+window.toggleFav = async function(id) {
+  if (!currentUser) { showAuthPrompt(); return; }
+  const btn = document.getElementById(`fav-${id}`);
+  const isActive = btn?.classList.contains('active-fav');
+  try {
+    const ref = doc(db,'usuarios',currentUser.uid);
+    if (isActive) {
+      await updateDoc(ref, { favoritos: arrayRemove(id) });
+      btn.classList.remove('active-fav');
+      window.showToast && window.showToast('Eliminado de favoritos');
+    } else {
+      await updateDoc(ref, { favoritos: arrayUnion(id) });
+      btn.classList.add('active-fav');
+      window.showToast && window.showToast('Guardado en favoritos');
+    }
+  } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
+};
 
     // ── DELETE (solo el autor) ──
     window.deleteSB = async function(id) {

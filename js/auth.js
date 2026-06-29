@@ -45,7 +45,7 @@ function renderNav(user, nombre, avatar) {
   const el = document.getElementById('nav-auth');
   if (!el) return;
   if (user) {
-    const name    = nombre || user.displayName || user.email || 'Jugador';
+    const name = nombre || user.email?.split('@')[0] || 'Jugador';
     const initial = name.charAt(0).toUpperCase();
     const avatarHTML = avatar
       ? `<img class="nav-avatar" src="${ROOT}/assets/avatars/${avatar}.png" alt=""
@@ -66,7 +66,7 @@ function renderMobile(user, nombre) {
   const el = document.getElementById('mobile-auth');
   if (!el) return;
   if (user) {
-    const name = nombre || user.displayName || user.email || 'Jugador';
+    const name = nombre || user.email?.split('@')[0] || 'Jugador';
     // Solo el nombre como link al perfil — sin botón de cerrar sesión (está en perfil.html)
     el.innerHTML = `<a href="${ROOT}/pages/perfil.html" class="mobile-perfil-link">${name}</a>`;
   } else {

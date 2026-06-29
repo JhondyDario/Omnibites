@@ -169,15 +169,15 @@ window.homeReact = async function(audioId, type) {
 window.homeFav = async function(audioId) {
   if (!homeUser) { window.location.href = ROOT + '/pages/login.html'; return; }
   const btn = document.getElementById(`hfav-${audioId}`);
-  const isActive = btn?.classList.contains('active');
+  const isActive = btn?.classList.contains('active-fav');
   try {
     const ref = doc(db, 'usuarios', homeUser.uid);
     if (isActive) {
       await updateDoc(ref, { favoritos: arrayRemove(audioId) });
-      btn.textContent = '☆'; btn.classList.remove('active');
+      btn.classList.remove('active-fav');
     } else {
       await updateDoc(ref, { favoritos: arrayUnion(audioId) });
-      btn.textContent = '★'; btn.classList.add('active');
+      btn.classList.add('active-fav');
     }
   } catch(e) { console.error('homeFav:', e); }
 };
@@ -225,7 +225,7 @@ async function loadLatest() {
     }
     grid.innerHTML = snap.docs.map((d, i) => {
       const a = d.data();
-      const r = a.reactions || { love:0, mid:0, bad:0 };
+const r = a.reactions || { love:0, meh:0 };
       return `
         <div class="sb-card" id="hcard-${d.id}">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
@@ -237,15 +237,24 @@ async function loadLatest() {
             </div>
           </div>
           <div class="sb-footer">
-            <div class="sb-reactions">
-              <button class="reaction-btn" onclick="homeReact('${d.id}','love')" id="hr-love-${d.id}" title="Me encanta">✨ <span class="reaction-count">${r.love||0}</span></button>
-              <button class="reaction-btn" onclick="homeReact('${d.id}','mid')"  id="hr-mid-${d.id}"  title="Regular">😐 <span class="reaction-count">${r.mid||0}</span></button>
-              <button class="reaction-btn" onclick="homeReact('${d.id}','bad')"  id="hr-bad-${d.id}"  title="No sirve">👎 <span class="reaction-count">${r.bad||0}</span></button>
-            </div>
-            <div class="sb-actions">
-              <button class="fav-btn" id="hfav-${d.id}" onclick="homeFav('${d.id}')" title="Favorito">☆</button>
-              <button class="btn-sm btn-sm-download" onclick="homeDl('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">↓</button>
-            </div>
+<div class="sb-reactions">
+  <button class="icon-btn" onclick="homeReact('${d.id}','love')" id="hr-love-${d.id}" title="Me encanta">
+    <img src="${ROOT}/assets/reactions/love.png" alt="Me encanta"/>
+    <span class="icon-count">${r.love||0}</span>
+  </button>
+  <button class="icon-btn" onclick="homeReact('${d.id}','meh')" id="hr-meh-${d.id}" title="Regular">
+    <img src="${ROOT}/assets/reactions/meh.png" alt="Regular"/>
+    <span class="icon-count">${r.meh||0}</span>
+  </button>
+</div>
+<div class="sb-actions">
+  <button class="icon-btn" id="hfav-${d.id}" onclick="homeFav('${d.id}')" title="Favorito">
+    <img src="${ROOT}/assets/reactions/fav.png" alt="Favorito"/>
+  </button>
+  <button class="icon-btn" onclick="homeDl('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')">
+    <img src="${ROOT}/assets/reactions/download.png" alt="Descargar"/>
+  </button>
+</div>
           </div>
         </div>`;
     }).join('');

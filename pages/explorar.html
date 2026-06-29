@@ -252,7 +252,7 @@
     <h1>Buscar música</h1>
     <div class="search-bar">
       <input type="text" id="searchInput"
-        placeholder="Ej: Star Fox Assault, Zelda, Mario Kart..." />
+        placeholder="Ej: Super Mario 64, Pokémon Red, Mega Man X8..." />
       <button class="btn-primary" id="searchBtn">Buscar</button>
     </div>
   </div>
@@ -263,7 +263,7 @@
     <div id="stateMsg" class="state-msg">
       <div class="emoji"></div>
       <p>Busca un juego para encontrar sus audios</p>
-      <small>Powered by Archive.org — miles de soundtracks gratuitos</small>
+      <small>Encuentra miles de soundtracks gratuitos</small>
     </div>
     <div id="resultsHeader" style="display:none" class="results-header"></div>
     <div id="resultsList"></div>
@@ -446,15 +446,15 @@
           <div class="card-actions">
             <button class="btn-sm btn-sm-green"
               onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
-              Añadir Soundbite
+              Añadir
             </button>
             <button class="btn-sm btn-sm-download" id="dlBtn-${i}"
               onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
-              Descargar Soundbite
+              Descargar
             </button>
             <a class="btn-sm btn-sm-outline"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
-              Fuente del audio
+              Fuente
             </a>
           </div>
         </div>

@@ -38,10 +38,10 @@
 </head>
 <body>
   <nav class="navbar">
-<a href="../index.html" class="logo">
-  <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
-  <span class="logo-text">OMNI<span>BITES</span></span>
-</a>
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      <span class="logo-text">OMNI<span>BITES</span></span>
+    </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="explorar.html">Explorar</a>
@@ -193,7 +193,7 @@
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null;
@@ -201,6 +201,14 @@
     let localFileUrl = null;
     let localFileDuration = 0;
     let activeTab = 'url';
+
+    // ── Leer nombre desde Firestore, nunca desde Google ──
+    async function getNombreUsuario(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'usuarios', uid));
+        return snap.exists() ? (snap.data().nombre || 'Jugador') : 'Jugador';
+      } catch { return 'Jugador'; }
+    }
 
     onAuthStateChanged(auth, user => {
       currentUser = user;
@@ -330,6 +338,9 @@
       btn.disabled = true; btn.textContent = 'Publicando...';
 
       try {
+        // ── Leer nombre de Firestore antes de publicar ──
+        const autorNombre = await getNombreUsuario(currentUser.uid);
+
         const dupeQ = query(collection(db,'audios'),
           where('autorId','==',currentUser.uid),
           where('titulo','==',titulo),
@@ -340,6 +351,7 @@
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
             trimStart, trimEnd, duracion: fmt(trimEnd-trimStart),
+            autorNombre,
             creadoEn: serverTimestamp()
           });
           window.showToast('Soundbite actualizado (ya existía uno igual)');
@@ -352,7 +364,7 @@
           trimStart, trimEnd,
           duracion: fmt(trimEnd - trimStart),
           autorId: currentUser.uid,
-          autorNombre: currentUser.displayName || 'Jugador',
+          autorNombre,
           likes: 0, rating: 0, totalVotos: 0,
           creadoEn: serverTimestamp()
         });

@@ -59,19 +59,20 @@
 
     <div class="sbox">
       <h2>Información de cuenta</h2>
-      <div class="info-row">
-        <label>Nombre de usuario</label>
-        <div class="info-row-edit">
-          <input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="30"/>
-          <button class="btn-primary" id="saveNombreBtn" style="padding:.4rem .85rem;font-size:.78rem">Guardar</button>
-        </div>
-      </div>
-      <div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
-      <div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Nombre actualizado.</div>
-      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
+<div style="padding:.65rem 0;border-bottom:1px solid var(--border);">
+  <label style="font-size:.78rem;color:var(--text-dim);display:block;margin-bottom:.4rem;">Nombre de usuario</label>
+  <div class="form-group" style="margin:0;">
+<input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="10"/>
+  </div>
+</div>
+<div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
+<div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Nombre actualizado.</div>      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
       <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
       <div class="info-row"><label>Cuenta creada</label><span id="infoFecha">—</span></div>
       <div class="info-row"><label>Correo verificado</label><span id="infoVerif">—</span></div>
+<button class="btn-primary" id="saveNombreBtn" style="display:block;margin-left:auto;margin-right:auto;margin-top:1.25rem;padding:.5rem 1.5rem;font-size:.82rem;">
+  Guardar cambios
+</button>
     </div>
 
     <div class="sbox">
@@ -81,14 +82,13 @@
       <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="confirmPass" placeholder="Repite la contraseña"/></div>
       <div id="passErr" class="field-err" style="display:none"></div>
       <div id="passOk"  class="field-ok" style="display:none">Contraseña actualizada.</div>
-      <button class="btn-primary" id="savePassBtn" style="margin-top:.5rem">Guardar contraseña</button>
+<button class="btn-primary" id="savePassBtn" style="margin-top:.5rem;display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Guardar contraseña</button>    
     </div>
 
     <div class="sbox">
       <h2>Eliminar cuenta</h2>
       <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Esta acción eliminará todos tus datos permanentemente y no se puede deshacer.</p>
-      <button class="btn-danger" id="deleteBtn">Eliminar mi cuenta</button>
-    </div>
+<button class="btn-danger" id="deleteBtn" style="display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Eliminar mi cuenta</button>    </div>
   </main>
 
   <div class="popup-overlay" id="deletePopup" style="display:none">
@@ -148,7 +148,8 @@
       errEl.style.display='none'; okEl.style.display='none';
       if (!raw) { errEl.textContent='Escribe un nombre.'; errEl.style.display='block'; return; }
       if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Solo letras, números y espacios.'; errEl.style.display='block'; return; }
-      if (raw.length < 3) { errEl.textContent='Mínimo 3 caracteres.'; errEl.style.display='block'; return; }
+      if (raw.length < 5) { errEl.textContent='Mínimo 5 caracteres.'; errEl.style.display='block'; return; }
+      if (raw.length > 10) { errEl.textContent='Máximo 10 caracteres.'; errEl.style.display='block'; return; }
       try {
         const snap = await getDocs(query(collection(db,'usuarios'), where('nombre','==',raw)));
         const taken = snap.docs.some(d => d.id !== currentUser.uid);
