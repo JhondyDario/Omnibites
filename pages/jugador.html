@@ -300,13 +300,17 @@ if (dataMios.length) {
         if (favIds.length > 0) {
           const favAudios = [];
           for (const fid of favIds) {
-            try {
-              const fs = await getDoc(doc(db, 'audios', fid));
-              if (fs.exists()) favAudios.push({ id: fs.id, ...fs.data() });
-            } catch {}
-          if (favAudios.length) {
+  try {
+    const fs = await getDoc(doc(db, 'audios', fid));
+    if (fs.exists()) favAudios.push({ id: fs.id, ...fs.data() });
+  } catch {}
+}
+if (favAudios.length) {
   dataFavs = favAudios;
   renderFavsPage();
+} else {
+  listFavs.innerHTML = '<div class="empty-mini">No se encontraron favoritos.</div>';
+}
 } else {
   listFavs.innerHTML = '<div class="empty-mini">No se encontraron favoritos.</div>';
                                                }
