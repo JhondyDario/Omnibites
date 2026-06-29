@@ -221,21 +221,67 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .sb-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
 .sb-actions{display:flex;align-items:center;gap:.4rem;min-width:0;}
 
-/* Reactions */
-.sb-reactions{display:flex;gap:.35rem;align-items:center;}
-.reaction-btn{display:flex;align-items:center;gap:.25rem;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.28rem .65rem;font-size:.8rem;cursor:pointer;font-family:var(--font-body);color:var(--text-dim);transition:border-color .2s,background .2s,color .2s;white-space:nowrap;}
-.reaction-btn:hover{border-color:var(--text-dim);}
-.reaction-btn.active-love{border-color:var(--neon);background:rgba(74,222,128,.08);color:var(--neon);}
-.reaction-btn.active-mid{border-color:var(--gold);background:rgba(251,191,36,.08);color:var(--gold);}
-.reaction-btn.active-bad{border-color:var(--danger);background:rgba(248,113,113,.08);color:var(--danger);}
-.reaction-count{font-size:.72rem;font-weight:600;}
-.reaction-hint{font-size:.75rem;color:var(--text-dim);margin-bottom:1rem;padding:.6rem .9rem;background:var(--bg3);border-radius:8px;border-left:2px solid var(--neon);}
+/* ── ICON BUTTONS (reactions, fav, download, delete) ── */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: .32rem .7rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: border-color .2s, background .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.icon-btn img {
+  width: 26px;
+  height: 26px;
+  display: block;
+  object-fit: contain;
+  opacity: .45;
+  transition: opacity .2s, filter .2s;
+  filter: grayscale(1);
+}
+.icon-btn:hover img { opacity: .75; filter: grayscale(0); }
+.icon-btn .icon-count {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: color .2s;
+  min-width: .6rem;
+  text-align: left;
+}
 
-.fav-btn{display:flex;align-items:center;gap:.25rem;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.28rem .65rem;font-size:.8rem;cursor:pointer;font-family:var(--font-body);color:var(--text-dim);transition:border-color .2s,color .2s;}
-.fav-btn:hover{border-color:var(--gold);}
-.fav-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(251,191,36,.08);}
-.sb-delete-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-size:.75rem;cursor:pointer;padding:.28rem .65rem;border-radius:20px;transition:color .2s,border-color .2s;}
-.sb-delete-btn:hover{color:var(--danger);border-color:var(--danger);}
+/* Estados activos por tipo */
+.icon-btn.active-love { border-color: var(--neon); background: rgba(74,222,128,.07); }
+.icon-btn.active-love img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--neon)); }
+.icon-btn.active-love .icon-count { color: var(--neon); }
+
+.icon-btn.active-meh { border-color: var(--gold); background: rgba(251,191,36,.07); }
+.icon-btn.active-meh img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--gold)); }
+.icon-btn.active-meh .icon-count { color: var(--gold); }
+
+.icon-btn.active-fav { border-color: var(--gold); background: rgba(251,191,36,.07); }
+.icon-btn.active-fav img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--gold)); }
+
+.icon-btn.active-dl  { border-color: var(--cyan); }
+.icon-btn.active-dl img { opacity: 1; filter: grayscale(0); }
+
+.icon-btn.icon-danger:hover { border-color: var(--danger); }
+.icon-btn.icon-danger:hover img { filter: grayscale(0) drop-shadow(0 0 3px var(--danger)); opacity: 1; }
+
+/* Tamaño mobile */
+@media(max-width: 480px) {
+  .icon-btn img { width: 22px; height: 22px; }
+  .icon-btn { padding: .28rem .55rem; gap: .28rem; }
+}
+
+/* Mantener compatibilidad reaction-count legacy */
+.reaction-count { font-size: .72rem; font-weight: 600; }
+.sb-reactions { display: flex; gap: .35rem; align-items: center; }
 
 .auth-prompt{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--neon);border-radius:10px;padding:.85rem 1.25rem;font-size:.82rem;color:var(--text);z-index:999;animation:slideIn .3s ease;white-space:nowrap;text-align:center;}
 .auth-prompt a{color:var(--neon);font-weight:600;text-decoration:none;margin-left:.4rem;}
