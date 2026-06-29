@@ -38,17 +38,6 @@
       transition: border-color 0.2s;
     }
     .search-bar input:focus { border-color: var(--neon); }
-    .search-hint {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-bottom: 1.5rem;
-    }
-    .search-hint span {
-      color: var(--neon);
-      cursor: pointer;
-      margin-right: 0.5rem;
-    }
-    .search-hint span:hover { text-decoration: underline; }
 
     .results-wrap {
       max-width: 900px;
@@ -149,20 +138,39 @@
       gap: 0.6rem;
       margin-top: 0.75rem;
       flex-wrap: wrap;
+      align-items: center;
     }
-    .btn-sm {
-      padding: 0.4rem 0.9rem;
-      font-size: 0.78rem;
-      border-radius: var(--radius);
+
+    /* Botones circulares de acción */
+    .card-actions .reaction-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
       cursor: pointer;
-      font-weight: 600;
-      border: none;
+      transition: border-color 0.2s, background 0.2s;
       text-decoration: none;
-      display: inline-block;
     }
-    .btn-sm-green  { background: var(--neon); color: #000; }
-    .btn-sm-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
-    .btn-sm-outline:hover { border-color: var(--neon); color: var(--neon); }
+    .card-actions .reaction-btn:hover {
+      border-color: var(--neon);
+      background: rgba(74,222,128,0.07);
+    }
+    .card-actions .reaction-btn img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      display: block;
+    }
+    .card-actions .reaction-btn.loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
 
     .state-msg {
       text-align: center;
@@ -203,14 +211,6 @@
     }
     .related-chip:hover { background: rgba(57,255,20,0.08); border-color: var(--neon); }
 
-    .btn-sm-download {
-      background: transparent;
-      border: 1px solid var(--cyan);
-      color: var(--cyan);
-    }
-    .btn-sm-download:hover { background: var(--cyan); color: #000; }
-    .btn-sm-download.loading { opacity: 0.6; pointer-events: none; }
-
     .fade-badge {
       display: inline-block;
       background: rgba(57,255,20,0.1);
@@ -225,10 +225,10 @@
 </head>
 <body>
   <nav class="navbar">
-<a href="../index.html" class="logo">
-  <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
-  <span class="logo-text">OMNI<span>BITES</span></span>
-</a>
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      <span class="logo-text">OMNI<span>BITES</span></span>
+    </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="explorar.html">Explorar</a>
@@ -243,7 +243,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>   
+    <a href="subir.html">Añadir</a>
     <a href="jugadores.html">Jugadores</a>
   </div>
 
@@ -293,7 +293,6 @@
 
     function enrichQuery(raw) {
       const clean = raw.trim().toLowerCase();
-      const alreadyHasOST = /\b(ost|soundtrack|music|audio|sound)\b/.test(clean);
       const words = clean.split(/\s+/).filter(w => w.length > 1 && !STOPWORDS.has(w));
       const ostTerms = 'title:(ost OR soundtrack OR "original soundtrack" OR "game music" OR "video game music" OR music OR audio)';
       const subjectTerms = 'subject:(videogame OR "video game" OR gaming OR nintendo OR sega OR playstation OR "game music" OR ost OR soundtrack OR arcade)';
@@ -443,19 +442,18 @@
             </div>
           </div>
 
-<div class="card-actions">
+          <div class="card-actions">
             <button class="reaction-btn" title="Añadir soundbite"
               onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
-              <img src="../assets/icons/add.png" style="width:16px;height:16px;object-fit:contain;"/>
+              <img src="../assets/icons/add.png" alt="Añadir"/>
             </button>
             <button class="reaction-btn" id="dlBtn-${i}" title="Descargar MP3"
               onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
-              <img src="../assets/icons/download.png" style="width:16px;height:16px;object-fit:contain;"/>
+              <img src="../assets/icons/download.png" alt="Descargar"/>
             </button>
             <a class="reaction-btn" title="Ver fuente en Archive.org"
-              href="https://archive.org/details/${item.archiveId}" target="_blank"
-              style="text-decoration:none">
-              <img src="../assets/icons/source.png" style="width:16px;height:16px;object-fit:contain;"/>
+              href="https://archive.org/details/${item.archiveId}" target="_blank">
+              <img src="../assets/icons/source.png" alt="Fuente"/>
             </a>
           </div>
         </div>
@@ -559,7 +557,6 @@
 
     window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
       const btn = document.getElementById(`dlBtn-${idx}`);
-      btn.textContent = '... Convirtiendo...';
       btn.classList.add('loading');
       try {
         const ctx = getAudioCtx();
@@ -592,13 +589,10 @@
         a.download = filename;
         a.click();
         URL.revokeObjectURL(a.href);
-        btn.textContent = ' ¡Listo!';
-        setTimeout(() => { btn.textContent = 'Descargar Soundbite'; btn.classList.remove('loading'); }, 3000);
+        btn.classList.remove('loading');
       } catch (e) {
         console.error(e);
-        btn.textContent = '✕ Error';
         btn.classList.remove('loading');
-        setTimeout(() => { btn.textContent = 'Descargar Soundbite'; }, 2500);
       }
     };
 
@@ -622,30 +616,30 @@
       return mp3Data;
     }
 
-window.compartir = function(idx, url, titleEsc, albumEsc) {
-  const title = unescape(titleEsc);
-  const album = unescape(albumEsc);
-  const item  = window._items?.[idx];
-  const start = 0;
-  const end   = item?.seconds ? Math.min(item.seconds, 15) : 15;
-  const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
-  window.location.href = `subir.html?${params.toString()}`;
-};
+    window.compartir = function(idx, url, titleEsc, albumEsc) {
+      const title = unescape(titleEsc);
+      const album = unescape(albumEsc);
+      const item  = window._items?.[idx];
+      const start = 0;
+      const end   = item?.seconds ? Math.min(item.seconds, 15) : 15;
+      const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
+      window.location.href = `subir.html?${params.toString()}`;
+    };
 
     const RELATED_GAMES = {
-      'star fox': ['Star Fox 64', 'Star Fox Adventures', 'Star Fox Command', 'Star Fox Zero'],
-      'mario':    ['Super Mario 64', 'Mario Kart 64', 'Paper Mario', 'Mario Galaxy', 'Mario Odyssey'],
-      'zelda':    ["Zelda: Majora's Mask", 'Zelda: Wind Waker', 'Zelda: Twilight Princess', 'Zelda: Skyward Sword'],
-      'sonic':    ['Sonic Adventure', 'Sonic Adventure 2', 'Sonic Heroes', 'Sonic Rush'],
-      'metroid':  ['Metroid Fusion', 'Metroid Zero Mission', 'Metroid Prime 2', 'Metroid Prime 3'],
-      'pokemon':  ['Pokemon Gold Silver', 'Pokemon Ruby Sapphire', 'Pokemon Diamond Pearl', 'Pokemon HeartGold'],
-      'kirby':    ['Kirby Super Star', 'Kirby 64', 'Kirby Amazing Mirror', 'Kirby Canvas Curse'],
-      'donkey':   ['Donkey Kong Country 2', 'Donkey Kong Country 3', 'DK64'],
-      'mega man': ['Mega Man X2', 'Mega Man X3', 'Mega Man Zero', 'Mega Man Battle Network'],
-      'castlevania': ['Castlevania Symphony of the Night', 'Castlevania Circle of the Moon', 'Castlevania Aria of Sorrow'],
+      'star fox':      ['Star Fox 64', 'Star Fox Adventures', 'Star Fox Command', 'Star Fox Zero'],
+      'mario':         ['Super Mario 64', 'Mario Kart 64', 'Paper Mario', 'Mario Galaxy', 'Mario Odyssey'],
+      'zelda':         ["Zelda: Majora's Mask", 'Zelda: Wind Waker', 'Zelda: Twilight Princess', 'Zelda: Skyward Sword'],
+      'sonic':         ['Sonic Adventure', 'Sonic Adventure 2', 'Sonic Heroes', 'Sonic Rush'],
+      'metroid':       ['Metroid Fusion', 'Metroid Zero Mission', 'Metroid Prime 2', 'Metroid Prime 3'],
+      'pokemon':       ['Pokemon Gold Silver', 'Pokemon Ruby Sapphire', 'Pokemon Diamond Pearl', 'Pokemon HeartGold'],
+      'kirby':         ['Kirby Super Star', 'Kirby 64', 'Kirby Amazing Mirror', 'Kirby Canvas Curse'],
+      'donkey':        ['Donkey Kong Country 2', 'Donkey Kong Country 3', 'DK64'],
+      'mega man':      ['Mega Man X2', 'Mega Man X3', 'Mega Man Zero', 'Mega Man Battle Network'],
+      'castlevania':   ['Castlevania Symphony of the Night', 'Castlevania Circle of the Moon', 'Castlevania Aria of Sorrow'],
       'final fantasy': ['Final Fantasy VI', 'Final Fantasy VIII', 'Final Fantasy IX', 'Final Fantasy X'],
-      'f-zero':   ['F-Zero X', 'F-Zero GX', 'F-Zero Maximum Velocity'],
-      'fire emblem': ['Fire Emblem Sacred Stones', 'Fire Emblem Path of Radiance', 'Fire Emblem Awakening'],
+      'f-zero':        ['F-Zero X', 'F-Zero GX', 'F-Zero Maximum Velocity'],
+      'fire emblem':   ['Fire Emblem Sacred Stones', 'Fire Emblem Path of Radiance', 'Fire Emblem Awakening'],
     };
 
     function showRelatedSuggestions(query) {
