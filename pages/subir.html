@@ -329,16 +329,16 @@ function loadAudioUrl(url, startHint = 0, endHint = 15) {
       if (!consola)   { window.showToast('Selecciona la consola.','error'); return; }
       if (!categoria) { window.showToast('Selecciona la categoría.','error'); return; }
 
-      let url = '', trimStart = 0, trimEnd = 15;
-if (activeTab === 'url') {
-  url = document.getElementById('audioUrl').value.trim();
-  if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
-  trimStart = parseFloat(document.getElementById('trimStart').value)||0;
-  trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
-  const clipDur = trimEnd - trimStart;
-  if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
-  if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
-} } else {
+let url = '', trimStart = 0, trimEnd = 15;
+      if (activeTab === 'url') {
+        url = document.getElementById('audioUrl').value.trim();
+        if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
+        trimStart = parseFloat(document.getElementById('trimStart').value)||0;
+        trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
+        const clipDur = trimEnd - trimStart;
+        if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
+        if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
+      } else {
   if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
   if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
   if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
