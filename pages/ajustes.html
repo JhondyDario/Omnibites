@@ -59,10 +59,12 @@
 
     <div class="sbox">
       <h2>Información de cuenta</h2>
-<div class="info-row" style="flex-wrap:wrap;gap:.5rem;">  <label>Nombre de usuario</label>
-<input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="30"
-    style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.4rem .7rem;font-size:.85rem;font-family:var(--font-body);outline:none;width:100%;max-width:200px;"/>
-      </div>
+<div style="padding:.65rem 0;border-bottom:1px solid var(--border);">
+  <label style="font-size:.78rem;color:var(--text-dim);display:block;margin-bottom:.4rem;">Nombre de usuario</label>
+  <div class="form-group" style="margin:0;">
+    <input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="30"/>
+  </div>
+</div>
 <div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
 <div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Nombre actualizado.</div>      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
       <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
