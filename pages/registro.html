@@ -47,7 +47,7 @@
 
       <div class="form-group">
         <label>Nombre de jugador</label>
-        <input type="text" id="nombre" placeholder="RetroPlayer99"/>
+<input type="text" id="nombre" placeholder="Omniguy2077" maxlength="10"/>
       </div>
       <div class="form-group">
         <label>Correo electrónico</label>
@@ -107,6 +107,7 @@
       const email  = document.getElementById('email').value.trim();
       const pass   = document.getElementById('password').value;
       if (!nombre || !email || !pass) return showErr('Completa todos los campos.');
+      if (nombre.length > 10) return showErr('El nombre no puede tener más de 10 caracteres.');
       const passErr = validatePass(pass);
       if (passErr) return showErr(passErr);
       try {
