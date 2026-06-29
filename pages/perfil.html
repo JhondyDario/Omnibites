@@ -136,7 +136,9 @@
         <img id="avatarImg" src="../assets/avatars/avatar1.png" alt="Avatar"
              onerror="this.style.display='none';document.getElementById('avFallback').style.display='flex'"/>
         <div class="avatar-fallback" id="avFallback" style="display:none"></div>
-        <div class="avatar-edit-hint">✏</div>
+<div class="avatar-edit-hint">
+  <img src="../assets/icons/camera.png" alt="Editar" style="width:14px;height:14px;object-fit:contain;display:block;"/>
+</div>
       </div>
       <div id="userName" style="font-weight:700;font-size:1.1rem;margin-bottom:.2rem"></div>
       <div id="userEmail" style="font-size:.78rem;color:var(--text-dim);display:none"></div>
@@ -178,14 +180,14 @@
     padding:.6rem 1.4rem; border-radius:20px;
     font-size:.85rem;
   ">
-    ⚙ Ajustes
+<img src="../assets/icons/settings.png" alt="" style="width:16px;height:16px;object-fit:contain;"/> Ajustes 
   </a>
   <button class="btn-signout" id="signOutBtn" style="
     display:flex; align-items:center; gap:.5rem;
     padding:.6rem 1.4rem; border-radius:20px;
     font-size:.85rem;
   ">
-    x Cerrar sesión
+<img src="../assets/icons/logout.png" alt="" style="width:16px;height:16px;object-fit:contain;"/> Cerrar sesión
   </button>
 </div>
   </main>
