@@ -109,12 +109,12 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
-  <script type="module">
+<script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       collection, getDocs, query, orderBy, doc,
-      updateDoc, deleteDoc, increment, getDoc, setDoc, arrayUnion, arrayRemove
+      updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
@@ -124,7 +124,6 @@
 
     onAuthStateChanged(auth, u => { currentUser = u; });
 
-    // ── LOAD ──
     async function loadSoundbites() {
       try {
         const snap = await getDocs(collection(db,'audios'));
@@ -159,45 +158,41 @@
     }
 
     function sbCard(a) {
-      const r = a.reactions || { love:0, mid:0, bad:0 };
+      const r = a.reactions || { love:0, meh:0 };
       return `
-function sbCard(a) {
-  const r = a.reactions || { love:0, meh:0 };
-  return `
-    <div class="sb-card" id="card-${a.id}">
-      <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-      <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
-      <div class="sb-player">
-        <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
-        <div class="sb-prog-wrap">
-          <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
-          <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
-        </div>
-      </div>
-      <div class="sb-footer">
-        <div class="sb-reactions">
-          <button class="icon-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
-            <img src="../assets/reactions/love.png" alt="Me encanta"/>
-            <span class="icon-count">${r.love||0}</span>
-          </button>
-          <button class="icon-btn" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
-            <img src="../assets/reactions/meh.png" alt="Regular"/>
-            <span class="icon-count">${r.meh||0}</span>
-          </button>
-        </div>
-        <div class="sb-actions">
-          <button class="icon-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-            <img src="../assets/reactions/fav.png" alt="Favorito"/>
-          </button>
-          <button class="icon-btn" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
-            <img src="../assets/reactions/download.png" alt="Descargar"/>
-          </button>
-        </div>
-      </div>
-    </div>`;
+        <div class="sb-card" id="card-${a.id}">
+          <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
+          <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
+          <div class="sb-player">
+            <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
+            <div class="sb-prog-wrap">
+              <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
+              <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
+            </div>
+          </div>
+          <div class="sb-footer">
+            <div class="sb-reactions">
+              <button class="icon-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
+                <img src="../assets/reactions/love.png" alt="Me encanta"/>
+                <span class="icon-count">${r.love||0}</span>
+              </button>
+              <button class="icon-btn" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
+                <img src="../assets/reactions/meh.png" alt="Regular"/>
+                <span class="icon-count">${r.meh||0}</span>
+              </button>
+            </div>
+            <div class="sb-actions">
+              <button class="icon-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+                <img src="../assets/reactions/fav.png" alt="Favorito"/>
+              </button>
+              <button class="icon-btn" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
+                <img src="../assets/reactions/download.png" alt="Descargar"/>
+              </button>
+            </div>
+          </div>
+        </div>`;
     }
 
-    // ── LOAD FAVORITES & REACTIONS from user doc ──
     async function loadUserData() {
       if (!currentUser) return;
       try {
@@ -206,95 +201,80 @@ function sbCard(a) {
         const data = snap.data();
         const favs = data.favoritos || [];
         const reacts = data.reacciones || {};
+        Object.entries(reacts).forEach(([id, type]) => {
+          const btn = document.getElementById(`r-${type}-${id}`);
+          if (btn) btn.classList.add(`active-${type}`);
+        });
         favs.forEach(id => {
           const btn = document.getElementById(`fav-${id}`);
-          if (btn) { btn.textContent = '★'; btn.classList.add('active'); }
+          if (btn) btn.classList.add('active-fav');
         });
-// DESPUÉS
-Object.entries(reacts).forEach(([id, type]) => {
-  const btn = document.getElementById(`r-${type}-${id}`);
-  if (btn) btn.classList.add(`active-${type}`);
-});
-// favoritos
-favs.forEach(id => {
-  const btn = document.getElementById(`fav-${id}`);
-  if (btn) btn.classList.add('active-fav');
-});
       } catch {}
     }
 
-    // ── REACTIONS ──
+    window.react = async function(id, type) {
+      if (!currentUser) { showAuthPrompt(); return; }
+      try {
+        const userRef  = doc(db, 'usuarios', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        const reacts   = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
+        const prev     = reacts[id];
 
-// En comunidad.html — reemplaza la función react completa
-window.react = async function(id, type) {
-  if (!currentUser) { showAuthPrompt(); return; }
-  try {
-    const userRef  = doc(db, 'usuarios', currentUser.uid);
-    const userSnap = await getDoc(userRef);
-    const reacts   = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
-    const prev     = reacts[id];
+        const audioRef  = doc(db, 'audios', id);
+        const audioSnap = await getDoc(audioRef);
+        const reactions = audioSnap.exists() ? (audioSnap.data().reactions || {}) : {};
 
-    const audioRef  = doc(db, 'audios', id);
-    const audioSnap = await getDoc(audioRef);
-    const reactions = audioSnap.exists() ? (audioSnap.data().reactions || {}) : {};
+        const updates = {};
 
-    const updates = {};
+        if (prev) {
+          updates[`reactions.${prev}`] = Math.max(0, (reactions[prev] || 0) - 1);
+          const prevBtn = document.getElementById(`r-${prev}-${id}`);
+          if (prevBtn) {
+            prevBtn.classList.remove(`active-${prev}`);
+            const s = prevBtn.querySelector('.icon-count');
+            if (s) s.textContent = updates[`reactions.${prev}`];
+          }
+        }
 
-    if (prev) {
-      updates[`reactions.${prev}`] = Math.max(0, (reactions[prev] || 0) - 1);
-      const prevBtn = document.getElementById(`r-${prev}-${id}`);
-      if (prevBtn) {
-        prevBtn.classList.remove(`active-${prev}`);
-        const s = prevBtn.querySelector('.icon-count');
-        if (s) s.textContent = updates[`reactions.${prev}`];
+        if (prev === type) {
+          delete reacts[id];
+          await updateDoc(userRef,  { reacciones: reacts });
+          await updateDoc(audioRef, updates);
+        } else {
+          updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
+          reacts[id] = type;
+          await updateDoc(userRef,  { reacciones: reacts });
+          await updateDoc(audioRef, updates);
+          const newBtn = document.getElementById(`r-${type}-${id}`);
+          if (newBtn) {
+            newBtn.classList.add(`active-${type}`);
+            const s = newBtn.querySelector('.icon-count');
+            if (s) s.textContent = updates[`reactions.${type}`];
+          }
+        }
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
       }
-    }
+    };
 
-    if (prev === type) {
-      delete reacts[id];
-      await updateDoc(userRef,  { reacciones: reacts });
-      await updateDoc(audioRef, updates);
-    } else {
-      updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
-      reacts[id] = type;
-      await updateDoc(userRef,  { reacciones: reacts });
-      await updateDoc(audioRef, updates);
+    window.toggleFav = async function(id) {
+      if (!currentUser) { showAuthPrompt(); return; }
+      const btn = document.getElementById(`fav-${id}`);
+      const isActive = btn?.classList.contains('active-fav');
+      try {
+        const ref = doc(db,'usuarios',currentUser.uid);
+        if (isActive) {
+          await updateDoc(ref, { favoritos: arrayRemove(id) });
+          btn.classList.remove('active-fav');
+          window.showToast && window.showToast('Eliminado de favoritos');
+        } else {
+          await updateDoc(ref, { favoritos: arrayUnion(id) });
+          btn.classList.add('active-fav');
+          window.showToast && window.showToast('Guardado en favoritos');
+        }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
+    };
 
-      const newBtn = document.getElementById(`r-${type}-${id}`);
-      if (newBtn) {
-        newBtn.classList.add(`active-${type}`);
-        const s = newBtn.querySelector('.icon-count');
-        if (s) s.textContent = updates[`reactions.${type}`];
-      }
-    }
-  } catch(e) {
-    window.showToast && window.showToast('Error: ' + e.message, 'error');
-  }
-};
-
-    function incCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=parseInt(s.textContent||0)+1; }
-    function decCount(btn) { const s=btn.querySelector('.reaction-count'); if(s) s.textContent=Math.max(0,parseInt(s.textContent||0)-1); }
-
-    // ── FAVORITES ──
-window.toggleFav = async function(id) {
-  if (!currentUser) { showAuthPrompt(); return; }
-  const btn = document.getElementById(`fav-${id}`);
-  const isActive = btn?.classList.contains('active-fav');
-  try {
-    const ref = doc(db,'usuarios',currentUser.uid);
-    if (isActive) {
-      await updateDoc(ref, { favoritos: arrayRemove(id) });
-      btn.classList.remove('active-fav');
-      window.showToast && window.showToast('Eliminado de favoritos');
-    } else {
-      await updateDoc(ref, { favoritos: arrayUnion(id) });
-      btn.classList.add('active-fav');
-      window.showToast && window.showToast('Guardado en favoritos');
-    }
-  } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
-};
-
-    // ── DELETE (solo el autor) ──
     window.deleteSB = async function(id) {
       if (!currentUser) return;
       if (!confirm('¿Eliminar este soundbite? Esta acción no se puede deshacer.')) return;
@@ -306,7 +286,6 @@ window.toggleFav = async function(id) {
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-    // ── PLAYER ──
     let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null;
     const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
@@ -316,6 +295,7 @@ window.toggleFav = async function(id) {
       if(activeSBId){const b=document.getElementById(`sbplay-${activeSBId}`);if(b){b.textContent='▶';b.classList.remove('playing');b.disabled=false;}const p=document.getElementById(`sbprog-${activeSBId}`);if(p)p.style.width='0%';}
       activeSBId=null;
     }
+
     window.playSB=async function(id,url,ts,te){
       if(activeSBId===id){stopSB();return;}
       stopSB();
@@ -355,10 +335,9 @@ window.toggleFav = async function(id) {
       }
     };
 
-    // ── DOWNLOAD MP3 ──
     window.dlSB=async function(url,titulo){
-      const btn = event?.target;
-      if(btn){btn.textContent='...';btn.disabled=true;}
+      const btn = event?.target?.closest('.icon-btn');
+      if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity='.3'; btn.disabled=true; }
       try{
         const response = await fetch(url, {mode:'cors'});
         if(!response.ok) throw new Error('HTTP '+response.status);
@@ -399,11 +378,11 @@ window.toggleFav = async function(id) {
         a.click();
         setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
         window.showToast&&window.showToast('Descargando MP3');
-        if(btn){btn.textContent='↓';btn.disabled=false;}
       }catch(e){
         console.error('dlSB error:',e);
-        window.showToast&&window.showToast('Error al descargar. El audio puede no estar disponible.','error');
-        if(btn){btn.textContent='↓';btn.disabled=false;}
+        window.showToast&&window.showToast('Error al descargar.','error');
+      } finally {
+        if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity=''; btn.disabled=false; }
       }
     };
 
@@ -419,7 +398,6 @@ window.toggleFav = async function(id) {
 
     function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
 
-    // ── FILTERS ──
     document.getElementById('searchBtn').addEventListener('click', render);
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') render(); });
     document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; render(); });
