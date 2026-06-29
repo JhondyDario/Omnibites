@@ -62,7 +62,7 @@
 <div style="padding:.65rem 0;border-bottom:1px solid var(--border);">
   <label style="font-size:.78rem;color:var(--text-dim);display:block;margin-bottom:.4rem;">Nombre de usuario</label>
   <div class="form-group" style="margin:0;">
-    <input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="30"/>
+<input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="10"/>
   </div>
 </div>
 <div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
@@ -148,7 +148,8 @@
       errEl.style.display='none'; okEl.style.display='none';
       if (!raw) { errEl.textContent='Escribe un nombre.'; errEl.style.display='block'; return; }
       if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Solo letras, números y espacios.'; errEl.style.display='block'; return; }
-      if (raw.length < 3) { errEl.textContent='Mínimo 3 caracteres.'; errEl.style.display='block'; return; }
+      if (raw.length < 5) { errEl.textContent='Mínimo 5 caracteres.'; errEl.style.display='block'; return; }
+      if (raw.length > 10) { errEl.textContent='Máximo 10 caracteres.'; errEl.style.display='block'; return; }
       try {
         const snap = await getDocs(query(collection(db,'usuarios'), where('nombre','==',raw)));
         const taken = snap.docs.some(d => d.id !== currentUser.uid);
