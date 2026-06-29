@@ -292,8 +292,10 @@
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
         </div>
         <div class="mini-sb-actions">
-          <button class="btn-xs btn-xs-danger" onclick="deleteMio('${a.id}')">Eliminar</button>
-        </div>
+<button class="icon-btn icon-danger" onclick="deleteMio('${a.id}')" title="Eliminar">
+  <img src="../assets/reactions/delete.png" alt="Eliminar"/>
+</button>
+</div>
       </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
   }
 
@@ -313,8 +315,10 @@
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
         </div>
         <div class="mini-sb-actions">
-          <button class="btn-xs btn-xs-fav" onclick="removeFav('${a.id}')">Quitar</button>
-        </div>
+<button class="icon-btn icon-danger" onclick="removeFav('${a.id}')" title="Quitar de favoritos">
+  <img src="../assets/reactions/delete.png" alt="Quitar"/>
+</button>
+</div>
       </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
   }
 
