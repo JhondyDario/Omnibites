@@ -443,18 +443,19 @@
             </div>
           </div>
 
-          <div class="card-actions">
-            <button class="btn-sm btn-sm-green"
+<div class="card-actions">
+            <button class="reaction-btn" title="Añadir soundbite"
               onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
-              Añadir
+              <img src="../assets/icons/add.png" style="width:16px;height:16px;object-fit:contain;"/>
             </button>
-            <button class="btn-sm btn-sm-download" id="dlBtn-${i}"
+            <button class="reaction-btn" id="dlBtn-${i}" title="Descargar MP3"
               onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
-              Descargar
+              <img src="../assets/icons/download.png" style="width:16px;height:16px;object-fit:contain;"/>
             </button>
-            <a class="btn-sm btn-sm-outline"
-              href="https://archive.org/details/${item.archiveId}" target="_blank">
-              Fuente
+            <a class="reaction-btn" title="Ver fuente en Archive.org"
+              href="https://archive.org/details/${item.archiveId}" target="_blank"
+              style="text-decoration:none">
+              <img src="../assets/icons/source.png" style="width:16px;height:16px;object-fit:contain;"/>
             </a>
           </div>
         </div>
@@ -621,12 +622,15 @@
       return mp3Data;
     }
 
-    window.compartir = function(idx, url, titleEsc, albumEsc) {
-      const title = unescape(titleEsc);
-      const album = unescape(albumEsc);
-      const params = new URLSearchParams({ url, titulo: title, juego: album });
-      window.location.href = `subir.html?${params.toString()}`;
-    };
+window.compartir = function(idx, url, titleEsc, albumEsc) {
+  const title = unescape(titleEsc);
+  const album = unescape(albumEsc);
+  const item  = window._items?.[idx];
+  const start = 0;
+  const end   = item?.seconds ? Math.min(item.seconds, 15) : 15;
+  const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
+  window.location.href = `subir.html?${params.toString()}`;
+};
 
     const RELATED_GAMES = {
       'star fox': ['Star Fox 64', 'Star Fox Adventures', 'Star Fox Command', 'Star Fox Zero'],
