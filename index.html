@@ -141,14 +141,30 @@
   </section>
 
   <!-- ÚLTIMOS SOUNDBITES -->
+<!-- ÚLTIMOS SOUNDBITES -->
   <section class="section">
     <div class="section-header">
-      <h2>Últimos soundbites añadidos</h2>
-      <a href="pages/comunidad.html" class="link-more">Ver todos →</a>
-    </div>
-    <div id="featuredGrid" class="com-cards">
-      <div class="sb-card" style="height:120px;animation:pulse 1.5s ease infinite"></div>
-      <div class="sb-card" style="height:120px;animation:pulse 1.5s ease infinite"></div>
+      <div>
+        <h2>Últimos soundbites añadidos</h2>
+        <p style="font-size:.78rem;color:var(--text-dim);margin-top:.2rem">
+          Los más recientes de la comunidad
+        </p>
+      </div>
+      <a href="pages/comunidad.html" class="link-more" style="
+        display:inline-flex;
+        align-items:center;
+        gap:.35rem;
+        padding:.4rem .9rem;
+        border:1px solid var(--border);
+        border-radius:20px;
+        font-size:.78rem;
+        white-space:nowrap;
+        flex-shrink:0;
+        transition:border-color .2s,color .2s;
+      " onmouseover="this.style.borderColor='var(--neon)'"
+         onmouseout="this.style.borderColor='var(--border)'">
+        Ver todos →
+      </a>
     </div>
   </section>
 
