@@ -20,16 +20,14 @@
     .auth-wall p { color:var(--text-dim);font-size:.85rem;margin-bottom:1.5rem; }
     .auth-wall .aw-btns { display:flex;gap:.75rem;justify-content:center; }
 
-    /* ── SLIDER DE RECORTE (estilo Instagram) ── */
-    .trim-track{position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem;}
-    .trim-range{position:absolute;top:0;bottom:0;background:rgba(74,222,128,.18);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon);}
-    .trim-handle{position:absolute;top:-4px;width:18px;height:50px;background:var(--neon);border-radius:5px;cursor:grab;transform:translateX(-50%);box-shadow:0 0 6px rgba(74,222,128,.5);touch-action:none;}
-    .trim-handle:active{cursor:grabbing;}
-    .trim-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:18px;background:#000;opacity:.4;}
+    /* ── SLIDER DE RECORTE ── */
+    .trim-slider-wrap { margin-bottom: 1rem; }
+    .trim-track { position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem; }
+    .trim-range { position:absolute;top:0;bottom:0;background:rgba(74,222,128,.18);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon); }
+    .trim-handle { position:absolute;top:-4px;width:18px;height:50px;background:var(--neon);border-radius:5px;cursor:grab;transform:translateX(-50%);box-shadow:0 0 6px rgba(74,222,128,.5);touch-action:none;user-select:none; }
+    .trim-handle:active { cursor:grabbing; }
+    .trim-handle::after { content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:18px;background:#000;opacity:.4; }
 
-    .tg label { font-size:.75rem;color:var(--text-dim);display:block;margin-bottom:.3rem;text-transform:uppercase; }
-    .tg input { background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.5rem .75rem;border-radius:var(--radius);font-family:var(--font-pixel);font-size:.65rem;width:100%;outline:none; }
-    .tg input:focus { border-color:var(--neon); }
     .time-disp { font-family:var(--font-pixel);font-size:.52rem;color:var(--neon);display:flex;gap:1.5rem;margin-bottom:1rem; }
     .drop-zone { border:2px dashed var(--border);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s; }
     .drop-zone:hover,.drop-zone.over { border-color:var(--neon);background:rgba(57,255,20,.03); }
@@ -39,11 +37,17 @@
     .file-ok { color:var(--neon);font-size:.82rem;margin-top:.75rem; }
     .file-err { color:var(--danger);font-size:.82rem;margin-top:.5rem; }
     .preview-box { background:var(--bg3);border-radius:6px;padding:1rem;margin-bottom:1rem; }
-    .preview-box audio { width:100%;accent-color:var(--neon); }
     .preview-info { font-size:.75rem;color:var(--text-dim);margin-top:.4rem; }
 
-    /* ── AUTOCOMPLETE DE JUEGO (RAWG) ── */
-    .juego-sug-item:hover { background: var(--bg3); }
+    /* ── CONSOLA BLOQUEADA ── */
+    select#consola:disabled { opacity:.45;cursor:not-allowed; }
+    .juego-lock-hint { font-size:.72rem;color:var(--text-dim);margin-top:.4rem;line-height:1.6; }
+    .juego-lock-hint.ok { color:var(--neon); }
+
+    /* ── AUTOCOMPLETE ── */
+    .juego-sug-item { padding:.6rem .9rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;transition:background .15s; }
+    .juego-sug-item:hover { background:var(--bg3); }
+    .juego-sug-item:last-child { border-bottom:none; }
   </style>
 </head>
 <body>
@@ -55,7 +59,7 @@
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>  
+      <a href="subir.html">Añadir</a>
       <a href="jugadores.html">Jugadores</a>
     </div>
     <div class="nav-right">
@@ -66,11 +70,10 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>   
+    <a href="subir.html">Añadir</a>
     <a href="jugadores.html">Jugadores</a>
   </div>
 
-  <!-- AUTH WALL -->
   <div id="authWall" style="display:none;padding:2rem 1.5rem;">
     <div class="auth-wall">
       <h2>Necesitas una cuenta</h2>
@@ -82,10 +85,10 @@
     </div>
   </div>
 
-  <!-- FORMULARIO -->
   <main id="mainForm" class="editor-page" style="display:none">
     <h1>Crear Soundbite</h1>
 
+    <!-- PASO 1 -->
     <div class="editor-box" style="margin-bottom:1.5rem">
       <p class="step-label">PASO 1 — Fuente del audio</p>
       <div class="tab-row">
@@ -99,7 +102,7 @@
           <button class="btn-primary" id="loadBtn">Cargar</button>
         </div>
         <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.8">
-          Fuentes compatibles: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong>, <strong style="color:var(--text)">VGMdownloads</strong>, <strong style="color:var(--text)">SoundCloud</strong> o cualquier enlace directo a .mp3 / .ogg.<br/>
+          Fuentes compatibles: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong> o cualquier enlace directo a .mp3 / .ogg.<br/>
           Lo más fácil: usa <a href="explorar.html" style="color:var(--neon);font-weight:600">Explorar música</a> y pulsa "Añadir Soundbite".
         </p>
         <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
@@ -116,49 +119,55 @@
       </div>
     </div>
 
+    <!-- PASO 2 -->
     <div id="previewSection" style="display:none" class="editor-box">
-      <p class="step-label">PASO 2 — Escucha y define el recorte</p>
-      <div class="preview-box">
-        <audio id="audioPlayer" controls crossorigin="anonymous"></audio>
-        <div class="preview-info" id="durationInfo"></div>
-      </div>
+      <p class="step-label">PASO 2 — Define el recorte</p>
 
-      <!-- Slider tipo Instagram para marcar inicio/fin -->
-      <div class="trim-slider-wrap" style="margin-bottom:1rem">
+      <!-- Audio oculto — solo para playback interno, no ocupa espacio visual -->
+      <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
+      <div class="preview-info" id="durationInfo"></div>
+
+      <div class="trim-slider-wrap">
         <div class="trim-track" id="trimTrack">
-          <div class="trim-range" id="trimRange"></div>
-          <div class="trim-handle" id="handleStart" data-handle="start"></div>
-          <div class="trim-handle" id="handleEnd" data-handle="end"></div>
+          <div class="trim-range"  id="trimRange"></div>
+          <div class="trim-handle" id="handleStart"></div>
+          <div class="trim-handle" id="handleEnd"></div>
         </div>
       </div>
+
       <div class="time-disp">
-        <span>Inicio: <span id="startDisp">0.00s</span></span>
-        <span>Fin: <span id="endDisp">15.00s</span></span>
-        <span>Clip: <span id="selDisp">15.00s</span></span>
+        <span>Inicio: <span id="startDisp">0s</span></span>
+        <span>Fin: <span id="endDisp">15s</span></span>
+        <span>Clip: <span id="selDisp">15s</span></span>
       </div>
       <input type="hidden" id="trimStart" value="0"/>
-      <input type="hidden" id="trimEnd" value="15"/>
+      <input type="hidden" id="trimEnd"   value="15"/>
 
       <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn-primary" id="playSelBtn">Escuchar clip</button>
-        <button class="btn-outline" id="stopBtn">Detener</button>
+        <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
+        <button class="btn-outline"  id="stopBtn">◼ Detener</button>
       </div>
     </div>
 
+    <!-- PASO 3 -->
     <div class="editor-box">
       <p class="step-label">PASO 3 — Información</p>
-      <div class="form-group"><label>Título del soundbite *</label><input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/></div>
+      <div class="form-group">
+        <label>Título del soundbite *</label>
+        <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/>
+      </div>
 
       <div class="form-group" style="position:relative">
         <label>Nombre del juego *</label>
-        <input type="text" id="juego" placeholder="Ej: Star Fox: Assault" autocomplete="off"/>
+        <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
         <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
+        <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
       </div>
 
       <div class="form-group">
-        <label>Consola *</label>
-        <select id="consola">
-          <option value="">— Selecciona —</option>
+        <label>Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
+        <select id="consola" disabled>
+          <option value="">— Elige un juego primero —</option>
           <optgroup label="Nintendo">
             <option value="NES">NES / Famicom</option>
             <option value="SNES">Super Nintendo (SNES)</option>
@@ -196,6 +205,7 @@
           </optgroup>
         </select>
       </div>
+
       <div class="form-group">
         <label>Categoría *</label>
         <select id="categoria">
@@ -209,7 +219,11 @@
           <option value="licenciada">Música Licenciada</option>
         </select>
       </div>
-      <div class="form-group"><label>Descripción (opcional)</label><textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea></div>
+
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
+      </div>
       <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
     </div>
   </main>
@@ -217,16 +231,19 @@
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let currentUser = null;
-    let audioPlayer = document.getElementById('audioPlayer');
+    let currentUser  = null;
+    let audioPlayer  = document.getElementById('audioPlayer');
     let localFileUrl = null;
     let localFileDuration = 0;
     let activeTab = 'url';
 
-    // ── Leer nombre desde Firestore, nunca desde Google ──
+    // Controla si el juego fue seleccionado desde RAWG (no escrito a mano)
+    let juegoConfirmado = false;
+
     async function getNombreUsuario(uid) {
       try {
         const snap = await getDoc(doc(db, 'usuarios', uid));
@@ -280,104 +297,124 @@
         const dur = audioPlayer.duration;
         let start = Math.max(0, startHint);
         let end   = Math.min(endHint, dur);
-        if (end - start < 10) end = Math.min(start + 15, dur);
+        if (end - start < 10) end   = Math.min(start + 15, dur);
         if (end - start < 10) start = Math.max(0, end - 10);
         setupTrimSlider(dur, start, end);
-        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — clip entre 10 y 15 seg`;
+        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra los handles para marcar el clip (10–15 seg)`;
         document.getElementById('previewSection').style.display = 'block';
       };
       audioPlayer.onerror = () => {
-        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG desde Archive.org.';
+        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
         errEl.style.display = 'block';
       };
     }
 
     // ════════════════════════════════════════════
-    // SLIDER DE RECORTE ESTILO INSTAGRAM
-    // Arrastra los dos handles. Mínimo 10s, máximo 15s.
+    // SLIDER DE RECORTE — corrección completa
+    // Bug 1 corregido: render() usa los nodos clonados, no los originales
+    // Bug 2 corregido: pointermove/pointerup van en el handle (no el document)
+    //                  porque setPointerCapture redirige eventos al handle
     // ════════════════════════════════════════════
     let trackDuration = 0;
+    let sliderStart   = 0;
+    let sliderEnd     = 15;
 
     function setupTrimSlider(duration, initStart, initEnd) {
       trackDuration = duration;
-      const track  = document.getElementById('trimTrack');
-      const hStart = document.getElementById('handleStart');
-      const hEnd   = document.getElementById('handleEnd');
-      const range  = document.getElementById('trimRange');
 
-      let start = Math.max(0, initStart);
-      let end   = Math.min(initEnd, duration);
+      // Clonar para eliminar listeners viejos
+      const oldHS = document.getElementById('handleStart');
+      const oldHE = document.getElementById('handleEnd');
+      const hStart = oldHS.cloneNode(true);
+      const hEnd   = oldHE.cloneNode(true);
+      oldHS.replaceWith(hStart);
+      oldHE.replaceWith(hEnd);
 
-      function pctFromSec(s) { return trackDuration > 0 ? (s / trackDuration) * 100 : 0; }
+      const track = document.getElementById('trimTrack');
+      const range = document.getElementById('trimRange');
+
+      sliderStart = Math.max(0, initStart);
+      sliderEnd   = Math.min(initEnd, duration);
+
+      function pct(s) { return trackDuration > 0 ? (s / trackDuration) * 100 : 0; }
       function secFromX(clientX) {
         const rect = track.getBoundingClientRect();
-        const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-        return pct * trackDuration;
+        return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)) * trackDuration;
       }
 
       function render() {
-        hStart.style.left = pctFromSec(start) + '%';
-        hEnd.style.left   = pctFromSec(end) + '%';
-        range.style.left  = pctFromSec(start) + '%';
-        range.style.width = (pctFromSec(end) - pctFromSec(start)) + '%';
-        document.getElementById('startDisp').textContent = Math.round(start) + 's';
-        document.getElementById('endDisp').textContent   = Math.round(end) + 's';
-        document.getElementById('selDisp').textContent   = Math.round(end - start) + 's';
-        document.getElementById('trimStart').value = Math.round(start);
-        document.getElementById('trimEnd').value   = Math.round(end);
+        // Usar los nodos clonados directamente (hStart / hEnd en el closure)
+        hStart.style.left = pct(sliderStart) + '%';
+        hEnd.style.left   = pct(sliderEnd)   + '%';
+        range.style.left  = pct(sliderStart) + '%';
+        range.style.width = (pct(sliderEnd) - pct(sliderStart)) + '%';
+        document.getElementById('startDisp').textContent = Math.round(sliderStart) + 's';
+        document.getElementById('endDisp').textContent   = Math.round(sliderEnd)   + 's';
+        document.getElementById('selDisp').textContent   = Math.round(sliderEnd - sliderStart) + 's';
+        document.getElementById('trimStart').value = Math.round(sliderStart);
+        document.getElementById('trimEnd').value   = Math.round(sliderEnd);
       }
 
-      // Limpiar listeners viejos clonando los handles (evita duplicados si se recarga otro audio)
-      const newHStart = hStart.cloneNode(true);
-      const newHEnd   = hEnd.cloneNode(true);
-      hStart.replaceWith(newHStart);
-      hEnd.replaceWith(newHEnd);
-
-      function dragHandle(handle, isStart) {
+      function attachDrag(handle, isStart) {
         handle.addEventListener('pointerdown', e => {
+          e.preventDefault();
           handle.setPointerCapture(e.pointerId);
+
+          // ── CORRECCIÓN: eventos en el handle, no en document ──
           function onMove(ev) {
             let sec = secFromX(ev.clientX);
             if (isStart) {
-              sec = Math.min(sec, end - 10);   // mínimo 10s de clip
-              sec = Math.max(sec, end - 15, 0); // máximo 15s de clip
-              start = Math.max(0, sec);
+              // No puede pasar del fin menos 10s (mínimo clip)
+              sec = Math.min(sec, sliderEnd - 10);
+              // No puede alejarse más de 15s del fin
+              sec = Math.max(sec, sliderEnd - 15);
+              // No puede ser negativo
+              sliderStart = Math.max(0, sec);
             } else {
-              sec = Math.max(sec, start + 10);
-              sec = Math.min(sec, start + 15, trackDuration);
-              end = sec;
+              // No puede quedar a menos de 10s del inicio
+              sec = Math.max(sec, sliderStart + 10);
+              // No puede superar 15s del inicio
+              sec = Math.min(sec, sliderStart + 15);
+              // No puede pasar del total de la canción
+              sliderEnd = Math.min(sec, trackDuration);
             }
             render();
           }
+
           function onUp() {
-            document.removeEventListener('pointermove', onMove);
-            document.removeEventListener('pointerup', onUp);
+            handle.removeEventListener('pointermove', onMove);
+            handle.removeEventListener('pointerup',   onUp);
           }
-          document.addEventListener('pointermove', onMove);
-          document.addEventListener('pointerup', onUp);
+
+          handle.addEventListener('pointermove', onMove);
+          handle.addEventListener('pointerup',   onUp);
         });
       }
 
-      dragHandle(newHStart, true);
-      dragHandle(newHEnd, false);
+      attachDrag(hStart, true);
+      attachDrag(hEnd,   false);
       render();
     }
 
     document.getElementById('playSelBtn').addEventListener('click', () => {
       const s = parseFloat(document.getElementById('trimStart').value) || 0;
-      const e = parseFloat(document.getElementById('trimEnd').value) || 15;
-      audioPlayer.currentTime = s; audioPlayer.play();
-      const iv = setInterval(() => { if (audioPlayer.currentTime >= e) { audioPlayer.pause(); clearInterval(iv); } }, 100);
+      const e = parseFloat(document.getElementById('trimEnd').value)   || 15;
+      audioPlayer.currentTime = s;
+      audioPlayer.play();
+      const iv = setInterval(() => {
+        if (audioPlayer.currentTime >= e) { audioPlayer.pause(); clearInterval(iv); }
+      }, 100);
     });
     document.getElementById('stopBtn').addEventListener('click', () => audioPlayer.pause());
 
-    const dropZone = document.getElementById('dropZone');
+    // Drop zone
+    const dropZone  = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('click',    () => fileInput.click());
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); validateFile(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', e => validateFile(e.target.files[0]));
+    dropZone.addEventListener('dragleave',() => dropZone.classList.remove('over'));
+    dropZone.addEventListener('drop',     e => { e.preventDefault(); dropZone.classList.remove('over'); validateFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change',  e => validateFile(e.target.files[0]));
 
     function validateFile(file) {
       const errEl = document.getElementById('fileError');
@@ -388,7 +425,7 @@
         errEl.textContent = 'Solo se aceptan archivos MP3.'; errEl.style.display = 'block'; return;
       }
       const tmpUrl = URL.createObjectURL(file);
-      const tmp = new Audio(tmpUrl);
+      const tmp    = new Audio(tmpUrl);
       tmp.onloadedmetadata = () => {
         const dur = tmp.duration;
         URL.revokeObjectURL(tmpUrl);
@@ -396,15 +433,17 @@
           errEl.textContent = `El archivo dura ${dur.toFixed(1)}s. Debe ser entre 10 y 15 segundos.`;
           errEl.style.display = 'block'; localFileUrl = null; return;
         }
-        localFileUrl = URL.createObjectURL(file);
+        localFileUrl      = URL.createObjectURL(file);
         localFileDuration = dur;
-        okEl.textContent = `${file.name} — ${dur.toFixed(1)}s listo para publicar`;
+        okEl.textContent  = `${file.name} — ${dur.toFixed(1)}s listo para publicar`;
         okEl.style.display = 'block';
       };
     }
 
     // ════════════════════════════════════════════
-    // AUTOCOMPLETE DE JUEGO (RAWG API)
+    // AUTOCOMPLETE DE JUEGO — RAWG API
+    // La consola se asigna SOLO desde aquí.
+    // El usuario no puede escribir el juego a mano y publicar.
     // ════════════════════════════════════════════
     const RAWG_KEY = '3207549bccd14954b04fa8e64840ec00';
 
@@ -414,21 +453,28 @@
       'nintendo 64':'N64',
       'game boy advance':'GBA','game boy':'GBA','nintendo ds':'GBA',
       'gamecube':'GameCube',
-      'wii':'Wii','wii u':'WiiU',
+      'wii u':'WiiU','wii':'Wii',
       'nintendo 3ds':'3DS','nintendo switch':'Switch',
-      'playstation':'PS1','playstation 2':'PS2','playstation 3':'PS3','playstation 4':'PS4',
-      'psp':'PSP','ps vita':'PSP',
-      'genesis':'Genesis','sega master system':'MasterSystem',
+      'playstation 4':'PS4','playstation 3':'PS3','playstation 2':'PS2','playstation':'PS1',
+      'ps vita':'PSP','psp':'PSP',
+      'sega master system':'MasterSystem','genesis':'Genesis','mega drive':'Genesis',
       'sega saturn':'Saturn','dreamcast':'Dreamcast',
-      'xbox':'Xbox','xbox 360':'Xbox360',
-      'arcade':'Arcade','atari':'Atari','neo geo':'Neo-Geo','pc':'PC'
+      'xbox 360':'Xbox360','xbox one':'Xbox360','xbox':'Xbox',
+      'arcade':'Arcade','atari':'Atari','neo geo':'Neo-Geo','pc':'PC','linux':'PC','macos':'PC'
     };
 
     let juegoDebounce = null;
     const juegoInput = document.getElementById('juego');
-    const sugBox = document.getElementById('juegoSuggestions');
+    const sugBox     = document.getElementById('juegoSuggestions');
+    const juegoHint  = document.getElementById('juegoHint');
 
+    // Si el usuario edita el campo manualmente, desconfirma el juego
     juegoInput.addEventListener('input', () => {
+      juegoConfirmado = false;
+      document.getElementById('consola').value = '';
+      juegoHint.className = 'juego-lock-hint';
+      juegoHint.textContent = 'Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.';
+
       clearTimeout(juegoDebounce);
       const val = juegoInput.value.trim();
       if (val.length < 3) { sugBox.style.display = 'none'; return; }
@@ -439,17 +485,18 @@
       if (!sugBox.contains(e.target) && e.target !== juegoInput) sugBox.style.display = 'none';
     });
 
-    async function buscarJuegos(queryStr) {
-      if (!RAWG_KEY || RAWG_KEY === 'TU_API_KEY_AQUI') return;
+    async function buscarJuegos(q) {
       try {
-        const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(queryStr)}&page_size=6`);
+        const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
         const data = await res.json();
         const results = data.results || [];
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
         sugBox.innerHTML = results.map(g => `
-          <div class="juego-sug-item" data-id="${g.id}" style="padding:.6rem .9rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem">
-            ${g.background_image ? `<img src="${g.background_image}" style="width:32px;height:32px;border-radius:4px;object-fit:cover"/>` : ''}
+          <div class="juego-sug-item" data-id="${g.id}">
+            ${g.background_image
+              ? `<img src="${g.background_image}" style="width:32px;height:32px;border-radius:4px;object-fit:cover;flex-shrink:0"/>`
+              : '<div style="width:32px;height:32px;border-radius:4px;background:var(--bg3);flex-shrink:0"></div>'}
             <span>${g.name}${g.released ? ` <span style="color:var(--text-dim);font-size:.75rem">(${g.released.slice(0,4)})</span>` : ''}</span>
           </div>`).join('');
         sugBox.style.display = 'block';
@@ -464,42 +511,66 @@
     }
 
     function seleccionarJuego(game) {
-      juegoInput.value = game.name;
+      juegoInput.value   = game.name;
       sugBox.style.display = 'none';
+      juegoConfirmado    = true;
 
+      // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
       const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
       let matched = null;
       for (const p of platforms) {
         const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
         if (key) { matched = PLATFORM_MAP[key]; break; }
       }
+
+      const consolaSelect = document.getElementById('consola');
       if (matched) {
-        document.getElementById('consola').value = matched;
+        consolaSelect.value = matched;
+        juegoHint.className  = 'juego-lock-hint ok';
+        juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
+      } else {
+        // No se encontró plataforma conocida → se deja en "Otra"
+        consolaSelect.value  = 'Otra';
+        juegoHint.className  = 'juego-lock-hint ok';
+        juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
       }
     }
 
+    // ════════════════════════════════════════════
+    // PUBLICAR
+    // ════════════════════════════════════════════
     document.getElementById('submitBtn').addEventListener('click', async () => {
       if (!currentUser) { window.showToast('Inicia sesión primero.','error'); return; }
-      const titulo   = document.getElementById('titulo').value.trim();
-      const juego    = document.getElementById('juego').value.trim();
-      const consola  = document.getElementById('consola').value;
-      const categoria= document.getElementById('categoria').value;
+
+      const titulo    = document.getElementById('titulo').value.trim();
+      const juego     = document.getElementById('juego').value.trim();
+      const consola   = document.getElementById('consola').value;
+      const categoria = document.getElementById('categoria').value;
+
       if (!titulo)    { window.showToast('Ponle un título.','error'); return; }
       if (!juego)     { window.showToast('Escribe el nombre del juego.','error'); return; }
-      if (!consola)   { window.showToast('Selecciona la consola.','error'); return; }
+
+      // ── Bloqueo: debe haber seleccionado de la lista ──
+      if (!juegoConfirmado) {
+        window.showToast('Selecciona el juego de la lista de sugerencias, no lo escribas a mano.','error');
+        juegoInput.focus();
+        return;
+      }
+
+      if (!consola)   { window.showToast('No se pudo detectar la consola. Intenta con otro juego.','error'); return; }
       if (!categoria) { window.showToast('Selecciona la categoría.','error'); return; }
 
       let url = '', trimStart = 0, trimEnd = 15;
       if (activeTab === 'url') {
         url = document.getElementById('audioUrl').value.trim();
         if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
-        trimStart = parseFloat(document.getElementById('trimStart').value)||0;
-        trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
+        trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
+        trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || 15;
         const clipDur = trimEnd - trimStart;
         if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
         if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
       } else {
-        if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
+        if (!localFileUrl)        { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
         if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
         if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
         url = localFileUrl; trimEnd = localFileDuration;
@@ -509,7 +580,6 @@
       btn.disabled = true; btn.textContent = 'Publicando...';
 
       try {
-        // ── Leer nombre de Firestore antes de publicar ──
         const autorNombre = await getNombreUsuario(currentUser.uid);
 
         const dupeQ = query(collection(db,'audios'),
@@ -517,18 +587,19 @@
           where('titulo','==',titulo),
           where('juego','==',juego));
         const dupeSnap = await getDocs(dupeQ);
+
         if (!dupeSnap.empty) {
           await updateDoc(doc(db,'audios',dupeSnap.docs[0].id), {
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
-            trimStart, trimEnd, duracion: fmt(trimEnd-trimStart),
-            autorNombre,
-            creadoEn: serverTimestamp()
+            trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
+            autorNombre, creadoEn: serverTimestamp()
           });
           window.showToast('Soundbite actualizado (ya existía uno igual)');
-          setTimeout(()=>window.location.href=ROOT+'/pages/comunidad.html',1200);
+          setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
           return;
         }
+
         await addDoc(collection(db,'audios'), {
           url, titulo, juego, consola, categoria,
           descripcion: document.getElementById('descripcion').value.trim(),
@@ -543,12 +614,15 @@
         setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
       } catch(e) {
         console.error(e);
-        window.showToast('Error al publicar: ' + e.message,'error');
+        window.showToast('Error al publicar: ' + e.message, 'error');
         btn.disabled = false; btn.textContent = 'Publicar Soundbite';
       }
     });
 
-    function fmt(s) { if(!s||isNaN(s))return'0:00'; return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+    function fmt(s) {
+      if (!s || isNaN(s)) return '0:00';
+      return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
+    }
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
