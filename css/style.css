@@ -519,6 +519,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   .action-card-body{text-align:center;}
   .action-card-btn{width:100%;justify-content:center;}
 }
+@media(max-width:768px){
+  .filters{
+    flex-direction:column;
+    align-items:stretch;
+    gap:.75rem;
+  }
+  .filter-group{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:.3rem;
+    width:100%;
+    margin-left:0 !important;
+  }
+  .filter-group label{
+    font-size:.72rem;
+  }
+  .filters select{
+    width:100%;
+  }
+}
 @media(max-width:480px){
   .hero-title{font-size:1.75rem;}
   .profile-stats{grid-template-columns:1fr 1fr;}
