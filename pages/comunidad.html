@@ -306,8 +306,8 @@ function stopSB(){
 
 window.playSB=async function(id,url,ts,te){
   if(activeSBId===id){stopSB();return;}
-  const myToken = ++playToken;
   stopSB();
+  const myToken = ++playToken;
   const btn=document.getElementById(`sbplay-${id}`);
   if(!btn)return;
   btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
