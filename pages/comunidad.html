@@ -288,10 +288,11 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-    let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null;
-    const CLIP=15,FADE=2;
+let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0;
+  const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function stopSB(){
+  playToken++;
   if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{}activeSource=activeGain=null;}
   clearInterval(progIv);
   if(activeSBId){
@@ -303,48 +304,58 @@ function stopSB(){
   activeSBId=null;
 }
 
-    window.playSB=async function(id,url,ts,te){
-      if(activeSBId===id){stopSB();return;}
-      stopSB();
-      const btn=document.getElementById(`sbplay-${id}`);
-      if(!btn)return;
-btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
-      try{
-        const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
-        const res=await fetch(url);if(!res.ok)throw new Error('fetch');
-        const buf=await ctx.decodeAudioData(await res.arrayBuffer());
-        const start=Math.min(ts||0,buf.duration-1);
-        const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-start);
-        const source=ctx.createBufferSource();source.buffer=buf;
-        const gain=ctx.createGain();
-        gain.gain.setValueAtTime(0,ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(1,ctx.currentTime+FADE);
-        gain.gain.setValueAtTime(1,ctx.currentTime+dur-FADE);
-        gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
-        source.connect(gain);gain.connect(ctx.destination);
-        source.start(0,start,dur);
-        source.onended=()=>{if(activeSBId===id)stopSB();};
-        activeSource=source;activeGain=gain;activeSBId=id;
-        btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
-        btn.classList.add('playing');btn.disabled=false;
-        const t0=ctx.currentTime;
-        progIv=setInterval(()=>{
-          const el=ctx.currentTime-t0;
-          const p=document.getElementById(`sbprog-${id}`);
-          const c=document.getElementById(`sbcur-${id}`);
-          if(p)p.style.width=(Math.min(el,dur)/dur*100)+'%';
-          if(c)c.textContent=fmt(el);
-          if(el>=dur)clearInterval(progIv);
-        },100);
-}catch(e){
-  const b=document.getElementById(`sbplay-${id}`);
-  if(b){b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>';b.style.background='var(--danger)';b.disabled=false;}
-  setTimeout(()=>{
+window.playSB=async function(id,url,ts,te){
+  if(activeSBId===id){stopSB();return;}
+  const myToken = ++playToken;
+  stopSB();
+  const btn=document.getElementById(`sbplay-${id}`);
+  if(!btn)return;
+  btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
+  try{
+    const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
+    const res=await fetch(url);if(!res.ok)throw new Error('fetch');
+    const buf=await ctx.decodeAudioData(await res.arrayBuffer());
+
+    // Si mientras cargaba el usuario le dio play a otro, abortar esta carga
+    if(myToken!==playToken){
+      btn.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';btn.disabled=false;
+      return;
+    }
+
+    const start=Math.min(ts||0,buf.duration-1);
+    const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-start);
+    const source=ctx.createBufferSource();source.buffer=buf;
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(0,ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(1,ctx.currentTime+FADE);
+    gain.gain.setValueAtTime(1,ctx.currentTime+dur-FADE);
+    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
+    source.connect(gain);gain.connect(ctx.destination);
+    source.start(0,start,dur);
+    source.onended=()=>{if(activeSBId===id && myToken===playToken)stopSB();};
+    activeSource=source;activeGain=gain;activeSBId=id;
+    btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
+    btn.classList.add('playing');btn.disabled=false;
+    const t0=ctx.currentTime;
+    progIv=setInterval(()=>{
+      if(myToken!==playToken){clearInterval(progIv);return;}
+      const el=ctx.currentTime-t0;
+      const p=document.getElementById(`sbprog-${id}`);
+      const c=document.getElementById(`sbcur-${id}`);
+      if(p)p.style.width=(Math.min(el,dur)/dur*100)+'%';
+      if(c)c.textContent=fmt(el);
+      if(el>=dur)clearInterval(progIv);
+    },100);
+  }catch(e){
+    if(myToken!==playToken)return;
     const b=document.getElementById(`sbplay-${id}`);
-    if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.style.background='';b.disabled=false;}
-  },3000);
-}
-    };
+    if(b){b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>';b.style.background='var(--danger)';b.disabled=false;}
+    setTimeout(()=>{
+      const b=document.getElementById(`sbplay-${id}`);
+      if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.style.background='';b.disabled=false;}
+    },3000);
+  }
+};
 
     window.dlSB=async function(url,titulo){
       const btn = event?.target?.closest('.icon-btn');
