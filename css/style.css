@@ -203,6 +203,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .btn-card-green  {background:var(--neon);  color:#000;}
 .btn-card-purple {background:var(--purple); color:#000;}
 .btn-card-gold   {background:var(--gold);   color:#000;}
+.btn-card-cyan{background:var(--cyan);color:#000;}
+.action-card:has(.btn-card-cyan):hover{border-color:var(--cyan);}
 
 /* ── SOUNDBITE CARD ── */
 .sb-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:border-color .2s,transform .2s;}
