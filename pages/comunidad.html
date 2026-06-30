@@ -288,24 +288,30 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0;
+let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0;
   const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-function stopSB(){
+function stopSB(isPause=false){
   playToken++;
-  if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{}activeSource=activeGain=null;}
+  if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);activeSource.stop(audioCtx.currentTime+.15);}catch{}activeSource=activeGain=null;}
   clearInterval(progIv);
   if(activeSBId){
     const b=document.getElementById(`sbplay-${activeSBId}`);
     if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.classList.remove('playing');b.disabled=false;}
-    const p=document.getElementById(`sbprog-${activeSBId}`);
-    if(p)p.style.width='0%';
+    if(!isPause){
+      const p=document.getElementById(`sbprog-${activeSBId}`);
+      if(p)p.style.width='0%';
+      const c=document.getElementById(`sbcur-${activeSBId}`);
+      if(c)c.textContent='0:00';
+      pausedAt=0;
+    }
   }
   activeSBId=null;
 }
 
 window.playSB=async function(id,url,ts,te){
-  if(activeSBId===id){stopSB();return;}
+  if(activeSBId===id){ pausedAt = lastElapsed; stopSB(true); return; }
+  pausedAt=0;
   stopSB();
   const myToken = ++playToken;
   const btn=document.getElementById(`sbplay-${id}`);
@@ -316,22 +322,26 @@ window.playSB=async function(id,url,ts,te){
     const res=await fetch(url);if(!res.ok)throw new Error('fetch');
     const buf=await ctx.decodeAudioData(await res.arrayBuffer());
 
-    // Si mientras cargaba el usuario le dio play a otro, abortar esta carga
     if(myToken!==playToken){
       btn.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';btn.disabled=false;
       return;
     }
 
-    const start=Math.min(ts||0,buf.duration-1);
-    const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-start);
+    const baseStart=Math.min(ts||0,buf.duration-1);
+    const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-baseStart);
+    const resumeOffset=Math.min(pausedAt,dur-0.1);
+    const start=baseStart+resumeOffset;
+    pausedAt=0;
+
     const source=ctx.createBufferSource();source.buffer=buf;
     const gain=ctx.createGain();
-    gain.gain.setValueAtTime(0,ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(1,ctx.currentTime+FADE);
-    gain.gain.setValueAtTime(1,ctx.currentTime+dur-FADE);
-    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
+    const remaining=dur-resumeOffset;
+    gain.gain.setValueAtTime(resumeOffset<FADE?0:1,ctx.currentTime);
+    if(resumeOffset<FADE) gain.gain.linearRampToValueAtTime(1,ctx.currentTime+(FADE-resumeOffset));
+    gain.gain.setValueAtTime(1,ctx.currentTime+remaining-FADE);
+    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+remaining);
     source.connect(gain);gain.connect(ctx.destination);
-    source.start(0,start,dur);
+    source.start(0,start,remaining);
     source.onended=()=>{if(activeSBId===id && myToken===playToken)stopSB();};
     activeSource=source;activeGain=gain;activeSBId=id;
     btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
@@ -339,7 +349,8 @@ window.playSB=async function(id,url,ts,te){
     const t0=ctx.currentTime;
     progIv=setInterval(()=>{
       if(myToken!==playToken){clearInterval(progIv);return;}
-      const el=ctx.currentTime-t0;
+      const el=resumeOffset+(ctx.currentTime-t0);
+      lastElapsed=el;
       const p=document.getElementById(`sbprog-${id}`);
       const c=document.getElementById(`sbcur-${id}`);
       if(p)p.style.width=(Math.min(el,dur)/dur*100)+'%';
