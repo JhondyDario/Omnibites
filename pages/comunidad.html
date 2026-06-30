@@ -293,7 +293,15 @@ let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function stopSB(isPause=false){
   playToken++;
-  if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.15);activeSource.stop(audioCtx.currentTime+.15);}catch{}activeSource=activeGain=null;}
+  if(activeSource){
+    try{
+      if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
+      activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime+.15);
+      setTimeout(()=>{ try{ activeSource.pause(); }catch{} }, 150);
+    }catch{}
+    activeSource=activeGain=null;
+  }
   clearInterval(progIv);
   if(activeSBId){
     const b=document.getElementById(`sbplay-${activeSBId}`);
@@ -323,35 +331,47 @@ window.playSB=async function(id,url,ts,te){
   const btn=document.getElementById(`sbplay-${id}`);
   if(!btn)return;
   btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
+
   try{
     const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
-    const res=await fetch(url);if(!res.ok)throw new Error('fetch');
-    const buf=await ctx.decodeAudioData(await res.arrayBuffer());
 
-    if(myToken!==playToken){
-      btn.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';btn.disabled=false;
-      return;
-    }
+    const audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.preload = 'auto';
+    audioEl.src = url;
 
-    const baseStart=Math.min(ts||0,buf.duration-1);
-    const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-baseStart);
-    const safeResumeOffset=Math.min(resumeOffset,dur-0.1);
-    const start=baseStart+safeResumeOffset;
+    await new Promise((resolve,reject)=>{
+      audioEl.addEventListener('loadedmetadata', resolve, {once:true});
+      audioEl.addEventListener('error', reject, {once:true});
+    });
 
-    const source=ctx.createBufferSource();source.buffer=buf;
-    const gain=ctx.createGain();
-    const remaining=dur-safeResumeOffset;
-    gain.gain.setValueAtTime(safeResumeOffset<FADE?0:1,ctx.currentTime);
-    if(safeResumeOffset<FADE) gain.gain.linearRampToValueAtTime(1,ctx.currentTime+(FADE-safeResumeOffset));
-    gain.gain.setValueAtTime(1,ctx.currentTime+remaining-FADE);
-    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+remaining);
-    source.connect(gain);gain.connect(ctx.destination);
-    source.start(0,start,remaining);
-    source.onended=()=>{if(activeSBId===id && myToken===playToken)stopSB();};
-    activeSource=source;activeGain=gain;activeSBId=id;
+    if(myToken!==playToken){ btn.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';btn.disabled=false; return; }
+
+    const baseStart=Math.min(ts||0, audioEl.duration-1);
+    const dur=Math.min((te||15)-(ts||0), CLIP, audioEl.duration-baseStart);
+    const safeResumeOffset=Math.min(resumeOffset, dur-0.1);
+    audioEl.currentTime = baseStart + safeResumeOffset;
+
+    const source = ctx.createMediaElementSource(audioEl);
+    const gain   = ctx.createGain();
+    const remaining = dur - safeResumeOffset;
+    gain.gain.setValueAtTime(safeResumeOffset<FADE?0:1, ctx.currentTime);
+    if(safeResumeOffset<FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime+(FADE-safeResumeOffset));
+    gain.gain.setValueAtTime(1, ctx.currentTime+remaining-FADE);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime+remaining);
+    source.connect(gain); gain.connect(ctx.destination);
+
+    await audioEl.play();
+
+    activeSource = audioEl;
+    activeGain = gain;
+    activeSBId = id;
     btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
-    btn.classList.add('playing');btn.disabled=false;
-    const t0=ctx.currentTime;
+    btn.classList.add('playing'); btn.disabled=false;
+
+    const t0 = ctx.currentTime;
+    const endTimeout = setTimeout(()=>{ if(activeSBId===id && myToken===playToken) stopSB(); }, remaining*1000);
+
     progIv=setInterval(()=>{
       if(myToken!==playToken){clearInterval(progIv);return;}
       const el=safeResumeOffset+(ctx.currentTime-t0);
@@ -362,6 +382,8 @@ window.playSB=async function(id,url,ts,te){
       if(c)c.textContent=fmt(el);
       if(el>=dur)clearInterval(progIv);
     },100);
+
+    activeSource._endTimeout = endTimeout;
   }catch(e){
     if(myToken!==playToken)return;
     const b=document.getElementById(`sbplay-${id}`);
@@ -372,7 +394,7 @@ window.playSB=async function(id,url,ts,te){
     },3000);
   }
 };
-
+  
     window.dlSB=async function(url,titulo){
       const btn = event?.target?.closest('.icon-btn');
       if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity='.3'; btn.disabled=true; }
