@@ -178,18 +178,20 @@
                 <img src="../assets/reactions/love.png" alt="Me encanta"/>
                 <span class="icon-count">${r.love||0}</span>
               </button>
-              <button class="icon-btn" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
-                <img src="../assets/reactions/meh.png" alt="Regular"/>
-                <span class="icon-count">${r.meh||0}</span>
-              </button>
+              <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+  <img src="../assets/reactions/fav.png" alt="Favorito"/>
+</button>
+<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
+  <img src="../assets/reactions/download.png" alt="Descargar"/>
+</button>
             </div>
             <div class="sb-actions">
-              <button class="icon-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-                <img src="../assets/reactions/fav.png" alt="Favorito"/>
-              </button>
-              <button class="icon-btn" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
-                <img src="../assets/reactions/download.png" alt="Descargar"/>
-              </button>
+              <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+  <img src="../assets/reactions/fav.png" alt="Favorito"/>
+</button>
+<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
+  <img src="../assets/reactions/download.png" alt="Descargar"/>
+</button>
             </div>
           </div>
         </div>`;
