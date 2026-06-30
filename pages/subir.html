@@ -19,7 +19,14 @@
     .auth-wall h2 { font-family:var(--font-pixel);font-size:.8rem;color:var(--neon);margin-bottom:.75rem; }
     .auth-wall p { color:var(--text-dim);font-size:.85rem;margin-bottom:1.5rem; }
     .auth-wall .aw-btns { display:flex;gap:.75rem;justify-content:center; }
-    .trim-grid { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem; }
+
+    /* ── SLIDER DE RECORTE (estilo Instagram) ── */
+    .trim-track{position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem;}
+    .trim-range{position:absolute;top:0;bottom:0;background:rgba(74,222,128,.18);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon);}
+    .trim-handle{position:absolute;top:-4px;width:18px;height:50px;background:var(--neon);border-radius:5px;cursor:grab;transform:translateX(-50%);box-shadow:0 0 6px rgba(74,222,128,.5);touch-action:none;}
+    .trim-handle:active{cursor:grabbing;}
+    .trim-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:18px;background:#000;opacity:.4;}
+
     .tg label { font-size:.75rem;color:var(--text-dim);display:block;margin-bottom:.3rem;text-transform:uppercase; }
     .tg input { background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.5rem .75rem;border-radius:var(--radius);font-family:var(--font-pixel);font-size:.65rem;width:100%;outline:none; }
     .tg input:focus { border-color:var(--neon); }
@@ -34,6 +41,9 @@
     .preview-box { background:var(--bg3);border-radius:6px;padding:1rem;margin-bottom:1rem; }
     .preview-box audio { width:100%;accent-color:var(--neon); }
     .preview-info { font-size:.75rem;color:var(--text-dim);margin-top:.4rem; }
+
+    /* ── AUTOCOMPLETE DE JUEGO (RAWG) ── */
+    .juego-sug-item:hover { background: var(--bg3); }
   </style>
 </head>
 <body>
@@ -112,15 +122,23 @@
         <audio id="audioPlayer" controls crossorigin="anonymous"></audio>
         <div class="preview-info" id="durationInfo"></div>
       </div>
-      <div class="trim-grid">
-        <div class="tg"><label>Segundo de inicio</label><input type="number" id="trimStart" value="0" min="0" step="0.5"/></div>
-        <div class="tg"><label>Segundo de fin</label><input type="number" id="trimEnd" value="15" min="0" step="0.5"/></div>
+
+      <!-- Slider tipo Instagram para marcar inicio/fin -->
+      <div class="trim-slider-wrap" style="margin-bottom:1rem">
+        <div class="trim-track" id="trimTrack">
+          <div class="trim-range" id="trimRange"></div>
+          <div class="trim-handle" id="handleStart" data-handle="start"></div>
+          <div class="trim-handle" id="handleEnd" data-handle="end"></div>
+        </div>
       </div>
       <div class="time-disp">
         <span>Inicio: <span id="startDisp">0.00s</span></span>
         <span>Fin: <span id="endDisp">15.00s</span></span>
         <span>Clip: <span id="selDisp">15.00s</span></span>
       </div>
+      <input type="hidden" id="trimStart" value="0"/>
+      <input type="hidden" id="trimEnd" value="15"/>
+
       <div style="display:flex;gap:.75rem;flex-wrap:wrap">
         <button class="btn-primary" id="playSelBtn">Escuchar clip</button>
         <button class="btn-outline" id="stopBtn">Detener</button>
@@ -130,7 +148,13 @@
     <div class="editor-box">
       <p class="step-label">PASO 3 — Información</p>
       <div class="form-group"><label>Título del soundbite *</label><input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/></div>
-      <div class="form-group"><label>Nombre del juego *</label><input type="text" id="juego" placeholder="Ej: Star Fox: Assault"/></div>
+
+      <div class="form-group" style="position:relative">
+        <label>Nombre del juego *</label>
+        <input type="text" id="juego" placeholder="Ej: Star Fox: Assault" autocomplete="off"/>
+        <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
+      </div>
+
       <div class="form-group">
         <label>Consola *</label>
         <select id="consola">
@@ -222,15 +246,15 @@
       }
     });
 
-function prefillFromURL() {
-  const p = new URLSearchParams(window.location.search);
-  if (p.get('url')) {
-    document.getElementById('audioUrl').value = p.get('url');
-    loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
-  }
-  if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
-  if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
-}
+    function prefillFromURL() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('url')) {
+        document.getElementById('audioUrl').value = p.get('url');
+        loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
+      }
+      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
+      if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -243,46 +267,105 @@ function prefillFromURL() {
       });
     });
 
-document.getElementById('loadBtn').addEventListener('click', () =>
-  loadAudioUrl(document.getElementById('audioUrl').value.trim()));
+    document.getElementById('loadBtn').addEventListener('click', () =>
+      loadAudioUrl(document.getElementById('audioUrl').value.trim()));
 
-function loadAudioUrl(url, startHint = 0, endHint = 15) {
-  const errEl = document.getElementById('urlError');
-  errEl.style.display = 'none';
-  if (!url) { errEl.textContent = 'Pega un enlace primero.'; errEl.style.display = 'block'; return; }
-  audioPlayer.src = url;
-  audioPlayer.load();
-  audioPlayer.onloadedmetadata = () => {
-    const dur = audioPlayer.duration;
-    let start = Math.max(0, startHint);
-    let end   = Math.min(endHint, dur);
-    if (end - start < 10) end = Math.min(start + 15, dur);
-    if (end - start < 10) start = Math.max(0, end - 10);
-document.getElementById('trimStart').value = Math.round(start);
-document.getElementById('trimEnd').value   = Math.round(end);
-    document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — clip entre 10 y 15 seg`;
-    document.getElementById('previewSection').style.display = 'block';
-    updateDisp();
-  };
-  audioPlayer.onerror = () => {
-    errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG desde Archive.org.';
-    errEl.style.display = 'block';
-  };
-}
+    function loadAudioUrl(url, startHint = 0, endHint = 15) {
+      const errEl = document.getElementById('urlError');
+      errEl.style.display = 'none';
+      if (!url) { errEl.textContent = 'Pega un enlace primero.'; errEl.style.display = 'block'; return; }
+      audioPlayer.src = url;
+      audioPlayer.load();
+      audioPlayer.onloadedmetadata = () => {
+        const dur = audioPlayer.duration;
+        let start = Math.max(0, startHint);
+        let end   = Math.min(endHint, dur);
+        if (end - start < 10) end = Math.min(start + 15, dur);
+        if (end - start < 10) start = Math.max(0, end - 10);
+        setupTrimSlider(dur, start, end);
+        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — clip entre 10 y 15 seg`;
+        document.getElementById('previewSection').style.display = 'block';
+      };
+      audioPlayer.onerror = () => {
+        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG desde Archive.org.';
+        errEl.style.display = 'block';
+      };
+    }
 
-    document.getElementById('trimStart').addEventListener('input', updateDisp);
-    document.getElementById('trimEnd').addEventListener('input', updateDisp);
-function updateDisp() {
-  const s = Math.round(parseFloat(document.getElementById('trimStart').value)||0);
-  const e = Math.round(parseFloat(document.getElementById('trimEnd').value)||15);
-  document.getElementById('startDisp').textContent = s+'s';
-  document.getElementById('endDisp').textContent   = e+'s';
-  document.getElementById('selDisp').textContent   = (e-s)+'s';
-}
+    // ════════════════════════════════════════════
+    // SLIDER DE RECORTE ESTILO INSTAGRAM
+    // Arrastra los dos handles. Mínimo 10s, máximo 15s.
+    // ════════════════════════════════════════════
+    let trackDuration = 0;
+
+    function setupTrimSlider(duration, initStart, initEnd) {
+      trackDuration = duration;
+      const track  = document.getElementById('trimTrack');
+      const hStart = document.getElementById('handleStart');
+      const hEnd   = document.getElementById('handleEnd');
+      const range  = document.getElementById('trimRange');
+
+      let start = Math.max(0, initStart);
+      let end   = Math.min(initEnd, duration);
+
+      function pctFromSec(s) { return trackDuration > 0 ? (s / trackDuration) * 100 : 0; }
+      function secFromX(clientX) {
+        const rect = track.getBoundingClientRect();
+        const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+        return pct * trackDuration;
+      }
+
+      function render() {
+        hStart.style.left = pctFromSec(start) + '%';
+        hEnd.style.left   = pctFromSec(end) + '%';
+        range.style.left  = pctFromSec(start) + '%';
+        range.style.width = (pctFromSec(end) - pctFromSec(start)) + '%';
+        document.getElementById('startDisp').textContent = Math.round(start) + 's';
+        document.getElementById('endDisp').textContent   = Math.round(end) + 's';
+        document.getElementById('selDisp').textContent   = Math.round(end - start) + 's';
+        document.getElementById('trimStart').value = Math.round(start);
+        document.getElementById('trimEnd').value   = Math.round(end);
+      }
+
+      // Limpiar listeners viejos clonando los handles (evita duplicados si se recarga otro audio)
+      const newHStart = hStart.cloneNode(true);
+      const newHEnd   = hEnd.cloneNode(true);
+      hStart.replaceWith(newHStart);
+      hEnd.replaceWith(newHEnd);
+
+      function dragHandle(handle, isStart) {
+        handle.addEventListener('pointerdown', e => {
+          handle.setPointerCapture(e.pointerId);
+          function onMove(ev) {
+            let sec = secFromX(ev.clientX);
+            if (isStart) {
+              sec = Math.min(sec, end - 10);   // mínimo 10s de clip
+              sec = Math.max(sec, end - 15, 0); // máximo 15s de clip
+              start = Math.max(0, sec);
+            } else {
+              sec = Math.max(sec, start + 10);
+              sec = Math.min(sec, start + 15, trackDuration);
+              end = sec;
+            }
+            render();
+          }
+          function onUp() {
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+          }
+          document.addEventListener('pointermove', onMove);
+          document.addEventListener('pointerup', onUp);
+        });
+      }
+
+      dragHandle(newHStart, true);
+      dragHandle(newHEnd, false);
+      render();
+    }
 
     document.getElementById('playSelBtn').addEventListener('click', () => {
-      const s = parseFloat(document.getElementById('trimStart').value)||0;
-      const e = parseFloat(document.getElementById('trimEnd').value)||15;
+      const s = parseFloat(document.getElementById('trimStart').value) || 0;
+      const e = parseFloat(document.getElementById('trimEnd').value) || 15;
       audioPlayer.currentTime = s; audioPlayer.play();
       const iv = setInterval(() => { if (audioPlayer.currentTime >= e) { audioPlayer.pause(); clearInterval(iv); } }, 100);
     });
@@ -320,6 +403,82 @@ function updateDisp() {
       };
     }
 
+    // ════════════════════════════════════════════
+    // AUTOCOMPLETE DE JUEGO (RAWG API)
+    // Sácate tu key gratis en rawg.io/apidocs
+    // ════════════════════════════════════════════
+    const RAWG_KEY = 'TU_API_KEY_AQUI';
+
+    const PLATFORM_MAP = {
+      'nes':'NES','famicom':'NES',
+      'snes':'SNES','super nintendo':'SNES',
+      'nintendo 64':'N64',
+      'game boy advance':'GBA','game boy':'GBA','nintendo ds':'GBA',
+      'gamecube':'GameCube',
+      'wii':'Wii','wii u':'WiiU',
+      'nintendo 3ds':'3DS','nintendo switch':'Switch',
+      'playstation':'PS1','playstation 2':'PS2','playstation 3':'PS3','playstation 4':'PS4',
+      'psp':'PSP','ps vita':'PSP',
+      'genesis':'Genesis','sega master system':'MasterSystem',
+      'sega saturn':'Saturn','dreamcast':'Dreamcast',
+      'xbox':'Xbox','xbox 360':'Xbox360',
+      'arcade':'Arcade','atari':'Atari','neo geo':'Neo-Geo','pc':'PC'
+    };
+
+    let juegoDebounce = null;
+    const juegoInput = document.getElementById('juego');
+    const sugBox = document.getElementById('juegoSuggestions');
+
+    juegoInput.addEventListener('input', () => {
+      clearTimeout(juegoDebounce);
+      const val = juegoInput.value.trim();
+      if (val.length < 3) { sugBox.style.display = 'none'; return; }
+      juegoDebounce = setTimeout(() => buscarJuegos(val), 350);
+    });
+
+    document.addEventListener('click', e => {
+      if (!sugBox.contains(e.target) && e.target !== juegoInput) sugBox.style.display = 'none';
+    });
+
+    async function buscarJuegos(queryStr) {
+      if (!RAWG_KEY || RAWG_KEY === 'TU_API_KEY_AQUI') return;
+      try {
+        const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(queryStr)}&page_size=6`);
+        const data = await res.json();
+        const results = data.results || [];
+        if (!results.length) { sugBox.style.display = 'none'; return; }
+
+        sugBox.innerHTML = results.map(g => `
+          <div class="juego-sug-item" data-id="${g.id}" style="padding:.6rem .9rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem">
+            ${g.background_image ? `<img src="${g.background_image}" style="width:32px;height:32px;border-radius:4px;object-fit:cover"/>` : ''}
+            <span>${g.name}${g.released ? ` <span style="color:var(--text-dim);font-size:.75rem">(${g.released.slice(0,4)})</span>` : ''}</span>
+          </div>`).join('');
+        sugBox.style.display = 'block';
+
+        sugBox.querySelectorAll('.juego-sug-item').forEach((el, i) => {
+          el.addEventListener('click', () => seleccionarJuego(results[i]));
+        });
+      } catch (e) {
+        console.warn('RAWG error:', e.message);
+        sugBox.style.display = 'none';
+      }
+    }
+
+    function seleccionarJuego(game) {
+      juegoInput.value = game.name;
+      sugBox.style.display = 'none';
+
+      const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
+      let matched = null;
+      for (const p of platforms) {
+        const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
+        if (key) { matched = PLATFORM_MAP[key]; break; }
+      }
+      if (matched) {
+        document.getElementById('consola').value = matched;
+      }
+    }
+
     document.getElementById('submitBtn').addEventListener('click', async () => {
       if (!currentUser) { window.showToast('Inicia sesión primero.','error'); return; }
       const titulo   = document.getElementById('titulo').value.trim();
@@ -331,7 +490,7 @@ function updateDisp() {
       if (!consola)   { window.showToast('Selecciona la consola.','error'); return; }
       if (!categoria) { window.showToast('Selecciona la categoría.','error'); return; }
 
-let url = '', trimStart = 0, trimEnd = 15;
+      let url = '', trimStart = 0, trimEnd = 15;
       if (activeTab === 'url') {
         url = document.getElementById('audioUrl').value.trim();
         if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
@@ -341,11 +500,11 @@ let url = '', trimStart = 0, trimEnd = 15;
         if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
         if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
       } else {
-  if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
-  if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
-  if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
-  url = localFileUrl; trimEnd = localFileDuration;
-}
+        if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
+        if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
+        if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
+        url = localFileUrl; trimEnd = localFileDuration;
+      }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true; btn.textContent = 'Publicando...';
