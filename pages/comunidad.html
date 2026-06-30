@@ -177,12 +177,13 @@
               <button class="icon-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
                 <img src="../assets/reactions/love.png" alt="Me encanta"/>
                 <span class="icon-count">${r.love||0}</span>
-              </button>
-              <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-  <img src="../assets/reactions/fav.png" alt="Favorito"/>
+              <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
+  <img src="../assets/reactions/love.png" alt="Me encanta"/>
+  <span class="icon-count">${r.love||0}</span>
 </button>
-<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
-  <img src="../assets/reactions/download.png" alt="Descargar"/>
+<button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
+  <img src="../assets/reactions/meh.png" alt="Regular"/>
+  <span class="icon-count">${r.meh||0}</span>
 </button>
             </div>
             <div class="sb-actions">
