@@ -254,9 +254,11 @@ function loadAudioUrl(url, startHint = 0, endHint = 15) {
   audioPlayer.load();
   audioPlayer.onloadedmetadata = () => {
     const dur = audioPlayer.duration;
-    const end = Math.min(endHint, dur, 15);
-    const start = Math.min(startHint, end - 10);
-    document.getElementById('trimStart').value = Math.max(0, start).toFixed(1);
+    let start = Math.max(0, startHint);
+    let end   = Math.min(endHint, dur);
+    if (end - start < 10) end = Math.min(start + 15, dur);
+    if (end - start < 10) start = Math.max(0, end - 10);
+    document.getElementById('trimStart').value = start.toFixed(1);
     document.getElementById('trimEnd').value   = end.toFixed(1);
     document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — clip entre 10 y 15 seg`;
     document.getElementById('previewSection').style.display = 'block';
