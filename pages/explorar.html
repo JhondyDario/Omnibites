@@ -430,8 +430,9 @@
           </div>
 
           <div class="mini-player">
-            <button class="mini-play-btn" id="playBtn-${i}"
-              onclick="togglePlay(${i}, '${item.url}', ${item.seconds})">▶</button>
+<button class="mini-play-btn" id="playBtn-${i}" onclick="togglePlay(${i}, '${item.url}', ${item.seconds})">
+  <img src="../assets/icons/play.png" alt="Play"/>
+</button>
             <div class="mini-progress-wrap">
               <div class="mini-progress-bar" onclick="seekTo(event, ${i}, ${item.seconds})">
                 <div class="mini-progress-fill" id="prog-${i}"></div>
@@ -505,7 +506,7 @@
         activeSource = source;
         activeGain   = gain;
         activeCard   = idx;
-        btn.textContent = '||';
+btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
         btn.classList.add('playing');
         btn.disabled = false;
         const startTime = ctx.currentTime;
@@ -524,7 +525,7 @@
         }, 100);
       } catch (e) {
         console.error(e);
-        btn.textContent = '▶';
+if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
         btn.disabled = false;
         alert('No se pudo cargar este audio. Prueba con otro resultado.');
       }
@@ -545,7 +546,7 @@
         const btn  = document.getElementById(`playBtn-${activeCard}`);
         const prog = document.getElementById(`prog-${activeCard}`);
         const cur  = document.getElementById(`cur-${activeCard}`);
-        if (btn)  { btn.textContent = '▶'; btn.classList.remove('playing'); btn.disabled = false; }
+if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
         if (!isPause) {
           if (prog) prog.style.width = '0%';
           if (cur)  cur.textContent  = '0:00';
