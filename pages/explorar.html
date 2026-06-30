@@ -106,6 +106,7 @@
     .mini-play-btn:hover { opacity: 0.8; }
     .mini-play-btn.playing { background: var(--purple); }
     .mini-play-btn img { width:32px; height:32px; object-fit:contain; display:block; }
+    .mini-play-btn img.loading-icon{animation:spin .4s linear infinite;}
     
     .mini-progress-wrap {
       flex: 1;
@@ -479,8 +480,8 @@
         return;
       }
       stopActive(false);
-      btn.textContent = '...';
-      btn.disabled = true;
+btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+btn.disabled = true;
       try {
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') await ctx.resume();
