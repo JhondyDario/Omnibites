@@ -220,7 +220,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   border-radius:50%;
 }
 .sb-play img.loading-icon{
-  animation:spin 2s linear infinite;
+  animation:spin 1s linear infinite;
 }
 .sb-play.playing{
   background:var(--purple);
@@ -403,7 +403,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .related-chip:hover{background:rgba(74,222,128,.07);border-color:var(--neon);}
 .state-msg{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
 .state-msg p{font-size:.9rem;margin-bottom:.5rem;}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin 2s linear infinite;margin:0 auto 1rem;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── COMUNIDAD ── */
