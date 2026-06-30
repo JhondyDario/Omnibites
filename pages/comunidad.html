@@ -308,7 +308,7 @@ function stopSB(){
       stopSB();
       const btn=document.getElementById(`sbplay-${id}`);
       if(!btn)return;
-      btn.textContent='...';btn.disabled=true;
+btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
       try{
         const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
         const res=await fetch(url);if(!res.ok)throw new Error('fetch');
