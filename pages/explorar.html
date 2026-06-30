@@ -622,10 +622,10 @@ window.compartir = function(idx, url, titleEsc, albumEsc) {
   const title = unescape(titleEsc);
   const album = unescape(albumEsc);
   const item  = window._items?.[idx];
-  const start = playbackStarts[idx] ?? 0;
+  const start = Math.round(playbackStarts[idx] ?? 0);
   const totalDur = item?.seconds || (start + 15);
-  const end = Math.min(start + 15, totalDur);
-  const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start.toFixed(2), trimEnd: end.toFixed(2) });
+  const end = Math.round(Math.min(start + 15, totalDur));
+  const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
   window.location.href = `subir.html?${params.toString()}`;
 };
 
