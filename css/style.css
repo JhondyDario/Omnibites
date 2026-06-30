@@ -212,10 +212,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .sb-meta{font-size:.75rem;color:var(--text-dim);margin-bottom:.75rem;}
 .sb-meta .sb-author{color:var(--purple);}
 .sb-player{background:var(--bg3);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;}
-.sb-play img{ width:32px; height:32px; object-fit:contain; display:block; }
-.sb-play img.loading-icon{animation:spin .4s linear infinite;}
-.sb-play.playing{background:var(--purple);color:#000;}
-.sb-play { display:flex; align-items:center; justify-content:center; padding:0; background:transparent; }
+.sb-play img{
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  display:block;
+  border-radius:50%;
+}
+.sb-play img.loading-icon{
+  animation:spin .16s linear infinite;
+}
+.sb-play.playing{
+  background:var(--purple);
+}
+.sb-play{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  padding:0;
+  background:var(--neon);
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  flex-shrink:0;
+}
 .sb-prog-wrap{flex:1;}
 .sb-prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:.3rem;}
 .sb-prog-fill{height:100%;background:var(--neon);width:0%;transition:width .1s linear;}
@@ -381,7 +403,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .related-chip:hover{background:rgba(74,222,128,.07);border-color:var(--neon);}
 .state-msg{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
 .state-msg p{font-size:.9rem;margin-bottom:.5rem;}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .4s linear infinite;margin:0 auto 1rem;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── COMUNIDAD ── */
