@@ -288,7 +288,7 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0;
+let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
   const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function stopSB(isPause=false){
@@ -310,8 +310,14 @@ function stopSB(isPause=false){
 }
 
 window.playSB=async function(id,url,ts,te){
-  if(activeSBId===id){ pausedAt = lastElapsed; stopSB(true); return; }
-  pausedAt=0;
+  if(activeSBId===id){
+    pausedAt = lastElapsed;
+    pausedSBId = id;
+    stopSB(true);
+    return;
+  }
+  const resumeOffset = (pausedSBId===id) ? pausedAt : 0;
+  pausedSBId = null;
   stopSB();
   const myToken = ++playToken;
   const btn=document.getElementById(`sbplay-${id}`);
@@ -329,15 +335,14 @@ window.playSB=async function(id,url,ts,te){
 
     const baseStart=Math.min(ts||0,buf.duration-1);
     const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-baseStart);
-    const resumeOffset=Math.min(pausedAt,dur-0.1);
-    const start=baseStart+resumeOffset;
-    pausedAt=0;
+    const safeResumeOffset=Math.min(resumeOffset,dur-0.1);
+    const start=baseStart+safeResumeOffset;
 
     const source=ctx.createBufferSource();source.buffer=buf;
     const gain=ctx.createGain();
-    const remaining=dur-resumeOffset;
-    gain.gain.setValueAtTime(resumeOffset<FADE?0:1,ctx.currentTime);
-    if(resumeOffset<FADE) gain.gain.linearRampToValueAtTime(1,ctx.currentTime+(FADE-resumeOffset));
+    const remaining=dur-safeResumeOffset;
+    gain.gain.setValueAtTime(safeResumeOffset<FADE?0:1,ctx.currentTime);
+    if(safeResumeOffset<FADE) gain.gain.linearRampToValueAtTime(1,ctx.currentTime+(FADE-safeResumeOffset));
     gain.gain.setValueAtTime(1,ctx.currentTime+remaining-FADE);
     gain.gain.linearRampToValueAtTime(0,ctx.currentTime+remaining);
     source.connect(gain);gain.connect(ctx.destination);
@@ -349,7 +354,7 @@ window.playSB=async function(id,url,ts,te){
     const t0=ctx.currentTime;
     progIv=setInterval(()=>{
       if(myToken!==playToken){clearInterval(progIv);return;}
-      const el=resumeOffset+(ctx.currentTime-t0);
+      const el=safeResumeOffset+(ctx.currentTime-t0);
       lastElapsed=el;
       const p=document.getElementById(`sbprog-${id}`);
       const c=document.getElementById(`sbcur-${id}`);
