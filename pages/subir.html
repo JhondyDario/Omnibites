@@ -254,10 +254,12 @@ function loadAudioUrl(url, startHint = 0, endHint = 15) {
   audioPlayer.load();
   audioPlayer.onloadedmetadata = () => {
     const dur = audioPlayer.duration;
-    const end = Math.min(endHint, dur, 15);
-    const start = Math.min(startHint, end - 10);
-    document.getElementById('trimStart').value = Math.max(0, start).toFixed(1);
-    document.getElementById('trimEnd').value   = end.toFixed(1);
+    let start = Math.max(0, startHint);
+    let end   = Math.min(endHint, dur);
+    if (end - start < 10) end = Math.min(start + 15, dur);
+    if (end - start < 10) start = Math.max(0, end - 10);
+document.getElementById('trimStart').value = Math.round(start);
+document.getElementById('trimEnd').value   = Math.round(end);
     document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — clip entre 10 y 15 seg`;
     document.getElementById('previewSection').style.display = 'block';
     updateDisp();
@@ -270,13 +272,13 @@ function loadAudioUrl(url, startHint = 0, endHint = 15) {
 
     document.getElementById('trimStart').addEventListener('input', updateDisp);
     document.getElementById('trimEnd').addEventListener('input', updateDisp);
-    function updateDisp() {
-      const s = parseFloat(document.getElementById('trimStart').value)||0;
-      const e = parseFloat(document.getElementById('trimEnd').value)||15;
-      document.getElementById('startDisp').textContent = s.toFixed(2)+'s';
-      document.getElementById('endDisp').textContent   = e.toFixed(2)+'s';
-      document.getElementById('selDisp').textContent   = (e-s).toFixed(2)+'s';
-    }
+function updateDisp() {
+  const s = Math.round(parseFloat(document.getElementById('trimStart').value)||0);
+  const e = Math.round(parseFloat(document.getElementById('trimEnd').value)||15);
+  document.getElementById('startDisp').textContent = s+'s';
+  document.getElementById('endDisp').textContent   = e+'s';
+  document.getElementById('selDisp').textContent   = (e-s)+'s';
+}
 
     document.getElementById('playSelBtn').addEventListener('click', () => {
       const s = parseFloat(document.getElementById('trimStart').value)||0;
@@ -329,16 +331,16 @@ function loadAudioUrl(url, startHint = 0, endHint = 15) {
       if (!consola)   { window.showToast('Selecciona la consola.','error'); return; }
       if (!categoria) { window.showToast('Selecciona la categoría.','error'); return; }
 
-      let url = '', trimStart = 0, trimEnd = 15;
-if (activeTab === 'url') {
-  url = document.getElementById('audioUrl').value.trim();
-  if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
-  trimStart = parseFloat(document.getElementById('trimStart').value)||0;
-  trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
-  const clipDur = trimEnd - trimStart;
-  if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
-  if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
-} } else {
+let url = '', trimStart = 0, trimEnd = 15;
+      if (activeTab === 'url') {
+        url = document.getElementById('audioUrl').value.trim();
+        if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
+        trimStart = parseFloat(document.getElementById('trimStart').value)||0;
+        trimEnd   = parseFloat(document.getElementById('trimEnd').value)||15;
+        const clipDur = trimEnd - trimStart;
+        if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
+        if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
+      } else {
   if (!localFileUrl) { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
   if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
   if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
