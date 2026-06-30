@@ -164,8 +164,10 @@
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
           <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
           <div class="sb-player">
-            <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">▶</button>
-            <div class="sb-prog-wrap">
+<button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">
+  <img src="../assets/icons/play.png" alt="Play"/>
+</button>
+<div class="sb-prog-wrap">
               <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
               <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
             </div>
@@ -292,8 +294,8 @@
     function stopSB(){
       if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{}activeSource=activeGain=null;}
       clearInterval(progIv);
-      if(activeSBId){const b=document.getElementById(`sbplay-${activeSBId}`);if(b){b.textContent='▶';b.classList.remove('playing');b.disabled=false;}const p=document.getElementById(`sbprog-${activeSBId}`);if(p)p.style.width='0%';}
-      activeSBId=null;
+if(activeSBId){const b=document.getElementById(`sbplay-${activeSBId}`);if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.classList.remove('playing');b.disabled=false;}...
+               activeSBId=null;
     }
 
     window.playSB=async function(id,url,ts,te){
@@ -318,7 +320,8 @@
         source.start(0,start,dur);
         source.onended=()=>{if(activeSBId===id)stopSB();};
         activeSource=source;activeGain=gain;activeSBId=id;
-        btn.textContent='||';btn.classList.add('playing');btn.disabled=false;
+        btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
+        btn.classList.add('playing');btn.disabled=false;
         const t0=ctx.currentTime;
         progIv=setInterval(()=>{
           const el=ctx.currentTime-t0;
@@ -330,8 +333,9 @@
         },100);
       }catch(e){
         const b=document.getElementById(`sbplay-${id}`);
-        if(b){b.textContent='✕';b.style.background='var(--danger)';b.disabled=false;}
-        setTimeout(()=>{const b=document.getElementById(`sbplay-${id}`);if(b){b.textContent='▶';b.style.background='';b.disabled=false;}},3000);
+if(b){b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>';b.style.background='var(--danger)';b.disabled=false;}
+setTimeout(()=>{const b=document.getElementById(`sbplay-${id}`);if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';...
+                                                                      setTimeout(()=>{const b=document.getElementById(`sbplay-${id}`);if(b){b.textContent='▶';b.style.background='';b.disabled=false;}},3000);
       }
     };
 
