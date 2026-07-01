@@ -169,6 +169,10 @@
         <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
         <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
         <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
+        <div id="juegoImgWrap" style="display:none;margin-top:.75rem">
+  <img id="juegoImg" src="" alt="" 
+       style="width:130px;height:73px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block;"/>
+        </div>
       </div>
 
       <div class="form-group">
@@ -487,8 +491,9 @@ function prefillFromURL() {
 
     // Si el usuario edita el campo manualmente, desconfirma el juego
     juegoInput.addEventListener('input', () => {
-      juegoConfirmado = false;
-      imagenFromRawg  = '';   // ← nuevo
+  juegoConfirmado = false;
+  imagenFromRawg  = '';
+      document.getElementById('juegoImgWrap').style.display = 'none'; // ← nuevo
       document.getElementById('consola').value = '';
       juegoHint.className = 'juego-lock-hint';
       juegoHint.textContent = 'Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.';
@@ -529,11 +534,20 @@ function prefillFromURL() {
     }
 
     function seleccionarJuego(game) {
-      juegoInput.value   = game.name;
-      sugBox.style.display = 'none';
-      juegoConfirmado    = true;
-      imagenFromRawg     = resizeRawgImage(game.background_image); // ← nuevo
+  juegoInput.value   = game.name;
+  sugBox.style.display = 'none';
+  juegoConfirmado    = true;
+  imagenFromRawg     = resizeRawgImage(game.background_image);
 
+  const imgWrap = document.getElementById('juegoImgWrap');
+  const imgEl   = document.getElementById('juegoImg');
+  if (game.background_image) {
+    imgEl.src = imagenFromRawg || game.background_image;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+      
       // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
       const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
       let matched = null;
