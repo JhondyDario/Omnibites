@@ -367,15 +367,12 @@
         const results = data.results || [];
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
-        sugBox.innerHTML = results.map(g => `
-          <div class="search-sug-item">
-            ${g.background_image
-              ? `<img src="${g.background_image}" style="width:28px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0"/>`
-              : `<div style="width:28px;height:28px;border-radius:4px;background:var(--bg3);flex-shrink:0"></div>`}
-            <span>${g.name}${g.released
-              ? ` <span style="color:var(--text-dim)">(${g.released.slice(0,4)})</span>`
-              : ''}</span>
-          </div>`).join('');
+sugBox.innerHTML = results.map(g => `
+  <div class="search-sug-item">
+    <span>${g.name}${g.released
+      ? ` <span style="color:var(--text-dim)">(${g.released.slice(0,4)})</span>`
+      : ''}</span>
+  </div>`).join('');
         sugBox.style.display = 'block';
 
         sugBox.querySelectorAll('.search-sug-item').forEach((el, i) => {
