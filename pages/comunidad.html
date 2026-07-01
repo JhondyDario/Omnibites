@@ -487,6 +487,7 @@ window.playSB = async function(id, url, ts, te){
 
     document.getElementById('searchBtn').addEventListener('click', render);
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') render(); });
+  document.getElementById('searchInput').addEventListener('input', render);
     document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; render(); });
     document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; render(); });
     document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; render(); });
