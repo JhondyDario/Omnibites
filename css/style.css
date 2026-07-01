@@ -209,6 +209,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 /* ── SOUNDBITE CARD ── */
 .sb-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:border-color .2s,transform .2s;}
 .sb-card:hover{border-color:var(--neon);transform:translateY(-1px);}
+.sb-head{display:flex;align-items:flex-start;gap:.65rem;margin-bottom:.6rem;}
+.sb-thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);}
+.sb-head-info{flex:1;min-width:0;}
+.sb-head-info .sb-meta{margin-bottom:0;}
+@media(max-width:480px){
+  .sb-thumb{width:40px;height:40px;}
+}
 .sb-tag{font-size:.68rem;font-weight:600;color:var(--neon);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem;}
 .sb-title{font-weight:600;font-size:.95rem;margin-bottom:.2rem;}
 .sb-meta{font-size:.75rem;color:var(--text-dim);margin-bottom:.75rem;}
