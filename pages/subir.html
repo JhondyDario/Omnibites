@@ -604,7 +604,7 @@ function prefillFromURL() {
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
             trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
-            autorNombre, creadoEn: serverTimestamp()
+            autorNombre, imagen: imagenFromArchive || imagenFromRawg || '', creadoEn: serverTimestamp()
           });
           window.showToast('Soundbite actualizado (ya existía uno igual)');
           setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
@@ -619,6 +619,7 @@ function prefillFromURL() {
           autorId: currentUser.uid,
           autorNombre,
           likes: 0, rating: 0, totalVotos: 0,
+          imagen: imagenFromArchive || imagenFromRawg || '',
           creadoEn: serverTimestamp()
         });
         window.showToast('Soundbite publicado');
