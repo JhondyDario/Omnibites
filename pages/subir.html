@@ -119,35 +119,38 @@
       </div>
     </div>
 
-    <!-- PASO 2 -->
-    <div id="previewSection" style="display:none" class="editor-box">
-      <p class="step-label">PASO 2 — Define el recorte</p>
+<!-- PASO 2 -->
+<div id="previewSection" class="editor-box locked">
+  <p class="step-label">PASO 2 — Define el recorte</p>
 
-      <!-- Audio oculto — solo para playback interno, no ocupa espacio visual -->
-      <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
-      <div class="preview-info" id="durationInfo"></div>
+  <div id="lockMsg" class="lock-msg">🔒 Carga un audio en el Paso 1 para desbloquear el recorte</div>
 
-      <div class="trim-slider-wrap">
-        <div class="trim-track" id="trimTrack">
-          <div class="trim-range"  id="trimRange"></div>
-          <div class="trim-handle" id="handleStart"></div>
-          <div class="trim-handle" id="handleEnd"></div>
-        </div>
-      </div>
+  <div id="trimContent">
+    <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
+    <div class="preview-info" id="durationInfo"></div>
 
-      <div class="time-disp">
-        <span>Inicio: <span id="startDisp">0s</span></span>
-        <span>Fin: <span id="endDisp">15s</span></span>
-        <span>Clip: <span id="selDisp">15s</span></span>
-      </div>
-      <input type="hidden" id="trimStart" value="0"/>
-      <input type="hidden" id="trimEnd"   value="15"/>
-
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
-        <button class="btn-outline"  id="stopBtn">◼ Detener</button>
+    <div class="trim-slider-wrap">
+      <div class="trim-track" id="trimTrack">
+        <div class="trim-range"  id="trimRange"></div>
+        <div class="trim-handle" id="handleStart"></div>
+        <div class="trim-handle" id="handleEnd"></div>
       </div>
     </div>
+
+    <div class="time-disp">
+      <span>Inicio: <span id="startDisp">0s</span></span>
+      <span>Fin: <span id="endDisp">15s</span></span>
+      <span>Clip: <span id="selDisp">15s</span></span>
+    </div>
+    <input type="hidden" id="trimStart" value="0"/>
+    <input type="hidden" id="trimEnd"   value="15"/>
+
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+      <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
+      <button class="btn-outline"  id="stopBtn">◼ Detener</button>
+    </div>
+  </div>
+</div>
 
     <!-- PASO 3 -->
     <div class="editor-box">
