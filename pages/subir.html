@@ -266,15 +266,16 @@ let imagenFromRawg    = '';
       }
     });
 
-    function prefillFromURL() {
-      const p = new URLSearchParams(window.location.search);
-      if (p.get('url')) {
-        document.getElementById('audioUrl').value = p.get('url');
-        loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
-      }
-      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
-      if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
-    }
+function prefillFromURL() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('url')) {
+    document.getElementById('audioUrl').value = p.get('url');
+    loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
+  }
+  if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
+  if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
+  if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
+}
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -466,6 +467,11 @@ let imagenFromRawg    = '';
       'arcade':'Arcade','atari':'Atari','neo geo':'Neo-Geo','pc':'PC','linux':'PC','macos':'PC'
     };
 
+    function resizeRawgImage(url, width = 150) {
+  if (!url) return '';
+  return url.includes('/media/') ? url.replace('/media/', `/media/resize/${width}/-/`) : url;
+}
+
     let juegoDebounce = null;
     const juegoInput = document.getElementById('juego');
     const sugBox     = document.getElementById('juegoSuggestions');
@@ -474,6 +480,7 @@ let imagenFromRawg    = '';
     // Si el usuario edita el campo manualmente, desconfirma el juego
     juegoInput.addEventListener('input', () => {
       juegoConfirmado = false;
+      imagenFromRawg  = '';   // ← nuevo
       document.getElementById('consola').value = '';
       juegoHint.className = 'juego-lock-hint';
       juegoHint.textContent = 'Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.';
@@ -517,6 +524,7 @@ let imagenFromRawg    = '';
       juegoInput.value   = game.name;
       sugBox.style.display = 'none';
       juegoConfirmado    = true;
+      imagenFromRawg     = resizeRawgImage(game.background_image); // ← nuevo
 
       // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
       const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
