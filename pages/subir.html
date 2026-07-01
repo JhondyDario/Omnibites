@@ -243,7 +243,10 @@
 
     // Controla si el juego fue seleccionado desde RAWG (no escrito a mano)
     let juegoConfirmado = false;
-
+    // Imagen para la targeta del soundbite — prioridad: Archive.org > RAWG
+let imagenFromArchive = '';
+let imagenFromRawg    = '';
+    
     async function getNombreUsuario(uid) {
       try {
         const snap = await getDoc(doc(db, 'usuarios', uid));
