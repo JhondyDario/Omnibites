@@ -144,11 +144,25 @@
       <div id="userEmail" style="font-size:.78rem;color:var(--text-dim);display:none"></div>
     </div>
 
-    <div class="profile-stats">
-      <div class="pstat"><strong id="statAudios">0</strong><span>Soundbites subidos</span></div>
-      <div class="pstat"><strong id="statFavs">0</strong><span>Favoritos guardados</span></div>
-      <div class="pstat"><strong id="statLove">0</strong><span>Me encanta recibidos</span></div>
-    </div>
+<div class="pstat-single">
+  <div class="pstat-item">
+    <img src="../assets/icons/soundbite.png" alt="Soundbites"/>
+    <strong id="statAudios">0</strong>
+    <span>Soundbites</span>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="pstat-item">
+    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <strong id="statLove">0</strong>
+    <span>Me encanta</span>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="pstat-item">
+    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
+    <strong id="statFavs">0</strong>
+    <span>Favoritos</span>
+  </div>
+</div>
 
     <div class="collapse-section" id="sec-mios">
       <div class="collapse-header" onclick="toggleSection('mios')">
