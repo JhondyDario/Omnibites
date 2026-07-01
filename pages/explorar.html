@@ -20,24 +20,77 @@
       color: var(--neon);
       margin-bottom: 1.5rem;
     }
+
+    /* ── BARRA DE BÚSQUEDA CON LUPA ── */
     .search-bar {
       display: flex;
-      gap: 0.75rem;
       margin-bottom: 0.75rem;
     }
-    .search-bar input {
+    .search-bar-inner {
+      position: relative;
       flex: 1;
+    }
+    .search-bar-inner input {
+      width: 100%;
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       color: var(--text);
-      padding: 0.85rem 1rem;
+      padding: 0.85rem 3rem 0.85rem 1rem; /* padding-right para la lupa */
       font-size: 1rem;
       font-family: var(--font-body);
       outline: none;
       transition: border-color 0.2s;
     }
-    .search-bar input:focus { border-color: var(--neon); }
+    .search-bar-inner input:focus { border-color: var(--neon); }
+
+    /* Botón lupa dentro del input */
+    .search-icon-btn {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .55;
+      transition: opacity .2s;
+    }
+    .search-icon-btn:hover { opacity: 1; }
+    .search-icon-btn img { width: 20px; height: 20px; object-fit: contain; display: block; }
+
+    /* ── AUTOCOMPLETE DE JUEGOS (RAWG) ── */
+    #searchSuggestions {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 50;
+    }
+    .search-sug-item {
+      padding: .55rem .9rem;
+      cursor: pointer;
+      font-size: .85rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      transition: background .15s;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .search-sug-item:hover  { background: var(--bg3); }
+    .search-sug-item:last-child { border-bottom: none; }
 
     .results-wrap {
       max-width: 900px;
@@ -106,8 +159,8 @@
     .mini-play-btn:hover { opacity: 0.8; }
     .mini-play-btn.playing { background: var(--purple); }
     .mini-play-btn img { width:32px; height:32px; object-fit:contain; display:block; }
-    .mini-play-btn img.loading-icon{animation:spin 2s linear infinite;}
-    
+    .mini-play-btn img.loading-icon { animation:spin 2s linear infinite; }
+
     .mini-progress-wrap {
       flex: 1;
       display: flex;
@@ -142,8 +195,6 @@
       flex-wrap: wrap;
       align-items: center;
     }
-
-    /* Botones circulares de acción */
     .card-actions .reaction-btn {
       width: 36px;
       height: 36px;
@@ -253,9 +304,15 @@
   <div class="search-section">
     <h1>Buscar música</h1>
     <div class="search-bar">
-      <input type="text" id="searchInput"
-        placeholder="Ej: Super Mario 64, Pokémon Red, Mega Man X8..." />
-      <button class="btn-primary" id="searchBtn">Buscar</button>
+      <div class="search-bar-inner">
+        <input type="text" id="searchInput"
+          placeholder="Ej: Super Mario 64, Pokémon Red, Mega Man X8..." />
+        <!-- El PNG de lupa va en assets/icons/search.png -->
+        <button class="search-icon-btn" id="searchBtn" title="Buscar">
+          <img src="../assets/icons/search.png" alt="Buscar"/>
+        </button>
+        <div id="searchSuggestions"></div>
+      </div>
     </div>
   </div>
 
@@ -279,31 +336,89 @@
     let currentUser = null;
     onAuthStateChanged(auth, u => currentUser = u);
 
+    // ══════════════════════════════════════════════
+    // RAWG — Autocomplete de juegos en el buscador
+    // Misma key que en subir.html
+    // ══════════════════════════════════════════════
+    const RAWG_KEY   = '3207549bccd14954b04fa8e64840ec00';
+    const searchInput = document.getElementById('searchInput');
+    const sugBox      = document.getElementById('searchSuggestions');
+    let rawgDebounce  = null;
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(rawgDebounce);
+      const val = searchInput.value.trim();
+      if (val.length < 3) { sugBox.style.display = 'none'; return; }
+      rawgDebounce = setTimeout(() => rawgSuggest(val), 350);
+    });
+
+    // Cerrar dropdown al hacer click fuera
+    document.addEventListener('click', e => {
+      if (!sugBox.contains(e.target) && e.target !== searchInput) {
+        sugBox.style.display = 'none';
+      }
+    });
+
+    async function rawgSuggest(q) {
+      try {
+        const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=8`);
+        const data = await res.json();
+        const results = data.results || [];
+        if (!results.length) { sugBox.style.display = 'none'; return; }
+
+        sugBox.innerHTML = results.map(g => `
+          <div class="search-sug-item">
+            ${g.background_image
+              ? `<img src="${g.background_image}" style="width:28px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0"/>`
+              : `<div style="width:28px;height:28px;border-radius:4px;background:var(--bg3);flex-shrink:0"></div>`}
+            <span>${g.name}${g.released
+              ? ` <span style="color:var(--text-dim)">(${g.released.slice(0,4)})</span>`
+              : ''}</span>
+          </div>`).join('');
+        sugBox.style.display = 'block';
+
+        sugBox.querySelectorAll('.search-sug-item').forEach((el, i) => {
+          el.addEventListener('click', () => {
+            searchInput.value      = results[i].name;
+            sugBox.style.display   = 'none';
+            doSearch(); // ← auto-busca al seleccionar, sin esperar al botón
+          });
+        });
+      } catch {
+        sugBox.style.display = 'none';
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    // AUDIO — player y estado
+    // ══════════════════════════════════════════════
     let audioCtx = null;
     let activeSource = null;
     let activeGain   = null;
     let activeCard   = null;
     let progressInterval = null;
     let pausedProgress   = {};
-    let playbackStarts = {};
+    let playbackStarts   = {};
 
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       return audioCtx;
     }
 
+    // ══════════════════════════════════════════════
+    // BÚSQUEDA EN ARCHIVE.ORG
+    // ══════════════════════════════════════════════
     const STOPWORDS = new Set(['the','de','la','el','los','las','un','una','and','of','for','en','a','con','por','del']);
 
     function enrichQuery(raw) {
       const clean = raw.trim().toLowerCase();
       const words = clean.split(/\s+/).filter(w => w.length > 1 && !STOPWORDS.has(w));
-      const ostTerms = 'title:(ost OR soundtrack OR "original soundtrack" OR "game music" OR "video game music" OR music OR audio)';
+      const ostTerms     = 'title:(ost OR soundtrack OR "original soundtrack" OR "game music" OR "video game music" OR music OR audio)';
       const subjectTerms = 'subject:(videogame OR "video game" OR gaming OR nintendo OR sega OR playstation OR "game music" OR ost OR soundtrack OR arcade)';
-      const titleQuery = words.map(w => `title:${w}`).join(' AND ');
-      const primary = `(${titleQuery}) AND (${ostTerms} OR ${subjectTerms}) AND mediatype:audio`;
-      const anyField = words.join(' ');
-      const fallback = `(${anyField}) AND (${subjectTerms}) AND mediatype:audio`;
-      const lastResort = `("${words.join(' ')}") AND mediatype:audio`;
+      const titleQuery   = words.map(w => `title:${w}`).join(' AND ');
+      const primary      = `(${titleQuery}) AND (${ostTerms} OR ${subjectTerms}) AND mediatype:audio`;
+      const fallback     = `(${words.join(' ')}) AND (${subjectTerms}) AND mediatype:audio`;
+      const lastResort   = `("${words.join(' ')}") AND mediatype:audio`;
       return { primary, fallback, lastResort, words };
     }
 
@@ -316,8 +431,7 @@
       words.forEach(w => { if (title.includes(w)) score += 3; });
       if (/\b(ost|soundtrack|original soundtrack|game music)\b/.test(title)) score += 2;
       if (/\b(videogame|video game|nintendo|sega|playstation|arcade|gaming)\b/.test(subject)) score += 1;
-      const anyMatch = words.some(w => title.includes(w));
-      if (!anyMatch) score -= 2;
+      if (!words.some(w => title.includes(w))) score -= 2;
       return score;
     }
 
@@ -327,9 +441,9 @@
         const { primary, fallback, lastResort, words } = enrichQuery(query);
         let docs = [];
         docs = await runSearch(primary, 15);
-        if (docs.length === 0) docs = await runSearch(fallback, 15);
-        if (docs.length === 0) docs = await runSearch(lastResort, 10);
-        if (docs.length === 0) { showEmpty(query); return; }
+        if (!docs.length) docs = await runSearch(fallback, 15);
+        if (!docs.length) docs = await runSearch(lastResort, 10);
+        if (!docs.length) { showEmpty(query); return; }
 
         const scored = docs
           .map(doc => ({ doc, score: scoreDoc(doc, words) }))
@@ -337,11 +451,11 @@
           .filter(s => s.score > -2)
           .slice(0, 6);
 
-        if (scored.length === 0) { showEmpty(query); return; }
+        if (!scored.length) { showEmpty(query); return; }
 
         const items = await Promise.all(scored.map(s => fetchItemFiles(s.doc, words)));
-        const flat = items.flat().filter(Boolean).slice(0, 10);
-        if (flat.length === 0) { showEmpty(query); return; }
+        const flat  = items.flat().filter(Boolean).slice(0, 10);
+        if (!flat.length) { showEmpty(query); return; }
         renderResults(flat, query);
       } catch (e) {
         console.error(e);
@@ -350,7 +464,7 @@
     }
 
     async function runSearch(q, rows = 12) {
-      const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,description,creator,year,subject&rows=${rows}&output=json&sort[]=downloads+desc`;
+      const url  = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,description,creator,year,subject&rows=${rows}&output=json&sort[]=downloads+desc`;
       const res  = await fetch(url);
       const data = await res.json();
       return data?.response?.docs || [];
@@ -358,8 +472,8 @@
 
     async function fetchItemFiles(doc, words = []) {
       try {
-        const res  = await fetch(`https://archive.org/metadata/${doc.identifier}/files`);
-        const data = await res.json();
+        const res   = await fetch(`https://archive.org/metadata/${doc.identifier}/files`);
+        const data  = await res.json();
         const files = (data?.result || [])
           .filter(f => /\.(mp3|ogg|flac|wav)$/i.test(f.name))
           .filter(f => {
@@ -368,11 +482,9 @@
           })
           .filter(f => !/\b(sfx|effect|jingle|short|voice|vo_|fx_|podcast|interview|episode)\b/i.test(f.name));
 
-        const scored = files.map(f => {
-          const nameLower = f.name.toLowerCase();
-          const score = words.filter(w => nameLower.includes(w)).length;
-          return { f, score };
-        }).sort((a, b) => b.score - a.score);
+        const scored = files
+          .map(f => ({ f, score: words.filter(w => f.name.toLowerCase().includes(w)).length }))
+          .sort((a, b) => b.score - a.score);
 
         return scored.slice(0, 2).map(({ f }) => ({
           id:        doc.identifier + '/' + f.name,
@@ -415,7 +527,7 @@
 
       state.style.display  = 'none';
       header.style.display = 'block';
-      header.innerHTML     = `Encontrados <strong>${items.length}</strong> audios para "<strong>${query}</strong>" — Clip de preview: 15 seg con fade`;
+      header.innerHTML     = `Encontrados <strong>${items.length}</strong> audios para "<strong>${query}</strong>" — Preview: 15 seg con fade`;
 
       list.innerHTML = items.map((item, i) => `
         <div class="result-card" id="card-${i}">
@@ -432,9 +544,9 @@
           </div>
 
           <div class="mini-player">
-<button class="mini-play-btn" id="playBtn-${i}" onclick="togglePlay(${i}, '${item.url}', ${item.seconds})">
-  <img src="../assets/icons/play.png" alt="Play"/>
-</button>
+            <button class="mini-play-btn" id="playBtn-${i}" onclick="togglePlay(${i}, '${item.url}', ${item.seconds})">
+              <img src="../assets/icons/play.png" alt="Play"/>
+            </button>
             <div class="mini-progress-wrap">
               <div class="mini-progress-bar" onclick="seekTo(event, ${i}, ${item.seconds})">
                 <div class="mini-progress-fill" id="prog-${i}"></div>
@@ -480,8 +592,8 @@
         return;
       }
       stopActive(false);
-btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
-btn.disabled = true;
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.disabled  = true;
       try {
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') await ctx.resume();
@@ -508,7 +620,7 @@ btn.disabled = true;
         activeSource = source;
         activeGain   = gain;
         activeCard   = idx;
-btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
         btn.classList.add('playing');
         btn.disabled = false;
         const startTime = ctx.currentTime;
@@ -527,8 +639,7 @@ btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
         }, 100);
       } catch (e) {
         console.error(e);
-if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
-        btn.disabled = false;
+        if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
         alert('No se pudo cargar este audio. Prueba con otro resultado.');
       }
     };
@@ -548,7 +659,7 @@ if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; b
         const btn  = document.getElementById(`playBtn-${activeCard}`);
         const prog = document.getElementById(`prog-${activeCard}`);
         const cur  = document.getElementById(`cur-${activeCard}`);
-if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+        if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
         if (!isPause) {
           if (prog) prog.style.width = '0%';
           if (cur)  cur.textContent  = '0:00';
@@ -568,12 +679,12 @@ if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; b
         if (ctx.state === 'suspended') await ctx.resume();
         const res = await fetch(url);
         if (!res.ok) throw new Error('fetch error');
-        const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+        const buf     = await ctx.decodeAudioData(await res.arrayBuffer());
         const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 2);
         const startAt  = buf.duration > 30 ? Math.min(maxStart, buf.duration * 0.15) : 0;
-        const dur = Math.min(CLIP_DURATION, buf.duration - startAt);
-        const offCtx = new OfflineAudioContext(1, Math.floor(dur * 44100), 44100);
-        const src = offCtx.createBufferSource();
+        const dur      = Math.min(CLIP_DURATION, buf.duration - startAt);
+        const offCtx   = new OfflineAudioContext(1, Math.floor(dur * 44100), 44100);
+        const src      = offCtx.createBufferSource();
         src.buffer = buf;
         const gain = offCtx.createGain();
         gain.gain.setValueAtTime(0, 0);
@@ -583,14 +694,13 @@ if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; b
         src.connect(gain); gain.connect(offCtx.destination);
         src.start(0, startAt, dur);
         const rendered = await offCtx.startRendering();
-        const mp3Data = encodeToMP3(rendered);
-        const blob = new Blob(mp3Data, { type: 'audio/mp3' });
-        const album = unescape(albumEsc);
-        const title = unescape(titleEsc);
+        const mp3Data  = encodeToMP3(rendered);
+        const blob     = new Blob(mp3Data, { type: 'audio/mp3' });
+        const album    = unescape(albumEsc);
         const filename = `${cleanAlbumForFilename(album)} [Omnibites].mp3`
           .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
+        a.href     = URL.createObjectURL(blob);
         a.download = filename;
         a.click();
         URL.revokeObjectURL(a.href);
@@ -603,16 +713,16 @@ if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; b
 
     function encodeToMP3(audioBuffer) {
       const sampleRate = audioBuffer.sampleRate;
-      const samples = audioBuffer.getChannelData(0);
-      const mp3enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
-      const blockSize = 1152;
-      const mp3Data = [];
-      const int16 = new Int16Array(samples.length);
+      const samples    = audioBuffer.getChannelData(0);
+      const mp3enc     = new lamejs.Mp3Encoder(1, sampleRate, 128);
+      const blockSize  = 1152;
+      const mp3Data    = [];
+      const int16      = new Int16Array(samples.length);
       for (let i = 0; i < samples.length; i++) {
         int16[i] = Math.max(-32768, Math.min(32767, samples[i] * 32767));
       }
       for (let i = 0; i < int16.length; i += blockSize) {
-        const chunk = int16.subarray(i, i + blockSize);
+        const chunk   = int16.subarray(i, i + blockSize);
         const encoded = mp3enc.encodeBuffer(chunk);
         if (encoded.length > 0) mp3Data.push(new Uint8Array(encoded));
       }
@@ -621,31 +731,29 @@ if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; b
       return mp3Data;
     }
 
-window.compartir = function(idx, url, titleEsc, albumEsc) {
-  const title = unescape(titleEsc);
-  const album = unescape(albumEsc);
-  const item  = window._items?.[idx];
-  const start = Math.round(playbackStarts[idx] ?? 0);
-  const totalDur = item?.seconds || (start + 15);
-  const end = Math.round(Math.min(start + 15, totalDur));
-  const params = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
-  window.location.href = `subir.html?${params.toString()}`;
-};
+    window.compartir = function(idx, url, titleEsc, albumEsc) {
+      const title    = unescape(titleEsc);
+      const album    = unescape(albumEsc);
+      const item     = window._items?.[idx];
+      const start    = Math.round(playbackStarts[idx] ?? 0);
+      const totalDur = item?.seconds || (start + 15);
+      const end      = Math.round(Math.min(start + 15, totalDur));
+      const params   = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
+      window.location.href = `subir.html?${params.toString()}`;
+    };
 
+    // ── Sugerencias relacionadas ──
     const RELATED_GAMES = {
       'star fox':      ['Star Fox 64', 'Star Fox Adventures', 'Star Fox Command', 'Star Fox Zero'],
       'mario':         ['Super Mario 64', 'Mario Kart 64', 'Paper Mario', 'Mario Galaxy', 'Mario Odyssey'],
       'zelda':         ["Zelda: Majora's Mask", 'Zelda: Wind Waker', 'Zelda: Twilight Princess', 'Zelda: Skyward Sword'],
       'sonic':         ['Sonic Adventure', 'Sonic Adventure 2', 'Sonic Heroes', 'Sonic Rush'],
       'metroid':       ['Metroid Fusion', 'Metroid Zero Mission', 'Metroid Prime 2', 'Metroid Prime 3'],
-      'pokemon':       ['Pokemon Gold Silver', 'Pokemon Ruby Sapphire', 'Pokemon Diamond Pearl', 'Pokemon HeartGold'],
-      'kirby':         ['Kirby Super Star', 'Kirby 64', 'Kirby Amazing Mirror', 'Kirby Canvas Curse'],
-      'donkey':        ['Donkey Kong Country 2', 'Donkey Kong Country 3', 'DK64'],
+      'pokemon':       ['Pokemon Gold Silver', 'Pokemon Ruby Sapphire', 'Pokemon Diamond Pearl'],
+      'kirby':         ['Kirby Super Star', 'Kirby 64', 'Kirby Amazing Mirror'],
       'mega man':      ['Mega Man X2', 'Mega Man X3', 'Mega Man Zero', 'Mega Man Battle Network'],
-      'castlevania':   ['Castlevania Symphony of the Night', 'Castlevania Circle of the Moon', 'Castlevania Aria of Sorrow'],
+      'castlevania':   ['Castlevania Symphony of the Night', 'Castlevania Circle of the Moon'],
       'final fantasy': ['Final Fantasy VI', 'Final Fantasy VIII', 'Final Fantasy IX', 'Final Fantasy X'],
-      'f-zero':        ['F-Zero X', 'F-Zero GX', 'F-Zero Maximum Velocity'],
-      'fire emblem':   ['Fire Emblem Sacred Stones', 'Fire Emblem Path of Radiance', 'Fire Emblem Awakening'],
     };
 
     function showRelatedSuggestions(query) {
@@ -658,21 +766,18 @@ window.compartir = function(idx, url, titleEsc, albumEsc) {
           break;
         }
       }
-      if (related.length === 0) {
-        related = ["Super Smash Bros Melee", 'Metroid Prime', 'Pikmin', "Luigi's Mansion", 'Animal Crossing'];
+      if (!related.length) {
+        related = ['Super Smash Bros Melee', 'Metroid Prime', 'Pikmin', "Luigi's Mansion", 'Animal Crossing'];
       }
       wrap.style.display = 'block';
       wrap.innerHTML = `
         <strong>Búsquedas relacionadas:</strong><br/>
         ${related.slice(0, 5).map(g =>
           `<span class="related-chip" onclick="quickSearch('${g}')">${g}</span>`
-        ).join('')}
-      `;
+        ).join('')}`;
     }
 
-    function updateSearchHints(query) {
-      showRelatedSuggestions(query);
-    }
+    function updateSearchHints(query) { showRelatedSuggestions(query); }
 
     function showLoading() {
       document.getElementById('resultsHeader').style.display = 'none';
@@ -681,53 +786,49 @@ window.compartir = function(idx, url, titleEsc, albumEsc) {
       document.getElementById('stateMsg').innerHTML = `
         <div class="spinner"></div>
         <p>Buscando en Archive.org...</p>
-        <small>Esto puede tardar unos segundos</small>
-      `;
+        <small>Esto puede tardar unos segundos</small>`;
     }
     function showEmpty(q) {
       document.getElementById('stateMsg').innerHTML = `
         <div class="emoji">😔</div>
         <p>No encontramos audios para "<strong>${q}</strong>"</p>
-        <small>Prueba con el nombre en inglés o solo el nombre del juego</small>
-      `;
+        <small>Prueba con el nombre en inglés o solo el nombre del juego</small>`;
       document.getElementById('stateMsg').style.display = 'block';
     }
     function showError() {
       document.getElementById('stateMsg').innerHTML = `
         <div class="emoji">⚠️</div>
         <p>Error de conexión con Archive.org</p>
-        <small>Verifica tu internet e inténtalo de nuevo</small>
-      `;
+        <small>Verifica tu internet e inténtalo de nuevo</small>`;
     }
 
     function formatTime(s) {
       if (!s || isNaN(s)) return '0:00';
-      const m   = Math.floor(s / 60);
-      const sec = Math.floor(s % 60).toString().padStart(2,'0');
-      return `${m}:${sec}`;
+      return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2,'0')}`;
     }
 
     function doSearch() {
-      const q = document.getElementById('searchInput').value.trim();
+      const q = searchInput.value.trim();
       if (!q) return;
+      sugBox.style.display = 'none'; // cierra autocomplete al buscar
       stopActive();
       document.getElementById('relatedWrap').style.display = 'none';
       searchArchive(q);
     }
 
     window.quickSearch = function(q) {
-      document.getElementById('searchInput').value = q;
+      searchInput.value = q;
       doSearch();
     };
 
     document.getElementById('searchBtn').addEventListener('click', doSearch);
-    document.getElementById('searchInput').addEventListener('keydown', e => {
+    searchInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') doSearch();
     });
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('q')) {
-      document.getElementById('searchInput').value = urlParams.get('q');
+      searchInput.value = urlParams.get('q');
       doSearch();
     }
   </script>
