@@ -48,6 +48,10 @@
     .juego-sug-item { padding:.6rem .9rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;transition:background .15s; }
     .juego-sug-item:hover { background:var(--bg3); }
     .juego-sug-item:last-child { border-bottom:none; }
+
+    .editor-box.locked #trimContent { opacity: .35; pointer-events: none; filter: grayscale(60%); }
+.lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
+.editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -301,19 +305,20 @@ function prefillFromURL() {
       audioPlayer.src = url;
       audioPlayer.load();
       audioPlayer.onloadedmetadata = () => {
-        const dur = audioPlayer.duration;
-        let start = Math.max(0, startHint);
-        let end   = Math.min(endHint, dur);
-        if (end - start < 10) end   = Math.min(start + 15, dur);
-        if (end - start < 10) start = Math.max(0, end - 10);
-        setupTrimSlider(dur, start, end);
-        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra los handles para marcar el clip (10–15 seg)`;
-        document.getElementById('previewSection').style.display = 'block';
-      };
+  const dur = audioPlayer.duration;
+  let start = Math.max(0, startHint);
+  let end   = Math.min(endHint, dur);
+  if (end - start < 10) end   = Math.min(start + 15, dur);
+  if (end - start < 10) start = Math.max(0, end - 10);
+  setupTrimSlider(dur, start, end);
+  document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra los handles para marcar el clip (10–15 seg)`;
+  document.getElementById('previewSection').classList.remove('locked'); // ← desbloquea
+};
       audioPlayer.onerror = () => {
-        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
-        errEl.style.display = 'block';
-      };
+  errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
+  errEl.style.display = 'block';
+  document.getElementById('previewSection').classList.add('locked'); // ← re-bloquea
+};
     }
 
     // ════════════════════════════════════════════
