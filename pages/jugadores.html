@@ -96,8 +96,10 @@
   <main class="players-page">
     <h1>Jugadores</h1>
     <div class="players-search">
-      <input type="text" id="searchInput" placeholder="Buscar jugador por nombre..."/>
-      <button class="btn-primary" id="searchBtn" style="background:var(--cyan);color:#000">Buscar</button>
+  <input type="text" id="searchInput" placeholder="Buscar jugador por nombre..."/>
+  <button class="players-search-btn" id="searchBtn" title="Buscar">
+    <img src="../assets/icons/search.png" alt="Buscar"/>
+  </button>
     </div>
     <div id="playersGrid" class="players-grid">
       <div class="state-msg" style="grid-column:1/-1">
@@ -127,8 +129,8 @@
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let allPlayers = [];
-    let audioCountMap = {};
-
+let audioCountMap = {};
+let loveCountMap  = {};   // ← añade esta línea
     async function loadPlayers() {
       try {
         const [usersSnap, audiosSnap] = await Promise.all([
@@ -138,15 +140,20 @@
 
         // Contar audios por usuario
         audiosSnap.docs.forEach(d => {
-          const uid = d.data().autorId;
-          if (uid) audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
-        });
+  const uid  = d.data().autorId;
+  const love = d.data().reactions?.love || 0;
+  if (uid) {
+    audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+    loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
+  }
+});
 
         allPlayers = usersSnap.docs.map(d => ({
-          uid: d.id,
-          ...d.data(),
-          audios: audioCountMap[d.id] || 0
-        }));
+  uid: d.id,
+  ...d.data(),
+  audios: audioCountMap[d.id] || 0,
+  love:   loveCountMap[d.id]  || 0   // ← añade esta línea
+}));
 
         render('');
       } catch(e) {
@@ -181,10 +188,22 @@
           <a class="player-card" href="jugador.html?uid=${p.uid}">
             ${avatarHTML}
             <div class="player-name">${name}</div>
-            <div class="player-stats">
-              <span><strong>${p.audios}</strong>Soundbites</span>
-              <span><strong>${favs}</strong>Favoritos</span>
-            </div>
+<div class="player-stats">
+  <div class="player-stat-item">
+    <img src="../assets/icons/soundbite.png" alt="Soundbites"/>
+    <strong>${p.audios}</strong>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="player-stat-item">
+    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <strong>${p.love}</strong>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="player-stat-item">
+    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
+    <strong>${favs}</strong>
+  </div>
+</div>
           </a>`;
       }).join('');
     }
