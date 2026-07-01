@@ -555,3 +555,44 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 /* ── SB CARD inline tag ── */
 .sb-tag-inline{font-size:.65rem;font-weight:600;color:var(--neon);text-transform:uppercase;letter-spacing:.4px;}
 .sb-dot{color:var(--border);margin:0 .2rem;}
+
+/* ── STAT CARD ÚNICA CON ICONOS ── */
+.pstat-single {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 1.25rem;
+  gap: .5rem;
+}
+.pstat-item {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  flex-shrink: 0;
+}
+.pstat-item img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: .85;
+}
+.pstat-item strong {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neon);
+}
+.pstat-item span {
+  font-size: .72rem;
+  color: var(--text-dim);
+}
+.pstat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}

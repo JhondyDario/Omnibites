@@ -34,10 +34,18 @@
 
   <div class="com-header">
     <h1>Soundbites de la Comunidad</h1>
-    <div class="com-search">
-      <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."/>
-      <button class="btn-primary" id="searchBtn">Buscar</button>
-    </div>
+<div class="com-search">
+  <div style="position:relative;flex:1">
+    <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."
+      style="width:100%;padding-right:3rem"/>
+    <button id="searchBtn" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;padding:.25rem;opacity:.55;
+      display:flex;align-items:center;justify-content:center;transition:opacity .2s"
+      onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.55'">
+      <img src="../assets/icons/search.png" style="width:35px;height:35px;object-fit:contain"/>
+    </button>
+  </div>
+</div>
   </div>
 
   <div class="filters">
@@ -479,6 +487,7 @@ window.playSB = async function(id, url, ts, te){
 
     document.getElementById('searchBtn').addEventListener('click', render);
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') render(); });
+  document.getElementById('searchInput').addEventListener('input', render);
     document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; render(); });
     document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; render(); });
     document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; render(); });
