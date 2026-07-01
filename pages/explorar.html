@@ -330,6 +330,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
+    import { buildMp3Blob } from '../js/id3-cover.js';
     import { auth } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -694,8 +695,10 @@
         src.connect(gain); gain.connect(offCtx.destination);
         src.start(0, startAt, dur);
         const rendered = await offCtx.startRendering();
-        const mp3Data  = encodeToMP3(rendered);
-        const blob     = new Blob(mp3Data, { type: 'audio/mp3' });
+const mp3Data  = encodeToMP3(rendered);
+const item     = window._items?.[idx];
+const imgUrl   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
+const blob     = await buildMp3Blob(mp3Data, imgUrl);
         const album    = unescape(albumEsc);
         const filename = `${cleanAlbumForFilename(album)} [Omnibites].mp3`
           .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
@@ -731,16 +734,17 @@
       return mp3Data;
     }
 
-    window.compartir = function(idx, url, titleEsc, albumEsc) {
-      const title    = unescape(titleEsc);
-      const album    = unescape(albumEsc);
-      const item     = window._items?.[idx];
-      const start    = Math.round(playbackStarts[idx] ?? 0);
-      const totalDur = item?.seconds || (start + 15);
-      const end      = Math.round(Math.min(start + 15, totalDur));
-      const params   = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end });
-      window.location.href = `subir.html?${params.toString()}`;
-    };
+window.compartir = function(idx, url, titleEsc, albumEsc) {
+  const title    = unescape(titleEsc);
+  const album    = unescape(albumEsc);
+  const item     = window._items?.[idx];
+  const start    = Math.round(playbackStarts[idx] ?? 0);
+  const totalDur = item?.seconds || (start + 15);
+  const end      = Math.round(Math.min(start + 15, totalDur));
+  const imagen   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
+  const params   = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end, imagen });
+  window.location.href = `subir.html?${params.toString()}`;
+};
 
     // ── Sugerencias relacionadas ──
     const RELATED_GAMES = {
