@@ -118,6 +118,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 <script type="module">
+  import { buildMp3Blob } from '../js/id3-cover.js';
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
@@ -165,13 +166,20 @@
       grid.innerHTML = items.map(a => sbCard(a)).join('');
     }
 
-    function sbCard(a) {
-      const r = a.reactions || { love:0, meh:0 };
-      return `
-        <div class="sb-card" id="card-${a.id}">
+function sbCard(a) {
+  const r = a.reactions || { love:0, meh:0 };
+  const imgSrc = a.imagen || `${ROOT}/assets/avatars/avatar0.png`;
+  return `
+    <div class="sb-card" id="card-${a.id}">
+      <div class="sb-head">
+        <img class="sb-thumb" src="${imgSrc}" alt="" loading="lazy"
+             onerror="this.onerror=null;this.src='${ROOT}/assets/avatars/avatar0.png'"/>
+        <div class="sb-head-info">
           <div class="sb-title">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
           <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
-          <div class="sb-player">
+        </div>
+      </div>
+      <div class="sb-player">
 <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">
   <img src="../assets/icons/play.png" alt="Play"/>
 </button>
@@ -195,8 +203,8 @@
               <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
   <img src="../assets/reactions/fav.png" alt="Favorito"/>
 </button>
-<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
-  <img src="../assets/reactions/download.png" alt="Descargar"/>
+<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}','${(a.imagen||'').replace(/'/g,'')}')" title="Descargar">
+<img src="../assets/reactions/download.png" alt="Descargar"/>
 </button>
             </div>
           </div>
@@ -458,7 +466,7 @@ window.playSB = async function(id, url, ts, te){
         }
         const end = enc.flush();
         if(end.length>0) mp3.push(new Uint8Array(end));
-        const blob = new Blob(mp3, {type:'audio/mpeg'});
+  const blob = await buildMp3Blob(mp3, imagen);
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `${titulo.slice(0,50)} [Omnibites].mp3`.replace(/[<>:"/\\|?*]/g,'');
