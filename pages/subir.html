@@ -534,16 +534,37 @@ sugBox.innerHTML = results.map(g => `
   juegoInput.value   = game.name;
   sugBox.style.display = 'none';
   juegoConfirmado    = true;
-  imagenFromRawg     = resizeRawgImage(game.background_image);
+  imagenFromRawg     = resizeRawgImage(game.background_image); // ← esto sigue siendo lo que se guarda en Firestore
 
   const imgWrap = document.getElementById('juegoImgWrap');
   const imgEl   = document.getElementById('juegoImg');
   if (game.background_image) {
-    imgEl.src = imagenFromRawg || game.background_image;
+    imgEl.onerror = () => { imgWrap.style.display = 'none'; };
+    imgEl.src = game.background_image; // ← usar la original acá, no la redimensionada
     imgWrap.style.display = 'block';
   } else {
     imgWrap.style.display = 'none';
   }
+
+  // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
+  const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
+  let matched = null;
+  for (const p of platforms) {
+    const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
+    if (key) { matched = PLATFORM_MAP[key]; break; }
+  }
+
+  const consolaSelect = document.getElementById('consola');
+  if (matched) {
+    consolaSelect.value = matched;
+    juegoHint.className  = 'juego-lock-hint ok';
+    juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
+  } else {
+    consolaSelect.value  = 'Otra';
+    juegoHint.className  = 'juego-lock-hint ok';
+    juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
+  }
+}
       
       // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
       const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
