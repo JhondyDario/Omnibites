@@ -174,22 +174,22 @@
           </div>
           <div class="sb-footer">
             <div class="sb-reactions">
-              <button class="icon-btn" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
-                <img src="../assets/reactions/love.png" alt="Me encanta"/>
-                <span class="icon-count">${r.love||0}</span>
-              </button>
-              <button class="icon-btn" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
-                <img src="../assets/reactions/meh.png" alt="Regular"/>
-                <span class="icon-count">${r.meh||0}</span>
-              </button>
+              <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
+  <img src="../assets/reactions/love.png" alt="Me encanta"/>
+  <span class="icon-count">${r.love||0}</span>
+</button>
+<button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
+  <img src="../assets/reactions/meh.png" alt="Regular"/>
+  <span class="icon-count">${r.meh||0}</span>
+</button>
             </div>
             <div class="sb-actions">
-              <button class="icon-btn" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-                <img src="../assets/reactions/fav.png" alt="Favorito"/>
-              </button>
-              <button class="icon-btn" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
-                <img src="../assets/reactions/download.png" alt="Descargar"/>
-              </button>
+              <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+  <img src="../assets/reactions/fav.png" alt="Favorito"/>
+</button>
+<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}')" title="Descargar">
+  <img src="../assets/reactions/download.png" alt="Descargar"/>
+</button>
             </div>
           </div>
         </div>`;
@@ -288,64 +288,132 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-    let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null;
-    const CLIP=15,FADE=2;
+let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
+  const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-function stopSB(){
-  if(activeSource){try{activeGain.gain.cancelScheduledValues(audioCtx.currentTime);activeGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);activeSource.stop(audioCtx.currentTime+.3);}catch{}activeSource=activeGain=null;}
+function stopSB(isPause=false){
+  playToken++;
+  if(activeSource){
+    try{
+      // activeSource ahora es un HTMLAudioElement, no un AudioBufferSourceNode
+      if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
+      activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      // Pausar el <audio> 150ms después del fade
+      const elAudio = activeSource;
+      setTimeout(() => { try{ elAudio.pause(); }catch{} }, 150);
+    }catch{}
+    activeSource = activeGain = null;
+  }
   clearInterval(progIv);
   if(activeSBId){
-    const b=document.getElementById(`sbplay-${activeSBId}`);
-    if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.classList.remove('playing');b.disabled=false;}
-    const p=document.getElementById(`sbprog-${activeSBId}`);
-    if(p)p.style.width='0%';
+    const b = document.getElementById(`sbplay-${activeSBId}`);
+    if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.classList.remove('playing'); b.disabled=false; }
+    if(!isPause){
+      const p = document.getElementById(`sbprog-${activeSBId}`);
+      if(p) p.style.width='0%';
+      const c = document.getElementById(`sbcur-${activeSBId}`);
+      if(c) c.textContent='0:00';
+      pausedAt = 0;
+    }
   }
-  activeSBId=null;
+  activeSBId = null;
 }
 
-    window.playSB=async function(id,url,ts,te){
-      if(activeSBId===id){stopSB();return;}
-      stopSB();
-      const btn=document.getElementById(`sbplay-${id}`);
-      if(!btn)return;
-btn.innerHTML='<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';btn.disabled=true;
-      try{
-        const ctx=getCtx();if(ctx.state==='suspended')await ctx.resume();
-        const res=await fetch(url);if(!res.ok)throw new Error('fetch');
-        const buf=await ctx.decodeAudioData(await res.arrayBuffer());
-        const start=Math.min(ts||0,buf.duration-1);
-        const dur=Math.min((te||15)-(ts||0),CLIP,buf.duration-start);
-        const source=ctx.createBufferSource();source.buffer=buf;
-        const gain=ctx.createGain();
-        gain.gain.setValueAtTime(0,ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(1,ctx.currentTime+FADE);
-        gain.gain.setValueAtTime(1,ctx.currentTime+dur-FADE);
-        gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
-        source.connect(gain);gain.connect(ctx.destination);
-        source.start(0,start,dur);
-        source.onended=()=>{if(activeSBId===id)stopSB();};
-        activeSource=source;activeGain=gain;activeSBId=id;
-        btn.innerHTML='<img src="../assets/icons/pause.png" alt="Pause"/>';
-        btn.classList.add('playing');btn.disabled=false;
-        const t0=ctx.currentTime;
-        progIv=setInterval(()=>{
-          const el=ctx.currentTime-t0;
-          const p=document.getElementById(`sbprog-${id}`);
-          const c=document.getElementById(`sbcur-${id}`);
-          if(p)p.style.width=(Math.min(el,dur)/dur*100)+'%';
-          if(c)c.textContent=fmt(el);
-          if(el>=dur)clearInterval(progIv);
-        },100);
-}catch(e){
-  const b=document.getElementById(`sbplay-${id}`);
-  if(b){b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>';b.style.background='var(--danger)';b.disabled=false;}
-  setTimeout(()=>{
-    const b=document.getElementById(`sbplay-${id}`);
-    if(b){b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>';b.style.background='';b.disabled=false;}
-  },3000);
-}
-    };
-
+window.playSB = async function(id, url, ts, te){
+  if(activeSBId === id){
+    pausedAt    = lastElapsed;
+    pausedSBId  = id;
+    stopSB(true);
+    return;
+  }
+  const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
+  pausedSBId = null;
+  stopSB();
+ 
+  const myToken = ++playToken;
+  const btn = document.getElementById(`sbplay-${id}`);
+  if(!btn) return;
+ 
+  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+  btn.disabled  = true;
+ 
+  try{
+    const ctx = getCtx();
+    if(ctx.state === 'suspended') await ctx.resume();
+ 
+    // ── Streaming: usa HTMLAudioElement en vez de fetch+decodeAudioData ──
+    // El navegador descarga por partes, no espera el archivo completo
+    const audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.preload     = 'auto';
+    audioEl.src         = url;
+ 
+    await new Promise((resolve, reject) => {
+      audioEl.addEventListener('loadedmetadata', resolve, { once:true });
+      audioEl.addEventListener('error',          reject,  { once:true });
+    });
+ 
+    if(myToken !== playToken){
+      btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
+      return;
+    }
+ 
+    const baseStart     = Math.min(ts || 0, audioEl.duration - 1);
+    const dur           = Math.min((te || 15) - (ts || 0), CLIP, audioEl.duration - baseStart);
+    const safeResume    = Math.min(resumeOffset, dur - 0.1);
+    audioEl.currentTime = baseStart + safeResume;
+ 
+    const source    = ctx.createMediaElementSource(audioEl);
+    const gain      = ctx.createGain();
+    const remaining = dur - safeResume;
+ 
+    // Fade in / fade out
+    gain.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
+    if(safeResume < FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
+    gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+ 
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    await audioEl.play();
+ 
+    activeSource = audioEl;
+    activeGain   = gain;
+    activeSBId   = id;
+    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+    btn.classList.add('playing'); btn.disabled = false;
+ 
+    // Parar automáticamente al terminar el clip
+    const endTimeout = setTimeout(() => {
+      if(activeSBId === id && myToken === playToken) stopSB();
+    }, remaining * 1000);
+    activeSource._endTimeout = endTimeout;
+ 
+    // Barra de progreso
+    const t0 = ctx.currentTime;
+    progIv = setInterval(() => {
+      if(myToken !== playToken){ clearInterval(progIv); return; }
+      const el = safeResume + (ctx.currentTime - t0);
+      lastElapsed = el;
+      const p = document.getElementById(`sbprog-${id}`);
+      const c = document.getElementById(`sbcur-${id}`);
+      if(p) p.style.width = (Math.min(el, dur) / dur * 100) + '%';
+      if(c) c.textContent = fmt(el);
+      if(el >= dur) clearInterval(progIv);
+    }, 100);
+ 
+  }catch(e){
+    if(myToken !== playToken) return;
+    const b = document.getElementById(`sbplay-${id}`);
+    if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
+    setTimeout(() => {
+      const b = document.getElementById(`sbplay-${id}`);
+      if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
+    }, 3000);
+  }
+};
+  
     window.dlSB=async function(url,titulo){
       const btn = event?.target?.closest('.icon-btn');
       if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity='.3'; btn.disabled=true; }

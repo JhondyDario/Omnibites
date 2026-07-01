@@ -203,6 +203,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .btn-card-green  {background:var(--neon);  color:#000;}
 .btn-card-purple {background:var(--purple); color:#000;}
 .btn-card-gold   {background:var(--gold);   color:#000;}
+.btn-card-cyan{background:var(--cyan);color:#000;}
+.action-card:has(.btn-card-cyan):hover{border-color:var(--cyan);}
 
 /* ── SOUNDBITE CARD ── */
 .sb-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:border-color .2s,transform .2s;}
@@ -220,7 +222,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   border-radius:50%;
 }
 .sb-play img.loading-icon{
-  animation:spin .16s linear infinite;
+  animation:spin 0.8s linear infinite;
 }
 .sb-play.playing{
   background:var(--purple);
@@ -260,16 +262,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   white-space: nowrap;
   flex-shrink: 0;
 }
+
 .icon-btn img {
   width: 26px;
   height: 26px;
   display: block;
   object-fit: contain;
-  opacity: .45;
-  transition: opacity .2s, filter .2s;
-  filter: grayscale(1);
+  opacity: .85;
+  transition: opacity .2s, filter .2s, border-color .2s;
 }
-.icon-btn:hover img { opacity: .75; filter: grayscale(0); }
 .icon-btn .icon-count {
   font-size: .72rem;
   font-weight: 600;
@@ -279,23 +280,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   text-align: left;
 }
 
-/* Estados activos por tipo */
-.icon-btn.active-love { border-color: var(--neon); background: rgba(74,222,128,.07); }
-.icon-btn.active-love img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--neon)); }
-.icon-btn.active-love .icon-count { color: var(--neon); }
+/* ── LOVE (rojo) ── */
+.icon-btn-love:hover { border-color: var(--danger); background: rgba(248,113,113,.07); }
+.icon-btn-love:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--danger)); }
+.icon-btn-love.active-love { border-color: var(--danger); background: rgba(248,113,113,.07); }
+.icon-btn-love.active-love img { opacity: 1; filter: drop-shadow(0 0 4px var(--danger)); }
+.icon-btn-love.active-love .icon-count { color: var(--danger); }
 
-.icon-btn.active-meh { border-color: var(--gold); background: rgba(251,191,36,.07); }
-.icon-btn.active-meh img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--gold)); }
-.icon-btn.active-meh .icon-count { color: var(--gold); }
+/* ── MEH (morado) ── */
+.icon-btn-meh:hover { border-color: var(--purple); background: rgba(167,139,250,.07); }
+.icon-btn-meh:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--purple)); }
+.icon-btn-meh.active-meh { border-color: var(--purple); background: rgba(167,139,250,.07); }
+.icon-btn-meh.active-meh img { opacity: 1; filter: drop-shadow(0 0 4px var(--purple)); }
+.icon-btn-meh.active-meh .icon-count { color: var(--purple); }
 
-.icon-btn.active-fav { border-color: var(--gold); background: rgba(251,191,36,.07); }
-.icon-btn.active-fav img { opacity: 1; filter: grayscale(0) drop-shadow(0 0 4px var(--gold)); }
+/* ── FAVORITO (dorado) ── */
+.icon-btn-fav:hover { border-color: var(--gold); background: rgba(251,191,36,.07); }
+.icon-btn-fav:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--gold)); }
+.icon-btn-fav.active-fav { border-color: var(--gold); background: rgba(251,191,36,.07); }
+.icon-btn-fav.active-fav img { opacity: 1; filter: drop-shadow(0 0 4px var(--gold)); }
 
-.icon-btn.active-dl  { border-color: var(--cyan); }
-.icon-btn.active-dl img { opacity: 1; filter: grayscale(0); }
-
-.icon-btn.icon-danger:hover { border-color: var(--danger); }
-.icon-btn.icon-danger:hover img { filter: grayscale(0) drop-shadow(0 0 3px var(--danger)); opacity: 1; }
+/* ── DESCARGAR (cyan, solo mientras descarga) ── */
+.icon-btn-dl:hover { border-color: var(--cyan); }
+.icon-btn-dl:hover img { opacity: 1; }
+.icon-btn-dl.active-dl { border-color: var(--cyan); background: rgba(103,232,249,.07); }
+.icon-btn-dl.active-dl img { opacity: 1; filter: drop-shadow(0 0 4px var(--cyan)); } 
 
 /* Tamaño mobile */
 @media(max-width: 480px) {
@@ -403,7 +412,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .related-chip:hover{background:rgba(74,222,128,.07);border-color:var(--neon);}
 .state-msg{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
 .state-msg p{font-size:.9rem;margin-bottom:.5rem;}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── COMUNIDAD ── */
@@ -509,6 +518,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   .action-card{flex-direction:column;align-items:center;text-align:center;gap:1rem;}
   .action-card-body{text-align:center;}
   .action-card-btn{width:100%;justify-content:center;}
+}
+@media(max-width:768px){
+  .filters{
+    flex-direction:column;
+    align-items:stretch;
+    gap:.75rem;
+  }
+  .filter-group{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:.3rem;
+    width:100%;
+    margin-left:0 !important;
+  }
+  .filter-group label{
+    font-size:.72rem;
+  }
+  .filters select{
+    width:100%;
+  }
 }
 @media(max-width:480px){
   .hero-title{font-size:1.75rem;}
