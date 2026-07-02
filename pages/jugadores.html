@@ -172,9 +172,10 @@
     import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let allPlayers = [];
+let allPlayers = [];
 let audioCountMap = {};
-let loveCountMap  = {};   // ← añade esta línea
+let loveCountMap  = {};
+let followersCountMap = {};
     async function loadPlayers() {
       try {
         const [usersSnap, audiosSnap] = await Promise.all([
@@ -192,11 +193,19 @@ let loveCountMap  = {};   // ← añade esta línea
   }
 });
 
-        allPlayers = usersSnap.docs.map(d => ({
+usersSnap.docs.forEach(d => {
+  const sig = d.data().siguiendo || [];
+  sig.forEach(uidSeguido => {
+    followersCountMap[uidSeguido] = (followersCountMap[uidSeguido] || 0) + 1;
+  });
+});
+
+allPlayers = usersSnap.docs.map(d => ({
   uid: d.id,
   ...d.data(),
   audios: audioCountMap[d.id] || 0,
-  love:   loveCountMap[d.id]  || 0   // ← añade esta línea
+  love:   loveCountMap[d.id]  || 0,
+  seguidores: followersCountMap[d.id] || 0
 }));
 
         render('');
@@ -242,10 +251,15 @@ let loveCountMap  = {};   // ← añade esta línea
     <img src="../assets/reactions/love.png" alt="Me encanta"/>
     <strong>${p.love}</strong>
   </div>
-  <div class="pstat-divider"></div>
+<div class="pstat-divider"></div>
   <div class="player-stat-item">
     <img src="../assets/reactions/fav.png" alt="Favoritos"/>
     <strong>${favs}</strong>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="player-stat-item">
+    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <strong>${p.seguidores}</strong>
   </div>
 </div>
           </a>`;
