@@ -4,6 +4,11 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <meta property="og:title" content="Omnibites — Soundbites de Videojuegos"/>
+<meta property="og:description" content="Escucha, descarga y comenta soundbites de tus juegos favoritos."/>
+<meta property="og:image" content="https://jhondydario.github.io/Omnibites/assets/og-banner.png"/>
+<meta property="og:url" content="https://jhondydario.github.io/Omnibites/pages/soundbite.html"/>
+<meta property="og:type" content="website"/>
   <title>Soundbite — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -52,6 +57,9 @@
     @media(max-width:420px){
       .sb-detail-img-row{flex-direction:column;}
     }
+
+    .icon-btn-report:hover{border-color:var(--danger);background:rgba(248,113,113,.07);}
+.icon-btn-report:hover img{opacity:1;filter:drop-shadow(0 0 4px var(--danger));}
   </style>
 </head>
 <body>
@@ -146,6 +154,9 @@
         <button class="icon-btn" id="shareBtn" title="Compartir">
           <img src="../assets/icons/share.png" alt="Compartir"/>
         </button>
+        <button class="icon-btn icon-btn-report" id="reportBtn" title="Reportar">
+          <img src="../assets/icons/report.png" alt="Reportar"/>
+        </button>
       </div>
 
       <div class="sbox" id="descBox" style="display:none">
@@ -234,7 +245,10 @@
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('sbMain').style.display = 'block';
       document.title = `${sbData.titulo || 'Soundbite'} — Omnibites`;
-
+      document.querySelector('meta[property="og:title"]')?.setAttribute('content', sbData.titulo || 'Soundbite');
+document.querySelector('meta[property="og:description"]')?.setAttribute('content', `${sbData.juego || ''} · Subido por ${sbData.autorNombre || 'Anónimo'}`);
+if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttribute('content', sbData.imagen);
+      
       const img = document.getElementById('sbImage');
       img.src = sbData.imagen || `${ROOT}/assets/avatars/avatar0.png`;
       img.onerror = function() { this.onerror = null; this.src = `${ROOT}/assets/avatars/avatar0.png`; };
