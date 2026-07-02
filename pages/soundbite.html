@@ -9,16 +9,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     .sb-detail-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;}
-    .sb-detail-img-wrap{text-align:center;margin-bottom:1.5rem;}
-    .sb-detail-img{width:190px;height:190px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);}
+
+    .sb-detail-meta{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:.82rem;margin-bottom:1rem;flex-wrap:wrap;text-align:center;}
+    .sb-meta-autor{color:var(--purple);font-weight:600;text-decoration:none;}
+    .sb-meta-autor:hover{text-decoration:underline;}
+    .sb-meta-neon{color:var(--neon);font-weight:600;}
+    .sb-meta-dot{color:var(--border);}
+
+    .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
+    .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;}
+    .edit-title-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);padding:.5rem 1rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:border-color .2s,color .2s;display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
+    .edit-title-btn:hover{border-color:var(--neon);color:var(--neon);}
+    .edit-title-btn img{width:16px;height:16px;object-fit:contain;}
+
     .sb-detail-header{text-align:center;margin-bottom:1.5rem;}
-    .sb-detail-header h1{font-family:var(--font-head);font-size:1.35rem;font-weight:700;margin-bottom:.4rem;}
-    .sb-detail-tag{font-size:.8rem;color:var(--text-dim);margin-bottom:.5rem;}
-    .sb-detail-author{font-size:.82rem;color:var(--text-dim);}
-    .sb-detail-author a{color:var(--purple);text-decoration:none;font-weight:600;}
+    .sb-detail-header h1{font-family:var(--font-head);font-size:1.35rem;font-weight:700;margin-bottom:.3rem;}
+    .sb-detail-juego{font-size:.8rem;color:var(--text-dim);}
+
+    .edit-title-form{display:none;flex-direction:column;gap:.5rem;max-width:380px;margin:0 auto 1.5rem;}
+    .edit-title-form input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.95rem;font-family:var(--font-body);outline:none;}
+    .edit-title-form input:focus{border-color:var(--neon);}
+    .edit-char-count{font-size:.7rem;color:var(--text-dim);text-align:right;}
+    .edit-title-actions{display:flex;gap:.5rem;justify-content:center;}
+
     .sb-detail-actions{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;}
     .sbox h2{font-family:var(--font-head);font-size:.9rem;font-weight:600;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px;}
     #sbDescripcion{font-size:.88rem;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+
     .comment-box textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.7rem .9rem;font-family:var(--font-body);font-size:.88rem;min-height:80px;resize:vertical;outline:none;margin-bottom:.75rem;}
     .comment-box textarea:focus{border-color:var(--neon);}
     .comment-item{background:var(--bg3);border-radius:8px;padding:.9rem 1rem;margin-bottom:.75rem;}
@@ -31,6 +48,10 @@
     .state-msg{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
     .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
     @keyframes spin{to{transform:rotate(360deg);}}
+
+    @media(max-width:420px){
+      .sb-detail-img-row{flex-direction:column;}
+    }
   </style>
 </head>
 <body>
@@ -71,14 +92,34 @@
     </div>
 
     <div id="sbMain" style="display:none">
-      <div class="sb-detail-img-wrap">
-        <img id="sbImage" class="sb-detail-img" src="" alt=""/>
+
+      <div class="sb-detail-meta">
+        <a id="sbAutorLink" class="sb-meta-autor" href="#"></a>
+        <span class="sb-meta-dot">·</span>
+        <span id="sbClasificacion" class="sb-meta-neon"></span>
+        <span class="sb-meta-dot">·</span>
+        <span id="sbConsolaMeta" class="sb-meta-neon"></span>
       </div>
 
-      <div class="sb-detail-header">
+      <div class="sb-detail-img-row">
+        <img id="sbImage" class="sb-detail-img" src="" alt=""/>
+        <button class="edit-title-btn" id="editTitleBtn" style="display:none">
+          <img src="../assets/icons/camera.png" alt=""/> Editar título
+        </button>
+      </div>
+
+      <div class="sb-detail-header" id="titleDisplay">
         <h1 id="sbTitulo"></h1>
-        <p class="sb-detail-tag" id="sbTagline"></p>
-        <p class="sb-detail-author">Subido por <a id="sbAutorLink" href="#"></a></p>
+        <p class="sb-detail-juego" id="sbJuego"></p>
+      </div>
+
+      <div class="edit-title-form" id="editTitleForm">
+        <input type="text" id="editTitleInput" maxlength="60"/>
+        <div class="edit-char-count" id="editCharCount">0/60</div>
+        <div class="edit-title-actions">
+          <button class="btn-primary" id="saveTitleBtn">Guardar</button>
+          <button class="btn-outline" id="cancelTitleBtn">Cancelar</button>
+        </div>
       </div>
 
       <div class="sb-player">
@@ -116,7 +157,7 @@
         <h2>Comentarios</h2>
         <div class="comment-box" id="commentForm" style="display:none">
           <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="300"></textarea>
-          <div class="comment-char-count" id="charCount">0/300</div>
+          <div class="comment-char-count" id="charCount">0/500</div>
           <button class="btn-primary" id="submitComment">Comentar</button>
         </div>
         <div class="note" id="loginPrompt" style="display:none">
@@ -167,7 +208,7 @@
       currentUser = user;
       document.getElementById('commentForm').style.display = user ? 'block' : 'none';
       document.getElementById('loginPrompt').style.display = user ? 'none' : 'block';
-      if (user && sbData) applyUserState();
+      if (sbData) updateEditButtonVisibility();
     });
 
     async function init() {
@@ -199,11 +240,14 @@
       img.onerror = function() { this.onerror = null; this.src = `${ROOT}/assets/avatars/avatar0.png`; };
 
       document.getElementById('sbTitulo').textContent = sbData.titulo || 'Sin título';
-      document.getElementById('sbTagline').textContent = `${sbData.juego || '—'} · ${sbData.consola || '—'} · ${sbData.categoria || 'soundbite'}`;
+      document.getElementById('sbJuego').textContent = sbData.juego || '';
 
       const autorLink = document.getElementById('sbAutorLink');
       autorLink.textContent = sbData.autorNombre || 'Anónimo';
       autorLink.href = `jugador.html?uid=${sbData.autorId || ''}`;
+
+      document.getElementById('sbClasificacion').textContent = sbData.categoria || 'soundbite';
+      document.getElementById('sbConsolaMeta').textContent = sbData.consola || '—';
 
       document.getElementById('sbTotal').textContent = sbData.duracion || '0:15';
 
@@ -216,7 +260,14 @@
         document.getElementById('descBox').style.display = 'block';
       }
 
+      updateEditButtonVisibility();
       if (currentUser) applyUserState();
+    }
+
+    function updateEditButtonVisibility() {
+      const btn = document.getElementById('editTitleBtn');
+      const isOwner = currentUser && sbData && currentUser.uid === sbData.autorId;
+      btn.style.display = isOwner ? 'flex' : 'none';
     }
 
     async function applyUserState() {
@@ -234,6 +285,47 @@
         }
       } catch {}
     }
+
+    // ── EDITAR TÍTULO ──
+    document.getElementById('editTitleBtn').addEventListener('click', () => {
+      document.getElementById('titleDisplay').style.display = 'none';
+      document.getElementById('editTitleForm').style.display = 'flex';
+      const input = document.getElementById('editTitleInput');
+      input.value = sbData.titulo || '';
+      document.getElementById('editCharCount').textContent = `${input.value.length}/60`;
+      input.focus();
+    });
+
+    document.getElementById('editTitleInput').addEventListener('input', e => {
+      document.getElementById('editCharCount').textContent = `${e.target.value.length}/60`;
+    });
+
+    document.getElementById('cancelTitleBtn').addEventListener('click', () => {
+      document.getElementById('editTitleForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'block';
+    });
+
+    document.getElementById('saveTitleBtn').addEventListener('click', async () => {
+      if (!currentUser || currentUser.uid !== sbData.autorId) return;
+      const nuevo = document.getElementById('editTitleInput').value.trim();
+      if (!nuevo) { window.showToast && window.showToast('El título no puede quedar vacío.', 'error'); return; }
+      if (nuevo.length > 60) { window.showToast && window.showToast('Máximo 60 caracteres.', 'error'); return; }
+      const btn = document.getElementById('saveTitleBtn');
+      btn.disabled = true; btn.textContent = 'Guardando...';
+      try {
+        await updateDoc(doc(db,'audios',sbId), { titulo: nuevo });
+        sbData.titulo = nuevo;
+        document.getElementById('sbTitulo').textContent = nuevo;
+        document.title = `${nuevo} — Omnibites`;
+        document.getElementById('editTitleForm').style.display = 'none';
+        document.getElementById('titleDisplay').style.display = 'block';
+        window.showToast && window.showToast('Título actualizado');
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Guardar';
+      }
+    });
 
     // ── REACCIONES ──
     async function reactSB(type) {
@@ -295,7 +387,7 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
     }
 
-    // ── REPRODUCTOR (streaming, igual que comunidad.html) ──
+    // ── REPRODUCTOR ──
     function stopPlayback(isPause = false) {
       playToken++;
       if (source) {
@@ -456,6 +548,7 @@
             </div>`;
         }).join('');
       } catch(e) {
+        console.error('comments error:', e);
         list.innerHTML = '<div class="empty-mini">Error al cargar comentarios.</div>';
       }
     }
