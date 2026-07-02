@@ -4,30 +4,45 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Verifica tu correo — Omnibites</title>
+  <title>Soundbite — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    .verify-page{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
-    .verify-card{background:var(--bg2);border:1px solid var(--gold);border-radius:12px;padding:2.5rem 2rem;max-width:440px;width:100%;text-align:center;}
-    .verify-icon{font-size:3rem;margin-bottom:1rem;}
-    .verify-card h1{font-family:var(--font-pixel);font-size:.78rem;color:var(--gold);margin-bottom:.75rem;}
-    .verify-card p{color:var(--text-dim);font-size:.85rem;line-height:1.7;margin-bottom:1.5rem;}
-    .verify-email{color:var(--neon);font-weight:600;}
-    .btn-row{display:flex;flex-direction:column;gap:.75rem;}
-    .resend-cool{font-size:.75rem;color:var(--text-dim);margin-top:.5rem;}
+    .sb-detail-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;}
+    .sb-detail-img-wrap{text-align:center;margin-bottom:1.5rem;}
+    .sb-detail-img{width:190px;height:190px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);}
+    .sb-detail-header{text-align:center;margin-bottom:1.5rem;}
+    .sb-detail-header h1{font-family:var(--font-head);font-size:1.35rem;font-weight:700;margin-bottom:.4rem;}
+    .sb-detail-tag{font-size:.8rem;color:var(--text-dim);margin-bottom:.5rem;}
+    .sb-detail-author{font-size:.82rem;color:var(--text-dim);}
+    .sb-detail-author a{color:var(--purple);text-decoration:none;font-weight:600;}
+    .sb-detail-actions{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;}
+    .sbox h2{font-family:var(--font-head);font-size:.9rem;font-weight:600;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px;}
+    #sbDescripcion{font-size:.88rem;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+    .comment-box textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.7rem .9rem;font-family:var(--font-body);font-size:.88rem;min-height:80px;resize:vertical;outline:none;margin-bottom:.75rem;}
+    .comment-box textarea:focus{border-color:var(--neon);}
+    .comment-item{background:var(--bg3);border-radius:8px;padding:.9rem 1rem;margin-bottom:.75rem;}
+    .comment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;flex-wrap:wrap;gap:.4rem;}
+    .comment-user{color:var(--purple);text-decoration:none;font-weight:600;font-size:.85rem;}
+    .comment-user:hover{text-decoration:underline;}
+    .comment-date{color:var(--text-dim);font-size:.7rem;}
+    .comment-text{font-size:.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+    .comment-char-count{font-size:.7rem;color:var(--text-dim);text-align:right;margin-top:-.5rem;margin-bottom:.75rem;}
+    .state-msg{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
+    @keyframes spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
   <nav class="navbar">
-<a href="../index.html" class="logo">
-  <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
-  <span class="logo-text">OMNI<span>BITES</span></span>
-</a>
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      <span class="logo-text">OMNI<span>BITES</span></span>
+    </a>
     <div class="nav-links">
       <a href="comunidad.html">Comunidad</a>
       <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>   
+      <a href="subir.html">Añadir</a>
       <a href="jugadores.html">Jugadores</a>
     </div>
     <div class="nav-right">
@@ -38,25 +53,463 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="comunidad.html">Comunidad</a>
     <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>   
+    <a href="subir.html">Añadir</a>
     <a href="jugadores.html">Jugadores</a>
   </div>
 
-  <main class="verify-page">
-    <div class="verify-card">
-      <div class="verify-icon">✉️</div>
-      <h1>Verifica tu correo</h1>
-      <p>Para usar Omnibites necesitas verificar tu cuenta. Te enviamos un enlace a <span class="verify-email" id="userEmail">tu correo</span>.<br/><br/>Revisa tu bandeja de entrada (y el spam, por si acaso).</p>
-      <div class="btn-row">
-        <button class="btn-primary" id="checkBtn">Ya lo verifiqué</button>
-        <button class="btn-outline" id="resendBtn">Reenviar correo</button>
-        <p class="resend-cool" id="cooldown"></p>
+  <main class="sb-detail-page">
+    <a href="#" class="btn-back" id="backBtn">← Volver</a>
+
+    <div id="loadingState" class="state-msg">
+      <div class="spinner"></div>
+      <p>Cargando soundbite...</p>
+    </div>
+
+    <div id="notFound" style="display:none" class="state-msg">
+      <p>No se encontró este soundbite.</p>
+      <a href="comunidad.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Volver a Comunidad</a>
+    </div>
+
+    <div id="sbMain" style="display:none">
+      <div class="sb-detail-img-wrap">
+        <img id="sbImage" class="sb-detail-img" src="" alt=""/>
       </div>
-      <p style="margin-top:1.5rem;font-size:.75rem;color:var(--text-dim)">
-        ¿Correo incorrecto? <a href="#" id="logoutLink" style="color:var(--neon)">Cerrar sesión</a> y regístrate de nuevo.
-      </p>
+
+      <div class="sb-detail-header">
+        <h1 id="sbTitulo"></h1>
+        <p class="sb-detail-tag" id="sbTagline"></p>
+        <p class="sb-detail-author">Subido por <a id="sbAutorLink" href="#"></a></p>
+      </div>
+
+      <div class="sb-player">
+        <button class="sb-play" id="sbPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
+        <div class="sb-prog-wrap">
+          <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
+          <div class="sb-time"><span id="sbCur">0:00</span><span id="sbTotal">0:15</span></div>
+        </div>
+      </div>
+
+      <div class="sb-detail-actions">
+        <button class="icon-btn icon-btn-love" id="rLove" title="Me encanta">
+          <img src="../assets/reactions/love.png" alt="Me encanta"/><span class="icon-count" id="loveCount">0</span>
+        </button>
+        <button class="icon-btn icon-btn-meh" id="rMeh" title="Regular">
+          <img src="../assets/reactions/meh.png" alt="Regular"/><span class="icon-count" id="mehCount">0</span>
+        </button>
+        <button class="icon-btn icon-btn-fav" id="favBtn" title="Favorito">
+          <img src="../assets/reactions/fav.png" alt="Favorito"/>
+        </button>
+        <button class="icon-btn icon-btn-dl" id="dlBtn" title="Descargar">
+          <img src="../assets/reactions/download.png" alt="Descargar"/>
+        </button>
+        <button class="icon-btn" id="shareBtn" title="Compartir">
+          <img src="../assets/icons/share.png" alt="Compartir"/>
+        </button>
+      </div>
+
+      <div class="sbox" id="descBox" style="display:none">
+        <h2>Descripción</h2>
+        <p id="sbDescripcion"></p>
+      </div>
+
+      <div class="sbox">
+        <h2>Comentarios</h2>
+        <div class="comment-box" id="commentForm" style="display:none">
+          <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="500"></textarea>
+          <div class="comment-char-count" id="charCount">0/500</div>
+          <button class="btn-primary" id="submitComment">Comentar</button>
+        </div>
+        <div class="note" id="loginPrompt" style="display:none">
+          Inicia sesión para comentar. <a href="login.html" style="color:var(--neon)">Entrar</a>
+        </div>
+        <div id="commentsList" style="margin-top:1.25rem"></div>
+      </div>
     </div>
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+  <script type="module">
+    import { buildMp3Blob } from '../js/id3-cover.js';
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      doc, getDoc, updateDoc, collection, getDocs, addDoc, query, orderBy,
+      arrayUnion, arrayRemove, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    const sbId = new URLSearchParams(location.search).get('id');
+
+    let currentUser = null, sbData = null, lastElapsed = 0;
+    let audioCtx = null, source = null, gain = null, isPlaying = false, progIv = null, playToken = 0, pausedAt = 0;
+    const CLIP = 15, FADE = 2;
+
+    function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+    function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+    function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+    function showAuthPrompt() {
+      const existing = document.querySelector('.auth-prompt');
+      if (existing) existing.remove();
+      const el = document.createElement('div');
+      el.className = 'auth-prompt';
+      el.innerHTML = `Debes iniciar sesión para esto.<a href="${ROOT}/pages/login.html">Entrar</a>`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    async function getNombreUsuario(uid) {
+      try { const snap = await getDoc(doc(db,'usuarios',uid)); return snap.exists() ? (snap.data().nombre || 'Jugador') : 'Jugador'; }
+      catch { return 'Jugador'; }
+    }
+
+    onAuthStateChanged(auth, async user => {
+      currentUser = user;
+      document.getElementById('commentForm').style.display = user ? 'block' : 'none';
+      document.getElementById('loginPrompt').style.display = user ? 'none' : 'block';
+      if (user && sbData) applyUserState();
+    });
+
+    async function init() {
+      if (!sbId) { showNotFound(); return; }
+      try {
+        const snap = await getDoc(doc(db,'audios',sbId));
+        if (!snap.exists()) { showNotFound(); return; }
+        sbData = { id: snap.id, ...snap.data() };
+        render();
+        await loadComments();
+      } catch(e) {
+        console.error(e);
+        showNotFound();
+      }
+    }
+
+    function showNotFound() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('notFound').style.display = 'block';
+    }
+
+    function render() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('sbMain').style.display = 'block';
+      document.title = `${sbData.titulo || 'Soundbite'} — Omnibites`;
+
+      const img = document.getElementById('sbImage');
+      img.src = sbData.imagen || `${ROOT}/assets/avatars/avatar0.png`;
+      img.onerror = function() { this.onerror = null; this.src = `${ROOT}/assets/avatars/avatar0.png`; };
+
+      document.getElementById('sbTitulo').textContent = sbData.titulo || 'Sin título';
+      document.getElementById('sbTagline').textContent = `${sbData.juego || '—'} · ${sbData.consola || '—'} · ${sbData.categoria || 'soundbite'}`;
+
+      const autorLink = document.getElementById('sbAutorLink');
+      autorLink.textContent = sbData.autorNombre || 'Anónimo';
+      autorLink.href = `jugador.html?uid=${sbData.autorId || ''}`;
+
+      document.getElementById('sbTotal').textContent = sbData.duracion || '0:15';
+
+      const r = sbData.reactions || { love: 0, meh: 0 };
+      document.getElementById('loveCount').textContent = r.love || 0;
+      document.getElementById('mehCount').textContent  = r.meh  || 0;
+
+      if (sbData.descripcion && sbData.descripcion.trim()) {
+        document.getElementById('sbDescripcion').textContent = sbData.descripcion;
+        document.getElementById('descBox').style.display = 'block';
+      }
+
+      if (currentUser) applyUserState();
+    }
+
+    async function applyUserState() {
+      try {
+        const snap = await getDoc(doc(db,'usuarios',currentUser.uid));
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const myReact = (data.reacciones || {})[sbId];
+        if (myReact) {
+          const btn = document.getElementById(myReact === 'love' ? 'rLove' : 'rMeh');
+          if (btn) btn.classList.add(`active-${myReact}`);
+        }
+        if ((data.favoritos || []).includes(sbId)) {
+          document.getElementById('favBtn').classList.add('active-fav');
+        }
+      } catch {}
+    }
+
+    // ── REACCIONES ──
+    async function reactSB(type) {
+      if (!currentUser) { showAuthPrompt(); return; }
+      try {
+        const userRef = doc(db,'usuarios',currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        const reacts = userSnap.exists() ? (userSnap.data().reacciones || {}) : {};
+        const prev = reacts[sbId];
+        const audioRef = doc(db,'audios',sbId);
+        const audioSnap = await getDoc(audioRef);
+        const reactions = audioSnap.exists() ? (audioSnap.data().reactions || {}) : {};
+        const updates = {};
+
+        if (prev) {
+          updates[`reactions.${prev}`] = Math.max(0, (reactions[prev] || 0) - 1);
+          const prevBtn = document.getElementById(prev === 'love' ? 'rLove' : 'rMeh');
+          if (prevBtn) {
+            prevBtn.classList.remove(`active-${prev}`);
+            const s = prevBtn.querySelector('.icon-count');
+            if (s) s.textContent = updates[`reactions.${prev}`];
+          }
+        }
+        if (prev === type) {
+          delete reacts[sbId];
+          await updateDoc(userRef, { reacciones: reacts });
+          await updateDoc(audioRef, updates);
+        } else {
+          updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
+          reacts[sbId] = type;
+          await updateDoc(userRef, { reacciones: reacts });
+          await updateDoc(audioRef, updates);
+          const newBtn = document.getElementById(type === 'love' ? 'rLove' : 'rMeh');
+          if (newBtn) {
+            newBtn.classList.add(`active-${type}`);
+            const s = newBtn.querySelector('.icon-count');
+            if (s) s.textContent = updates[`reactions.${type}`];
+          }
+        }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
+    }
+
+    // ── FAVORITO ──
+    async function toggleFavSB() {
+      if (!currentUser) { showAuthPrompt(); return; }
+      const btn = document.getElementById('favBtn');
+      const isActive = btn.classList.contains('active-fav');
+      try {
+        const ref = doc(db,'usuarios',currentUser.uid);
+        if (isActive) {
+          await updateDoc(ref, { favoritos: arrayRemove(sbId) });
+          btn.classList.remove('active-fav');
+          window.showToast && window.showToast('Eliminado de favoritos');
+        } else {
+          await updateDoc(ref, { favoritos: arrayUnion(sbId) });
+          btn.classList.add('active-fav');
+          window.showToast && window.showToast('Guardado en favoritos');
+        }
+      } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
+    }
+
+    // ── REPRODUCTOR (streaming, igual que comunidad.html) ──
+    function stopPlayback(isPause = false) {
+      playToken++;
+      if (source) {
+        try {
+          if (source._endTimeout) clearTimeout(source._endTimeout);
+          gain.gain.cancelScheduledValues(audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+          const el = source;
+          setTimeout(() => { try { el.pause(); } catch {} }, 150);
+        } catch {}
+        source = gain = null;
+      }
+      clearInterval(progIv);
+      const btn = document.getElementById('sbPlayBtn');
+      if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+      if (!isPause) {
+        document.getElementById('sbProgFill').style.width = '0%';
+        document.getElementById('sbCur').textContent = '0:00';
+        pausedAt = 0;
+      }
+      isPlaying = false;
+    }
+
+    async function togglePlaySB() {
+      if (!sbData) return;
+      if (isPlaying) { pausedAt = lastElapsed; stopPlayback(true); return; }
+      const resumeOffset = pausedAt;
+      stopPlayback();
+      const myToken = ++playToken;
+      const btn = document.getElementById('sbPlayBtn');
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.disabled = true;
+      try {
+        const ctx = getCtx();
+        if (ctx.state === 'suspended') await ctx.resume();
+        const audioEl = new Audio();
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.preload = 'auto';
+        audioEl.src = sbData.url;
+        await new Promise((resolve, reject) => {
+          audioEl.addEventListener('loadedmetadata', resolve, { once: true });
+          audioEl.addEventListener('error', reject, { once: true });
+        });
+        if (myToken !== playToken) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false; return; }
+
+        const baseStart = Math.min(sbData.trimStart || 0, audioEl.duration - 1);
+        const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP, audioEl.duration - baseStart);
+        const safeResume = Math.min(resumeOffset, dur - 0.1);
+        audioEl.currentTime = baseStart + safeResume;
+
+        const src = ctx.createMediaElementSource(audioEl);
+        const g = ctx.createGain();
+        const remaining = dur - safeResume;
+        g.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
+        if (safeResume < FADE) g.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
+        g.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+        src.connect(g); g.connect(ctx.destination);
+        await audioEl.play();
+
+        source = audioEl; gain = g; isPlaying = true;
+        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+        btn.classList.add('playing'); btn.disabled = false;
+
+        const endTimeout = setTimeout(() => { if (myToken === playToken) stopPlayback(); }, remaining * 1000);
+        source._endTimeout = endTimeout;
+
+        const t0 = ctx.currentTime;
+        progIv = setInterval(() => {
+          if (myToken !== playToken) { clearInterval(progIv); return; }
+          const el = safeResume + (ctx.currentTime - t0);
+          lastElapsed = el;
+          document.getElementById('sbProgFill').style.width = (Math.min(el, dur) / dur * 100) + '%';
+          document.getElementById('sbCur').textContent = fmt(el);
+          if (el >= dur) clearInterval(progIv);
+        }, 100);
+      } catch(e) {
+        if (myToken !== playToken) return;
+        btn.innerHTML = '<img src="../assets/icons/error.png" alt="Error"/>'; btn.disabled = false;
+        setTimeout(() => { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; }, 3000);
+      }
+    }
+
+    // ── DESCARGA ──
+    async function downloadSB() {
+      const btn = document.getElementById('dlBtn');
+      const img = btn.querySelector('img');
+      if (img) img.style.opacity = '.3';
+      btn.disabled = true;
+      try {
+        const response = await fetch(sbData.url, { mode: 'cors' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const arrayBuf = await response.arrayBuffer();
+        const ctx = getCtx();
+        if (ctx.state === 'suspended') await ctx.resume();
+        const buf = await ctx.decodeAudioData(arrayBuf);
+        const dur = Math.min(15, buf.duration);
+        const sampleRate = Math.min(buf.sampleRate, 44100);
+        const offCtx = new OfflineAudioContext(1, Math.floor(dur * sampleRate), sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buf;
+        const g = offCtx.createGain();
+        g.gain.setValueAtTime(0, 0);
+        g.gain.linearRampToValueAtTime(1, Math.min(2, dur * 0.15));
+        g.gain.setValueAtTime(1, Math.max(dur - 2, dur * 0.85));
+        g.gain.linearRampToValueAtTime(0, dur);
+        src.connect(g); g.connect(offCtx.destination); src.start(0, 0, dur);
+        const rendered = await offCtx.startRendering();
+        const samples = rendered.getChannelData(0);
+        const int16 = new Int16Array(samples.length);
+        for (let i = 0; i < samples.length; i++) int16[i] = Math.max(-32768, Math.min(32767, Math.round(samples[i] * 32767)));
+        if (typeof lamejs === 'undefined') throw new Error('lamejs not loaded');
+        const enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
+        const mp3 = []; const bs = 1152;
+        for (let i = 0; i < int16.length; i += bs) {
+          const chunk = int16.subarray(i, Math.min(i + bs, int16.length));
+          const d = enc.encodeBuffer(chunk);
+          if (d.length > 0) mp3.push(new Uint8Array(d));
+        }
+        const end = enc.flush();
+        if (end.length > 0) mp3.push(new Uint8Array(end));
+        const blob = await buildMp3Blob(mp3, sbData.imagen || '');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(sbData.titulo || 'soundbite').slice(0,50)} [Omnibites].mp3`.replace(/[<>:"/\\|?*]/g, '');
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+        window.showToast && window.showToast('Descargando MP3');
+      } catch(e) {
+        console.error('download error:', e);
+        window.showToast && window.showToast('Error al descargar.', 'error');
+      } finally {
+        if (img) img.style.opacity = '';
+        btn.disabled = false;
+      }
+    }
+
+    // ── COMENTARIOS ──
+    async function loadComments() {
+      const list = document.getElementById('commentsList');
+      list.innerHTML = '<div class="empty-mini">Cargando comentarios...</div>';
+      try {
+        const q = query(collection(db,'audios',sbId,'comentarios'), orderBy('creadoEn','desc'));
+        const snap = await getDocs(q);
+        if (snap.empty) { list.innerHTML = '<div class="empty-mini">Sé el primero en comentar.</div>'; return; }
+        list.innerHTML = snap.docs.map(d => {
+          const c = d.data();
+          const fecha = c.creadoEn?.toDate
+            ? c.creadoEn.toDate().toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+            : '';
+          return `
+            <div class="comment-item">
+              <div class="comment-head">
+                <a class="comment-user" href="jugador.html?uid=${c.autorId || ''}">${escapeHtml(c.autorNombre || 'Jugador')}</a>
+                <span class="comment-date">${fecha}</span>
+              </div>
+              <div class="comment-text">${escapeHtml(c.texto || '')}</div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        list.innerHTML = '<div class="empty-mini">Error al cargar comentarios.</div>';
+      }
+    }
+
+    document.getElementById('commentInput').addEventListener('input', e => {
+      document.getElementById('charCount').textContent = `${e.target.value.length}/500`;
+    });
+
+    document.getElementById('submitComment').addEventListener('click', async () => {
+      if (!currentUser) { showAuthPrompt(); return; }
+      const input = document.getElementById('commentInput');
+      const texto = input.value.trim();
+      if (!texto) { window.showToast && window.showToast('Escribe algo primero.', 'error'); return; }
+      const btn = document.getElementById('submitComment');
+      btn.disabled = true; btn.textContent = 'Enviando...';
+      try {
+        const autorNombre = await getNombreUsuario(currentUser.uid);
+        await addDoc(collection(db,'audios',sbId,'comentarios'), {
+          texto, autorId: currentUser.uid, autorNombre, creadoEn: serverTimestamp()
+        });
+        input.value = '';
+        document.getElementById('charCount').textContent = '0/500';
+        await loadComments();
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Comentar';
+      }
+    });
+
+    // ── BOTONES ──
+    document.getElementById('rLove').addEventListener('click', () => reactSB('love'));
+    document.getElementById('rMeh').addEventListener('click', () => reactSB('meh'));
+    document.getElementById('favBtn').addEventListener('click', toggleFavSB);
+    document.getElementById('sbPlayBtn').addEventListener('click', togglePlaySB);
+    document.getElementById('dlBtn').addEventListener('click', downloadSB);
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(location.href);
+        window.showToast && window.showToast('Enlace copiado');
+      } catch {
+        window.showToast && window.showToast('No se pudo copiar el enlace', 'error');
+      }
+    });
+    document.getElementById('backBtn').addEventListener('click', e => {
+      e.preventDefault();
+      if (document.referrer && document.referrer.includes(location.host)) history.back();
+      else window.location.href = ROOT + '/pages/comunidad.html';
+    });
+
+    init();
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
 
   <footer class="footer">
     <div class="footer-inner">
@@ -71,75 +524,5 @@
       </a>
     </div>
   </footer>
-
-  <script type="module">
-    import { auth } from '../js/firebase-config.js';
-    import { onAuthStateChanged, sendEmailVerification, signOut, reload }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let currentUser = null;
-    let cooldownTimer = null;
-
-    onAuthStateChanged(auth, async user => {
-      if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
-      if (user.emailVerified) { window.location.href = ROOT + '/index.html'; return; }
-      currentUser = user;
-      document.getElementById('userEmail').textContent = user.email || '';
-    });
-
-    document.getElementById('checkBtn').addEventListener('click', async () => {
-      if (!currentUser) return;
-      const btn = document.getElementById('checkBtn');
-      btn.textContent = 'Verificando...'; btn.disabled = true;
-      try {
-        await reload(currentUser);
-        if (currentUser.emailVerified) {
-          window.showToast && window.showToast('Correo verificado. ¡Bienvenido!');
-          setTimeout(() => window.location.href = ROOT + '/index.html', 1000);
-        } else {
-          window.showToast && window.showToast('Aún no verificado. Revisa tu correo.', 'error');
-          btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
-        }
-      } catch(e) {
-        btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
-        window.showToast && window.showToast('Error: ' + e.message, 'error');
-      }
-    });
-
-    document.getElementById('resendBtn').addEventListener('click', async () => {
-      if (!currentUser || cooldownTimer) return;
-      try {
-        await sendEmailVerification(currentUser);
-        window.showToast && window.showToast('Correo reenviado');
-        startCooldown(60);
-      } catch(e) {
-        window.showToast && window.showToast('Error: ' + e.message, 'error');
-      }
-    });
-
-    function startCooldown(secs) {
-      const btn  = document.getElementById('resendBtn');
-      const cool = document.getElementById('cooldown');
-      btn.disabled = true;
-      let remaining = secs;
-      cooldownTimer = setInterval(() => {
-        remaining--;
-        cool.textContent = `Puedes reenviar en ${remaining}s`;
-        if (remaining <= 0) {
-          clearInterval(cooldownTimer); cooldownTimer = null;
-          btn.disabled = false; cool.textContent = '';
-        }
-      }, 1000);
-    }
-
-    document.getElementById('logoutLink').addEventListener('click', async e => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.href = ROOT + '/pages/login.html';
-    });
-  </script>
-  <script type="module" src="../js/auth.js"></script>
-  <script src="../js/ui.js"></script>
 </body>
 </html>
