@@ -80,6 +80,14 @@
   100% { background-position: 0% 50%; }
 }
 
+    .char-counter {
+  font-size: .7rem;
+  color: var(--text-dim);
+  text-align: right;
+  margin-top: .3rem;
+}
+.char-counter.near-limit { color: var(--gold); }
+
     .editor-box.locked #trimContent { opacity: .35; pointer-events: none; filter: grayscale(60%); }
 .lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
 .editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
@@ -191,26 +199,41 @@
 <div class="editor-box">
   <p class="step-label">PASO 3 — Información</p>
 
-  <div class="form-group" style="position:relative">
-    <label>1. Busca el nombre del juego *</label>
-    <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
-    <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
-    <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
-
-    <div id="juegoImgWrap" style="display:none">
+      <div id="juegoImgWrap" style="display:none">
       <div class="juego-img-frame">
         <img id="juegoImg" src="" alt=""/>
       </div>
     </div>
   </div>
 
-  <div class="form-group">
-    <label>2. Título del soundbite *</label>
-    <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/>
+  <div class="form-group" style="position:relative">
+    <label>1. Busca el nombre del juego *</label>
+    <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
+    <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
+    <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
+
+<div class="form-group">
+  <label>2. Título del soundbite *</label>
+  <input type="text" id="titulo" maxlength="60" placeholder="Ej: Tema principal — Star Fox Assault"/>
+  <p class="char-counter" id="tituloCounter">0/60</p>
+</div>
+
+      <div class="form-group">
+    <label>3. Categoría *</label>
+    <select id="categoria">
+      <option value="">— Selecciona —</option>
+      <option value="orquestal">Orquestal e Instrumental</option>
+      <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+      <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+      <option value="rock-metal">Rock, Metal e Industrial</option>
+      <option value="jazz">Jazz y Dark Jazz / Noir</option>
+      <option value="hibrido">Soundtracks Híbridos</option>
+      <option value="licenciada">Música Licenciada</option>
+    </select>
   </div>
 
   <div class="form-group">
-    <label>3. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
+    <label>4. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
     <select id="consola" disabled>
       <option value="">— Elige un juego primero —</option>
       <optgroup label="Nintendo">
@@ -251,25 +274,10 @@
     </select>
   </div>
 
-  <div class="form-group">
-    <label>4. Categoría *</label>
-    <select id="categoria">
-      <option value="">— Selecciona —</option>
-      <option value="orquestal">Orquestal e Instrumental</option>
-      <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-      <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-      <option value="rock-metal">Rock, Metal e Industrial</option>
-      <option value="jazz">Jazz y Dark Jazz / Noir</option>
-      <option value="hibrido">Soundtracks Híbridos</option>
-      <option value="licenciada">Música Licenciada</option>
-    </select>
-  </div>
-
-  <div class="form-group">
-    <label>5. Descripción (opcional)</label>
-    <textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
-  </div>
-  <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
+<div class="form-group">
+  <label>5. Descripción (opcional)</label>
+  <textarea id="descripcion" maxlength="300" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
+  <p class="char-counter" id="descripcionCounter">0/300</p>
 </div>
   </main>
 
@@ -465,6 +473,18 @@ function prefillFromURL() {
     dropZone.addEventListener('dragleave',() => dropZone.classList.remove('over'));
     dropZone.addEventListener('drop',     e => { e.preventDefault(); dropZone.classList.remove('over'); validateFile(e.dataTransfer.files[0]); });
     fileInput.addEventListener('change',  e => validateFile(e.target.files[0]));
+
+    function setupCharCounter(inputId, counterId, max) {
+  const input   = document.getElementById(inputId);
+  const counter = document.getElementById(counterId);
+  input.addEventListener('input', () => {
+    const len = input.value.length;
+    counter.textContent = `${len}/${max}`;
+    counter.classList.toggle('near-limit', len >= max * 0.9);
+  });
+}
+setupCharCounter('titulo', 'tituloCounter', 60);
+setupCharCounter('descripcion', 'descripcionCounter', 300);
 
     function validateFile(file) {
       const errEl = document.getElementById('fileError');
