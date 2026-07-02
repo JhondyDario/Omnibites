@@ -49,6 +49,37 @@
     .juego-sug-item:hover { background:var(--bg3); }
     .juego-sug-item:last-child { border-bottom:none; }
 
+    /* ── IMAGEN DEL JUEGO — vertical, centrada, marco animado ── */
+#juegoImgWrap {
+  margin-top: 1rem;
+  text-align: center;
+}
+.juego-img-frame {
+  display: inline-block;
+  position: relative;
+  width: 130px;
+  height: 180px;
+  border-radius: 10px;
+  padding: 3px;
+  background: linear-gradient(130deg, var(--neon), var(--purple), var(--cyan), var(--neon));
+  background-size: 300% 300%;
+  animation: frameGlow 4s ease infinite;
+}
+.juego-img-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  display: block;
+  background: var(--bg3);
+}
+@keyframes frameGlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
     .editor-box.locked #trimContent { opacity: .35; pointer-events: none; filter: grayscale(60%); }
 .lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
 .editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
@@ -156,87 +187,90 @@
   </div>
 </div>
 
-    <!-- PASO 3 -->
-    <div class="editor-box">
-      <p class="step-label">PASO 3 — Información</p>
-      <div class="form-group">
-        <label>Título del soundbite *</label>
-        <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/>
-      </div>
+<!-- PASO 3 -->
+<div class="editor-box">
+  <p class="step-label">PASO 3 — Información</p>
 
-      <div class="form-group" style="position:relative">
-        <label>Nombre del juego *</label>
-        <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
-        <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
-        <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
-        <div id="juegoImgWrap" style="display:none;margin-top:.75rem">
-  <img id="juegoImg" src="" alt="" 
-       style="width:130px;height:73px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block;"/>
-        </div>
-      </div>
+  <div class="form-group" style="position:relative">
+    <label>1. Busca el nombre del juego *</label>
+    <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
+    <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
+    <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
 
-      <div class="form-group">
-        <label>Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
-        <select id="consola" disabled>
-          <option value="">— Elige un juego primero —</option>
-          <optgroup label="Nintendo">
-            <option value="NES">NES / Famicom</option>
-            <option value="SNES">Super Nintendo (SNES)</option>
-            <option value="N64">Nintendo 64</option>
-            <option value="GBA">Game Boy / GBA / DS</option>
-            <option value="GameCube">GameCube</option>
-            <option value="Wii">Wii</option>
-            <option value="WiiU">Wii U</option>
-            <option value="3DS">Nintendo 3DS</option>
-            <option value="Switch">Nintendo Switch</option>
-          </optgroup>
-          <optgroup label="PlayStation">
-            <option value="PS1">PlayStation 1</option>
-            <option value="PS2">PlayStation 2</option>
-            <option value="PS3">PlayStation 3</option>
-            <option value="PS4">PlayStation 4</option>
-            <option value="PSP">PSP / PS Vita</option>
-          </optgroup>
-          <optgroup label="Sega">
-            <option value="MasterSystem">Sega Master System</option>
-            <option value="Genesis">Sega Genesis / Mega Drive</option>
-            <option value="Saturn">Sega Saturn</option>
-            <option value="Dreamcast">Sega Dreamcast</option>
-          </optgroup>
-          <optgroup label="Xbox">
-            <option value="Xbox">Xbox Original</option>
-            <option value="Xbox360">Xbox 360</option>
-          </optgroup>
-          <optgroup label="Otros">
-            <option value="Arcade">Arcade</option>
-            <option value="Atari">Atari</option>
-            <option value="Neo-Geo">Neo Geo</option>
-            <option value="PC">PC / DOS</option>
-            <option value="Otra">Otra</option>
-          </optgroup>
-        </select>
+    <div id="juegoImgWrap" style="display:none">
+      <div class="juego-img-frame">
+        <img id="juegoImg" src="" alt=""/>
       </div>
-
-      <div class="form-group">
-        <label>Categoría *</label>
-        <select id="categoria">
-          <option value="">— Selecciona —</option>
-          <option value="orquestal">Orquestal e Instrumental</option>
-          <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-          <option value="rock-metal">Rock, Metal e Industrial</option>
-          <option value="jazz">Jazz y Dark Jazz / Noir</option>
-          <option value="hibrido">Soundtracks Híbridos</option>
-          <option value="licenciada">Música Licenciada</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Descripción (opcional)</label>
-        <textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
-      </div>
-      <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
     </div>
+  </div>
+
+  <div class="form-group">
+    <label>2. Título del soundbite *</label>
+    <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault"/>
+  </div>
+
+  <div class="form-group">
+    <label>3. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
+    <select id="consola" disabled>
+      <option value="">— Elige un juego primero —</option>
+      <optgroup label="Nintendo">
+        <option value="NES">NES / Famicom</option>
+        <option value="SNES">Super Nintendo (SNES)</option>
+        <option value="N64">Nintendo 64</option>
+        <option value="GBA">Game Boy / GBA / DS</option>
+        <option value="GameCube">GameCube</option>
+        <option value="Wii">Wii</option>
+        <option value="WiiU">Wii U</option>
+        <option value="3DS">Nintendo 3DS</option>
+        <option value="Switch">Nintendo Switch</option>
+      </optgroup>
+      <optgroup label="PlayStation">
+        <option value="PS1">PlayStation 1</option>
+        <option value="PS2">PlayStation 2</option>
+        <option value="PS3">PlayStation 3</option>
+        <option value="PS4">PlayStation 4</option>
+        <option value="PSP">PSP / PS Vita</option>
+      </optgroup>
+      <optgroup label="Sega">
+        <option value="MasterSystem">Sega Master System</option>
+        <option value="Genesis">Sega Genesis / Mega Drive</option>
+        <option value="Saturn">Sega Saturn</option>
+        <option value="Dreamcast">Sega Dreamcast</option>
+      </optgroup>
+      <optgroup label="Xbox">
+        <option value="Xbox">Xbox Original</option>
+        <option value="Xbox360">Xbox 360</option>
+      </optgroup>
+      <optgroup label="Otros">
+        <option value="Arcade">Arcade</option>
+        <option value="Atari">Atari</option>
+        <option value="Neo-Geo">Neo Geo</option>
+        <option value="PC">PC / DOS</option>
+        <option value="Otra">Otra</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>4. Categoría *</label>
+    <select id="categoria">
+      <option value="">— Selecciona —</option>
+      <option value="orquestal">Orquestal e Instrumental</option>
+      <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+      <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+      <option value="rock-metal">Rock, Metal e Industrial</option>
+      <option value="jazz">Jazz y Dark Jazz / Noir</option>
+      <option value="hibrido">Soundtracks Híbridos</option>
+      <option value="licenciada">Música Licenciada</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>5. Descripción (opcional)</label>
+    <textarea id="descripcion" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
+  </div>
+  <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
+</div>
   </main>
 
   <script type="module">
