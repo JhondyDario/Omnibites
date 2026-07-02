@@ -266,8 +266,8 @@
         const total = Math.ceil(dataMios.length / PAGE_SIZE);
         el.innerHTML = slice.map(a => `
           <div class="mini-sb-card">
-            <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
-            <div class="mini-sb-meta">${a.juego || '—'} · ${a.consola || '—'}</div>
+<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Sin título'}</a>
+<div class="mini-sb-meta">${a.juego || '—'} · ${a.consola || '—'}</div>
           </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
       }
 
@@ -281,8 +281,8 @@
         const total = Math.ceil(dataFavs.length / PAGE_SIZE);
         el.innerHTML = slice.map(a => `
           <div class="mini-sb-card">
-            <div class="mini-sb-title">${a.titulo || 'Sin título'}</div>
-            <div class="mini-sb-meta">${a.juego || '—'} · ${a.autorNombre || '—'}</div>
+<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Sin título'}</a>
+<div class="mini-sb-meta">${a.juego || '—'} · ${a.autorNombre || '—'}</div>
           </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
       }
 
