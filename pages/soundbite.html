@@ -115,8 +115,8 @@
       <div class="sbox">
         <h2>Comentarios</h2>
         <div class="comment-box" id="commentForm" style="display:none">
-          <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="500"></textarea>
-          <div class="comment-char-count" id="charCount">0/500</div>
+          <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="300"></textarea>
+          <div class="comment-char-count" id="charCount">0/300</div>
           <button class="btn-primary" id="submitComment">Comentar</button>
         </div>
         <div class="note" id="loginPrompt" style="display:none">
@@ -461,7 +461,7 @@
     }
 
     document.getElementById('commentInput').addEventListener('input', e => {
-      document.getElementById('charCount').textContent = `${e.target.value.length}/500`;
+      document.getElementById('charCount').textContent = `${e.target.value.length}/300`;
     });
 
     document.getElementById('submitComment').addEventListener('click', async () => {
@@ -477,7 +477,7 @@
           texto, autorId: currentUser.uid, autorNombre, creadoEn: serverTimestamp()
         });
         input.value = '';
-        document.getElementById('charCount').textContent = '0/500';
+        document.getElementById('charCount').textContent = '0/300';
         await loadComments();
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
