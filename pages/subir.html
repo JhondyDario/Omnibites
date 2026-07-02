@@ -747,7 +747,7 @@
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
             trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
-            autorNombre, imagen: imagenFromArchive || imagenFromRawg || '', creadoEn: serverTimestamp()
+            autorNombre, imagen: imagenFromRawg || imagenFromArchive || '', creadoEn: serverTimestamp()
           });
           window.showToast('Soundbite actualizado (ya existía uno igual)');
           setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
@@ -762,7 +762,7 @@
           autorId: currentUser.uid,
           autorNombre,
           likes: 0, rating: 0, totalVotos: 0,
-          imagen: imagenFromArchive || imagenFromRawg || '',
+          imagen: imagenFromRawg || imagenFromArchive || '',
           creadoEn: serverTimestamp()
         });
         window.showToast('Soundbite publicado');
