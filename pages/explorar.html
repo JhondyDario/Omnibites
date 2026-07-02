@@ -18,10 +18,15 @@
       font-family: var(--font-pixel);
       font-size: 0.85rem;
       color: var(--neon);
-      margin-bottom: 1.5rem;
+      margin-bottom: .5rem;
+    }
+    .search-section .search-hint {
+      font-size: .78rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
     }
 
-    /* ── BARRA DE BÚSQUEDA CON LUPA ── */
+    /* ── BARRA DE BÚSQUEDA (solo autocomplete, sin botón) ── */
     .search-bar {
       display: flex;
       margin-bottom: 0.75rem;
@@ -36,32 +41,13 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       color: var(--text);
-      padding: 0.85rem 3rem 0.85rem 1rem; /* padding-right para la lupa */
+      padding: 0.85rem 1rem;
       font-size: 1rem;
       font-family: var(--font-body);
       outline: none;
       transition: border-color 0.2s;
     }
     .search-bar-inner input:focus { border-color: var(--neon); }
-
-    /* Botón lupa dentro del input */
-    .search-icon-btn {
-      position: absolute;
-      right: 0.6rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: .55;
-      transition: opacity .2s;
-    }
-    .search-icon-btn:hover { opacity: 1; }
-    .search-icon-btn img { width: 35px; height: 35px; object-fit: contain; display: block; }
 
     /* ── AUTOCOMPLETE DE JUEGOS (RAWG) ── */
     #searchSuggestions {
@@ -91,6 +77,44 @@
     }
     .search-sug-item:hover  { background: var(--bg3); }
     .search-sug-item:last-child { border-bottom: none; }
+
+    /* ── BARRA DE JUEGO SELECCIONADO ── */
+    .selected-game-bar {
+      display: none;
+      align-items: center;
+      gap: .75rem;
+      background: var(--bg2);
+      border: 1px solid var(--neon);
+      border-radius: 10px;
+      padding: .6rem .9rem;
+      margin-bottom: 1.25rem;
+    }
+    .selected-game-bar img {
+      width: 42px; height: 42px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+    }
+    .selected-game-bar .sgb-info { flex: 1; min-width: 0; }
+    .selected-game-bar .sgb-name { font-weight: 600; font-size: .85rem; }
+    .selected-game-bar .sgb-hint { font-size: .72rem; color: var(--text-dim); }
+    .selected-game-bar button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 20px;
+      padding: .35rem .85rem;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: border-color .2s, color .2s;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .selected-game-bar button:hover { border-color: var(--danger); color: var(--danger); }
 
     .results-wrap {
       max-width: 900px;
@@ -303,14 +327,11 @@
   <!-- BÚSQUEDA -->
   <div class="search-section">
     <h1>Buscar música</h1>
+    <p class="search-hint">Escribe el nombre de un juego y selecciónalo de la lista para ver sus soundtracks.</p>
     <div class="search-bar">
       <div class="search-bar-inner">
         <input type="text" id="searchInput"
           placeholder="Ej: Super Mario 64..." />
-        <!-- El PNG de lupa va en assets/icons/search.png -->
-        <button class="search-icon-btn" id="searchBtn" title="Buscar">
-          <img src="../assets/icons/search.png" alt="Buscar"/>
-        </button>
         <div id="searchSuggestions"></div>
       </div>
     </div>
@@ -318,6 +339,15 @@
 
   <!-- RESULTADOS -->
   <div class="results-wrap">
+    <div class="selected-game-bar" id="selectedGameBar">
+      <img id="sgbImg" src="" alt=""/>
+      <div class="sgb-info">
+        <div class="sgb-name" id="sgbName"></div>
+        <div class="sgb-hint">Soundtracks encontrados en Archive.org para este juego</div>
+      </div>
+      <button id="sgbClear">Cambiar juego</button>
+    </div>
+
     <div id="relatedWrap" style="display:none" class="related-wrap"></div>
     <div id="stateMsg" class="state-msg">
       <div class="emoji"></div>
@@ -338,13 +368,39 @@
     onAuthStateChanged(auth, u => currentUser = u);
 
     // ══════════════════════════════════════════════
-    // RAWG — Autocomplete de juegos en el buscador
-    // Misma key que en subir.html
+    // RAWG — Autocomplete de juegos (única fuente de búsqueda)
     // ══════════════════════════════════════════════
     const RAWG_KEY   = '3207549bccd14954b04fa8e64840ec00';
     const searchInput = document.getElementById('searchInput');
     const sugBox      = document.getElementById('searchSuggestions');
     let rawgDebounce  = null;
+    let selectedGame  = null;
+
+    // Mismo mapeo de plataformas que subir.html — para pre-asignar consola
+    const PLATFORM_MAP = {
+      'nes':'NES','famicom':'NES',
+      'snes':'SNES','super nintendo':'SNES',
+      'nintendo 64':'N64',
+      'game boy advance':'GBA','game boy':'GBA','nintendo ds':'GBA',
+      'gamecube':'GameCube',
+      'wii u':'WiiU','wii':'Wii',
+      'nintendo 3ds':'3DS','nintendo switch':'Switch',
+      'playstation 4':'PS4','playstation 3':'PS3','playstation 2':'PS2','playstation':'PS1',
+      'ps vita':'PSP','psp':'PSP',
+      'sega master system':'MasterSystem','genesis':'Genesis','mega drive':'Genesis',
+      'sega saturn':'Saturn','dreamcast':'Dreamcast',
+      'xbox 360':'Xbox360','xbox one':'Xbox360','xbox':'Xbox',
+      'arcade':'Arcade','atari':'Atari','neo geo':'Neo-Geo','pc':'PC','linux':'PC','macos':'PC'
+    };
+
+    function detectConsola(platforms) {
+      const names = (platforms || []).map(p => (p.platform?.name || '').toLowerCase());
+      for (const p of names) {
+        const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
+        if (key) return PLATFORM_MAP[key];
+      }
+      return 'Otra';
+    }
 
     searchInput.addEventListener('input', () => {
       clearTimeout(rawgDebounce);
@@ -353,7 +409,14 @@
       rawgDebounce = setTimeout(() => rawgSuggest(val), 350);
     });
 
-    // Cerrar dropdown al hacer click fuera
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        clearTimeout(rawgDebounce);
+        const val = searchInput.value.trim();
+        if (val.length >= 3) rawgSuggest(val);
+      }
+    });
+
     document.addEventListener('click', e => {
       if (!sugBox.contains(e.target) && e.target !== searchInput) {
         sugBox.style.display = 'none';
@@ -367,25 +430,54 @@
         const results = data.results || [];
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
-sugBox.innerHTML = results.map(g => `
-  <div class="search-sug-item">
-    <span>${g.name}${g.released
-      ? ` <span style="color:var(--text-dim)">(${g.released.slice(0,4)})</span>`
-      : ''}</span>
-  </div>`).join('');
+        sugBox.innerHTML = results.map(g => `
+          <div class="search-sug-item">
+            <span>${g.name}${g.released
+              ? ` <span style="color:var(--text-dim)">(${g.released.slice(0,4)})</span>`
+              : ''}</span>
+          </div>`).join('');
         sugBox.style.display = 'block';
 
         sugBox.querySelectorAll('.search-sug-item').forEach((el, i) => {
-          el.addEventListener('click', () => {
-            searchInput.value      = results[i].name;
-            sugBox.style.display   = 'none';
-            doSearch(); // ← auto-busca al seleccionar, sin esperar al botón
-          });
+          el.addEventListener('click', () => selectGame(results[i]));
         });
       } catch {
         sugBox.style.display = 'none';
       }
     }
+
+    function showSelectedGameBar(game) {
+      const bar = document.getElementById('selectedGameBar');
+      document.getElementById('sgbName').textContent = game.name;
+      const img = document.getElementById('sgbImg');
+      img.onerror = () => { img.src = '../assets/avatars/avatar0.png'; };
+      img.src = game.background_image || '../assets/avatars/avatar0.png';
+      bar.style.display = 'flex';
+    }
+
+    function selectGame(game) {
+      selectedGame = game;
+      searchInput.value = game.name;
+      sugBox.style.display = 'none';
+      showSelectedGameBar(game);
+      stopActive();
+      document.getElementById('relatedWrap').style.display = 'none';
+      searchArchive(game.name);
+    }
+
+    document.getElementById('sgbClear').addEventListener('click', () => {
+      selectedGame = null;
+      document.getElementById('selectedGameBar').style.display = 'none';
+      searchInput.value = '';
+      searchInput.focus();
+      stopActive();
+      document.getElementById('resultsList').innerHTML = '';
+      document.getElementById('resultsHeader').style.display = 'none';
+      document.getElementById('relatedWrap').style.display = 'none';
+      const state = document.getElementById('stateMsg');
+      state.style.display = 'block';
+      state.innerHTML = `<p>Busca un juego para encontrar sus audios</p><small>Encuentra miles de soundtracks gratuitos</small>`;
+    });
 
     // ══════════════════════════════════════════════
     // AUDIO — player y estado
@@ -557,8 +649,7 @@ sugBox.innerHTML = results.map(g => `
           </div>
 
           <div class="card-actions">
-            <button class="reaction-btn" title="Añadir soundbite"
-              onclick="compartir(${i}, '${item.url}', '${escape(item.title)}', '${escape(item.album)}')">
+            <button class="reaction-btn" title="Añadir soundbite" onclick="compartir(${i})">
               <img src="../assets/icons/add.png" alt="Añadir"/>
             </button>
             <button class="reaction-btn" id="dlBtn-${i}" title="Descargar MP3"
@@ -692,10 +783,10 @@ sugBox.innerHTML = results.map(g => `
         src.connect(gain); gain.connect(offCtx.destination);
         src.start(0, startAt, dur);
         const rendered = await offCtx.startRendering();
-const mp3Data  = encodeToMP3(rendered);
-const item     = window._items?.[idx];
-const imgUrl   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
-const blob     = await buildMp3Blob(mp3Data, imgUrl);
+        const mp3Data  = encodeToMP3(rendered);
+        const item     = window._items?.[idx];
+        const imgUrl   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
+        const blob     = await buildMp3Blob(mp3Data, imgUrl);
         const album    = unescape(albumEsc);
         const filename = `${cleanAlbumForFilename(album)} [Omnibites].mp3`
           .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
@@ -731,17 +822,32 @@ const blob     = await buildMp3Blob(mp3Data, imgUrl);
       return mp3Data;
     }
 
-window.compartir = function(idx, url, titleEsc, albumEsc) {
-  const title    = unescape(titleEsc);
-  const album    = unescape(albumEsc);
-  const item     = window._items?.[idx];
-  const start    = Math.round(playbackStarts[idx] ?? 0);
-  const totalDur = item?.seconds || (start + 15);
-  const end      = Math.round(Math.min(start + 15, totalDur));
-  const imagen   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
-  const params   = new URLSearchParams({ url, titulo: title, juego: album, trimStart: start, trimEnd: end, imagen });
-  window.location.href = `subir.html?${params.toString()}`;
-};
+    // ── Añadir soundbite: viaja el juego, consola e imagen ya confirmados ──
+    window.compartir = function(idx) {
+      const item = window._items?.[idx];
+      if (!item) return;
+
+      const start    = Math.round(playbackStarts[idx] ?? 0);
+      const totalDur = item.seconds || (start + 15);
+      const end      = Math.round(Math.min(start + 15, totalDur));
+      const imagenAudio = item.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
+
+      const params = new URLSearchParams({
+        url: item.url,
+        titulo: item.title,
+        trimStart: start,
+        trimEnd: end,
+        imagen: imagenAudio
+      });
+
+      if (selectedGame) {
+        params.set('juego', selectedGame.name);
+        params.set('consola', detectConsola(selectedGame.platforms));
+        if (selectedGame.background_image) params.set('juegoImagen', selectedGame.background_image);
+      }
+
+      window.location.href = `subir.html?${params.toString()}`;
+    };
 
     // ── Sugerencias relacionadas ──
     const RELATED_GAMES = {
@@ -808,29 +914,16 @@ window.compartir = function(idx, url, titleEsc, albumEsc) {
       return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2,'0')}`;
     }
 
-    function doSearch() {
-      const q = searchInput.value.trim();
-      if (!q) return;
-      sugBox.style.display = 'none'; // cierra autocomplete al buscar
-      stopActive();
-      document.getElementById('relatedWrap').style.display = 'none';
-      searchArchive(q);
-    }
-
     window.quickSearch = function(q) {
       searchInput.value = q;
-      doSearch();
+      rawgSuggest(q);
+      searchInput.focus();
     };
-
-    document.getElementById('searchBtn').addEventListener('click', doSearch);
-    searchInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') doSearch();
-    });
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('q')) {
       searchInput.value = urlParams.get('q');
-      doSearch();
+      rawgSuggest(urlParams.get('q'));
     }
   </script>
   <script type="module" src="../js/auth.js"></script>
