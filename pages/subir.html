@@ -554,7 +554,7 @@ sugBox.innerHTML = results.map(g => `
     if (key) { matched = PLATFORM_MAP[key]; break; }
   }
 
-  const consolaSelect = document.getElementById('consola');
+const consolaSelect = document.getElementById('consola');
   if (matched) {
     consolaSelect.value = matched;
     juegoHint.className  = 'juego-lock-hint ok';
@@ -565,27 +565,6 @@ sugBox.innerHTML = results.map(g => `
     juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
   }
 }
-      
-      // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
-      const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
-      let matched = null;
-      for (const p of platforms) {
-        const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
-        if (key) { matched = PLATFORM_MAP[key]; break; }
-      }
-
-      const consolaSelect = document.getElementById('consola');
-      if (matched) {
-        consolaSelect.value = matched;
-        juegoHint.className  = 'juego-lock-hint ok';
-        juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
-      } else {
-        // No se encontró plataforma conocida → se deja en "Otra"
-        consolaSelect.value  = 'Otra';
-        juegoHint.className  = 'juego-lock-hint ok';
-        juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
-      }
-    }
 
     // ════════════════════════════════════════════
     // PUBLICAR
