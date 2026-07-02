@@ -22,13 +22,14 @@
 
     /* ── SLIDER DE RECORTE ── */
     .trim-slider-wrap { margin-bottom: 1rem; }
-    .trim-track { position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem; }
-    .trim-range { position:absolute;top:0;bottom:0;background:rgba(74,222,128,.18);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon); }
-    .trim-handle { position:absolute;top:-4px;width:18px;height:50px;background:var(--neon);border-radius:5px;cursor:grab;transform:translateX(-50%);box-shadow:0 0 6px rgba(74,222,128,.5);touch-action:none;user-select:none; }
-    .trim-handle:active { cursor:grabbing; }
+    .trim-track { position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem;cursor:pointer;touch-action:none; }
+    .trim-range { position:absolute;top:0;bottom:0;min-width:26px;background:rgba(74,222,128,.22);border-top:2px solid var(--neon);border-bottom:2px solid var(--neon);cursor:grab;touch-action:none; }
+    .trim-range:active { cursor:grabbing; }
+    .trim-handle { position:absolute;top:-4px;width:18px;height:50px;background:var(--neon);border-radius:5px;cursor:ew-resize;transform:translateX(-50%);box-shadow:0 0 6px rgba(74,222,128,.5);touch-action:none;user-select:none;z-index:2; }
+    .trim-handle::before { content:'';position:absolute;inset:-12px -14px; }
     .trim-handle::after { content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:18px;background:#000;opacity:.4; }
 
-    .time-disp { font-family:var(--font-pixel);font-size:.52rem;color:var(--neon);display:flex;gap:1.5rem;margin-bottom:1rem; }
+    .time-disp { font-family:var(--font-pixel);font-size:.52rem;color:var(--neon);display:flex;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap; }
     .drop-zone { border:2px dashed var(--border);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s; }
     .drop-zone:hover,.drop-zone.over { border-color:var(--neon);background:rgba(57,255,20,.03); }
     .drop-zone input { display:none; }
@@ -50,47 +51,47 @@
     .juego-sug-item:last-child { border-bottom:none; }
 
     /* ── IMAGEN DEL JUEGO — vertical, centrada, marco animado ── */
-#juegoImgWrap {
-  margin-top: 1rem;
-  text-align: center;
-}
-.juego-img-frame {
-  display: inline-block;
-  position: relative;
-  width: 130px;
-  height: 180px;
-  border-radius: 10px;
-  padding: 3px;
-  background: linear-gradient(130deg, var(--neon), var(--purple), var(--cyan), var(--neon));
-  background-size: 300% 300%;
-  animation: frameGlow 4s ease infinite;
-}
-.juego-img-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 8px;
-  display: block;
-  background: var(--bg3);
-}
-@keyframes frameGlow {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+    #juegoImgWrap {
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+    .juego-img-frame {
+      display: inline-block;
+      position: relative;
+      width: 130px;
+      height: 180px;
+      border-radius: 10px;
+      padding: 3px;
+      background: linear-gradient(130deg, var(--neon), var(--purple), var(--cyan), var(--neon));
+      background-size: 300% 300%;
+      animation: frameGlow 4s ease infinite;
+    }
+    .juego-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 8px;
+      display: block;
+      background: var(--bg3);
+    }
+    @keyframes frameGlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
     .char-counter {
-  font-size: .7rem;
-  color: var(--text-dim);
-  text-align: right;
-  margin-top: .3rem;
-}
-.char-counter.near-limit { color: var(--gold); }
+      font-size: .7rem;
+      color: var(--text-dim);
+      text-align: right;
+      margin-top: .3rem;
+    }
+    .char-counter.near-limit { color: var(--gold); }
 
     .editor-box.locked #trimContent { opacity: .35; pointer-events: none; filter: grayscale(60%); }
-.lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
-.editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
+    .lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
+    .editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -162,123 +163,129 @@
       </div>
     </div>
 
-<!-- PASO 2 -->
-<div id="previewSection" class="editor-box locked">
-  <p class="step-label">PASO 2 — Define el recorte</p>
+    <!-- PASO 2 -->
+    <div id="previewSection" class="editor-box locked" style="margin-bottom:1.5rem">
+      <p class="step-label">PASO 2 — Define el recorte</p>
 
-  <div id="lockMsg" class="lock-msg">🔒 Carga un audio en el Paso 1 para desbloquear el recorte</div>
+      <div id="lockMsg" class="lock-msg">🔒 Carga un audio en el Paso 1 para desbloquear el recorte</div>
 
-  <div id="trimContent">
-    <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
-    <div class="preview-info" id="durationInfo"></div>
+      <div id="trimContent">
+        <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
+        <div class="preview-info" id="durationInfo"></div>
 
-    <div class="trim-slider-wrap">
-      <div class="trim-track" id="trimTrack">
-        <div class="trim-range"  id="trimRange"></div>
-        <div class="trim-handle" id="handleStart"></div>
-        <div class="trim-handle" id="handleEnd"></div>
+        <div class="trim-slider-wrap">
+          <div class="trim-track" id="trimTrack">
+            <div class="trim-range"  id="trimRange"></div>
+            <div class="trim-handle" id="handleStart"></div>
+            <div class="trim-handle" id="handleEnd"></div>
+          </div>
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:-.4rem;margin-bottom:.85rem">
+          Arrastra el bloque verde para mover el clip, los bordes para ajustarlo, o toca cualquier parte de la pista para saltar ahí.
+        </p>
+
+        <div class="time-disp">
+          <span>Inicio: <span id="startDisp">0:00</span></span>
+          <span>Fin: <span id="endDisp">0:15</span></span>
+          <span>Clip: <span id="selDisp">15s</span></span>
+        </div>
+        <input type="hidden" id="trimStart" value="0"/>
+        <input type="hidden" id="trimEnd"   value="15"/>
+
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+          <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
+          <button class="btn-outline"  id="stopBtn">◼ Detener</button>
+        </div>
       </div>
     </div>
 
-    <div class="time-disp">
-      <span>Inicio: <span id="startDisp">0s</span></span>
-      <span>Fin: <span id="endDisp">15s</span></span>
-      <span>Clip: <span id="selDisp">15s</span></span>
-    </div>
-    <input type="hidden" id="trimStart" value="0"/>
-    <input type="hidden" id="trimEnd"   value="15"/>
-
-    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-      <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
-      <button class="btn-outline"  id="stopBtn">◼ Detener</button>
-    </div>
-  </div>
-</div>
-
-<!-- PASO 3 -->
-<div class="editor-box">
-  <p class="step-label">PASO 3 — Información</p>
+    <!-- PASO 3 -->
+    <div class="editor-box">
+      <p class="step-label">PASO 3 — Información</p>
 
       <div id="juegoImgWrap" style="display:none">
-      <div class="juego-img-frame">
-        <img id="juegoImg" src="" alt=""/>
+        <div class="juego-img-frame">
+          <img id="juegoImg" src="" alt=""/>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="form-group" style="position:relative">
-    <label>1. Busca el nombre del juego *</label>
-    <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
-    <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
-    <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
-
-<div class="form-group">
-  <label>2. Título del soundbite *</label>
-<input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault" maxlength="60"/>
-  <p class="char-counter" id="tituloCounter">0/60</p>
-</div>
+      <div class="form-group" style="position:relative">
+        <label>1. Busca el nombre del juego *</label>
+        <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
+        <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
+        <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
+      </div>
 
       <div class="form-group">
-    <label>3. Categoría *</label>
-    <select id="categoria">
-      <option value="">— Selecciona —</option>
-      <option value="orquestal">Orquestal e Instrumental</option>
-      <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-      <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-      <option value="rock-metal">Rock, Metal e Industrial</option>
-      <option value="jazz">Jazz y Dark Jazz / Noir</option>
-      <option value="hibrido">Soundtracks Híbridos</option>
-      <option value="licenciada">Música Licenciada</option>
-    </select>
-  </div>
+        <label>2. Título del soundbite *</label>
+        <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault" maxlength="60"/>
+        <p class="char-counter" id="tituloCounter">0/60</p>
+      </div>
 
-  <div class="form-group">
-    <label>4. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
-    <select id="consola" disabled>
-      <option value="">— Elige un juego primero —</option>
-      <optgroup label="Nintendo">
-        <option value="NES">NES / Famicom</option>
-        <option value="SNES">Super Nintendo (SNES)</option>
-        <option value="N64">Nintendo 64</option>
-        <option value="GBA">Game Boy / GBA / DS</option>
-        <option value="GameCube">GameCube</option>
-        <option value="Wii">Wii</option>
-        <option value="WiiU">Wii U</option>
-        <option value="3DS">Nintendo 3DS</option>
-        <option value="Switch">Nintendo Switch</option>
-      </optgroup>
-      <optgroup label="PlayStation">
-        <option value="PS1">PlayStation 1</option>
-        <option value="PS2">PlayStation 2</option>
-        <option value="PS3">PlayStation 3</option>
-        <option value="PS4">PlayStation 4</option>
-        <option value="PSP">PSP / PS Vita</option>
-      </optgroup>
-      <optgroup label="Sega">
-        <option value="MasterSystem">Sega Master System</option>
-        <option value="Genesis">Sega Genesis / Mega Drive</option>
-        <option value="Saturn">Sega Saturn</option>
-        <option value="Dreamcast">Sega Dreamcast</option>
-      </optgroup>
-      <optgroup label="Xbox">
-        <option value="Xbox">Xbox Original</option>
-        <option value="Xbox360">Xbox 360</option>
-      </optgroup>
-      <optgroup label="Otros">
-        <option value="Arcade">Arcade</option>
-        <option value="Atari">Atari</option>
-        <option value="Neo-Geo">Neo Geo</option>
-        <option value="PC">PC / DOS</option>
-        <option value="Otra">Otra</option>
-      </optgroup>
-    </select>
-  </div>
+      <div class="form-group">
+        <label>3. Categoría *</label>
+        <select id="categoria">
+          <option value="">— Selecciona —</option>
+          <option value="orquestal">Orquestal e Instrumental</option>
+          <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+          <option value="rock-metal">Rock, Metal e Industrial</option>
+          <option value="jazz">Jazz y Dark Jazz / Noir</option>
+          <option value="hibrido">Soundtracks Híbridos</option>
+          <option value="licenciada">Música Licenciada</option>
+        </select>
+      </div>
 
-<div class="form-group">
-  <label>5. Descripción (opcional)</label>
-  <textarea id="descripcion" maxlength="300" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
-  <p class="char-counter" id="descripcionCounter">0/300</p>
-</div>
+      <div class="form-group">
+        <label>4. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
+        <select id="consola" disabled>
+          <option value="">— Elige un juego primero —</option>
+          <optgroup label="Nintendo">
+            <option value="NES">NES / Famicom</option>
+            <option value="SNES">Super Nintendo (SNES)</option>
+            <option value="N64">Nintendo 64</option>
+            <option value="GBA">Game Boy / GBA / DS</option>
+            <option value="GameCube">GameCube</option>
+            <option value="Wii">Wii</option>
+            <option value="WiiU">Wii U</option>
+            <option value="3DS">Nintendo 3DS</option>
+            <option value="Switch">Nintendo Switch</option>
+          </optgroup>
+          <optgroup label="PlayStation">
+            <option value="PS1">PlayStation 1</option>
+            <option value="PS2">PlayStation 2</option>
+            <option value="PS3">PlayStation 3</option>
+            <option value="PS4">PlayStation 4</option>
+            <option value="PSP">PSP / PS Vita</option>
+          </optgroup>
+          <optgroup label="Sega">
+            <option value="MasterSystem">Sega Master System</option>
+            <option value="Genesis">Sega Genesis / Mega Drive</option>
+            <option value="Saturn">Sega Saturn</option>
+            <option value="Dreamcast">Sega Dreamcast</option>
+          </optgroup>
+          <optgroup label="Xbox">
+            <option value="Xbox">Xbox Original</option>
+            <option value="Xbox360">Xbox 360</option>
+          </optgroup>
+          <optgroup label="Otros">
+            <option value="Arcade">Arcade</option>
+            <option value="Atari">Atari</option>
+            <option value="Neo-Geo">Neo Geo</option>
+            <option value="PC">PC / DOS</option>
+            <option value="Otra">Otra</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>5. Descripción (opcional)</label>
+        <textarea id="descripcion" maxlength="300" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
+        <p class="char-counter" id="descripcionCounter">0/300</p>
+      </div>
+
+      <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
+    </div>
   </main>
 
   <script type="module">
@@ -296,10 +303,10 @@
 
     // Controla si el juego fue seleccionado desde RAWG (no escrito a mano)
     let juegoConfirmado = false;
-    // Imagen para la targeta del soundbite — prioridad: Archive.org > RAWG
-let imagenFromArchive = '';
-let imagenFromRawg    = '';
-    
+    // Imagen para la tarjeta del soundbite — prioridad: Archive.org > RAWG
+    let imagenFromArchive = '';
+    let imagenFromRawg    = '';
+
     async function getNombreUsuario(uid) {
       try {
         const snap = await getDoc(doc(db, 'usuarios', uid));
@@ -319,16 +326,42 @@ let imagenFromRawg    = '';
       }
     });
 
-function prefillFromURL() {
-  const p = new URLSearchParams(window.location.search);
-  if (p.get('url')) {
-    document.getElementById('audioUrl').value = p.get('url');
-    loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
-  }
-  if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
-  if (p.get('juego'))  document.getElementById('juego').value  = decodeURIComponent(p.get('juego'));
-  if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
-}
+    function prefillFromURL() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('url')) {
+        document.getElementById('audioUrl').value = p.get('url');
+        loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
+      }
+      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
+      if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
+
+      // ── Juego, consola e imagen ya confirmados desde Explorar ──
+      const juegoParam    = p.get('juego');
+      const consolaParam  = p.get('consola');
+      const juegoImgParam = p.get('juegoImagen');
+
+      if (juegoParam && consolaParam) {
+        const nombreJuego = decodeURIComponent(juegoParam);
+        juegoInput.value = nombreJuego;
+        juegoConfirmado   = true;
+        document.getElementById('consola').value = consolaParam;
+        juegoHint.className   = 'juego-lock-hint ok';
+        juegoHint.textContent = `✓ ${nombreJuego} seleccionado — consola asignada automáticamente`;
+
+        if (juegoImgParam) {
+          const decodedImg = decodeURIComponent(juegoImgParam);
+          imagenFromRawg = resizeRawgImage(decodedImg);
+          const imgWrap = document.getElementById('juegoImgWrap');
+          const imgEl   = document.getElementById('juegoImg');
+          imgEl.onerror = () => { imgWrap.style.display = 'none'; };
+          imgEl.src = decodedImg;
+          imgWrap.style.display = 'block';
+        }
+      } else if (juegoParam) {
+        // Solo el nombre, sin consola confirmada — el usuario debe seleccionarlo de la lista igual
+        document.getElementById('juego').value = decodeURIComponent(juegoParam);
+      }
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -351,27 +384,28 @@ function prefillFromURL() {
       audioPlayer.src = url;
       audioPlayer.load();
       audioPlayer.onloadedmetadata = () => {
-  const dur = audioPlayer.duration;
-  let start = Math.max(0, startHint);
-  let end   = Math.min(endHint, dur);
-  if (end - start < 10) end   = Math.min(start + 15, dur);
-  if (end - start < 10) start = Math.max(0, end - 10);
-  setupTrimSlider(dur, start, end);
-  document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra los handles para marcar el clip (10–15 seg)`;
-  document.getElementById('previewSection').classList.remove('locked'); // ← desbloquea
-};
+        const dur = audioPlayer.duration;
+        let start = Math.max(0, startHint);
+        let end   = Math.min(endHint, dur);
+        if (end - start < 10) end   = Math.min(start + 15, dur);
+        if (end - start < 10) start = Math.max(0, end - 10);
+        setupTrimSlider(dur, start, end);
+        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra el bloque para mover el clip, los bordes para ajustarlo (10–15 seg)`;
+        document.getElementById('previewSection').classList.remove('locked');
+      };
       audioPlayer.onerror = () => {
-  errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
-  errEl.style.display = 'block';
-  document.getElementById('previewSection').classList.add('locked'); // ← re-bloquea
-};
+        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
+        errEl.style.display = 'block';
+        document.getElementById('previewSection').classList.add('locked');
+      };
     }
 
     // ════════════════════════════════════════════
-    // SLIDER DE RECORTE — corrección completa
-    // Bug 1 corregido: render() usa los nodos clonados, no los originales
-    // Bug 2 corregido: pointermove/pointerup van en el handle (no el document)
-    //                  porque setPointerCapture redirige eventos al handle
+    // SLIDER DE RECORTE
+    // - Arrastrar un borde: redimensiona el clip (10–15s)
+    // - Arrastrar el bloque verde (el medio): mueve el clip completo
+    // - Tocar cualquier parte vacía de la pista: salta el clip hasta ahí
+    // - Elementos reconstruidos en cada carga para evitar listeners viejos
     // ════════════════════════════════════════════
     let trackDuration = 0;
     let sliderStart   = 0;
@@ -380,77 +414,115 @@ function prefillFromURL() {
     function setupTrimSlider(duration, initStart, initEnd) {
       trackDuration = duration;
 
-      // Clonar para eliminar listeners viejos
-      const oldHS = document.getElementById('handleStart');
-      const oldHE = document.getElementById('handleEnd');
-      const hStart = oldHS.cloneNode(true);
-      const hEnd   = oldHE.cloneNode(true);
-      oldHS.replaceWith(hStart);
-      oldHE.replaceWith(hEnd);
+      const oldTrack = document.getElementById('trimTrack');
+      const newTrack = document.createElement('div');
+      newTrack.className = 'trim-track';
+      newTrack.id = 'trimTrack';
 
-      const track = document.getElementById('trimTrack');
-      const range = document.getElementById('trimRange');
+      const range = document.createElement('div');
+      range.className = 'trim-range';
+      range.id = 'trimRange';
+
+      const hStart = document.createElement('div');
+      hStart.className = 'trim-handle';
+      hStart.id = 'handleStart';
+
+      const hEnd = document.createElement('div');
+      hEnd.className = 'trim-handle';
+      hEnd.id = 'handleEnd';
+
+      newTrack.append(range, hStart, hEnd);
+      oldTrack.replaceWith(newTrack);
 
       sliderStart = Math.max(0, initStart);
       sliderEnd   = Math.min(initEnd, duration);
 
       function pct(s) { return trackDuration > 0 ? (s / trackDuration) * 100 : 0; }
       function secFromX(clientX) {
-        const rect = track.getBoundingClientRect();
+        const rect = newTrack.getBoundingClientRect();
         return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)) * trackDuration;
       }
 
       function render() {
-        // Usar los nodos clonados directamente (hStart / hEnd en el closure)
         hStart.style.left = pct(sliderStart) + '%';
         hEnd.style.left   = pct(sliderEnd)   + '%';
         range.style.left  = pct(sliderStart) + '%';
         range.style.width = (pct(sliderEnd) - pct(sliderStart)) + '%';
-        document.getElementById('startDisp').textContent = Math.round(sliderStart) + 's';
-        document.getElementById('endDisp').textContent   = Math.round(sliderEnd)   + 's';
+        document.getElementById('startDisp').textContent = fmt(sliderStart);
+        document.getElementById('endDisp').textContent   = fmt(sliderEnd);
         document.getElementById('selDisp').textContent   = Math.round(sliderEnd - sliderStart) + 's';
         document.getElementById('trimStart').value = Math.round(sliderStart);
         document.getElementById('trimEnd').value   = Math.round(sliderEnd);
       }
 
-      function attachDrag(handle, isStart) {
+      // Redimensionar desde los bordes
+      function attachResize(handle, isStart) {
         handle.addEventListener('pointerdown', e => {
           e.preventDefault();
+          e.stopPropagation();
           handle.setPointerCapture(e.pointerId);
 
-          // ── CORRECCIÓN: eventos en el handle, no en document ──
           function onMove(ev) {
             let sec = secFromX(ev.clientX);
             if (isStart) {
-              // No puede pasar del fin menos 10s (mínimo clip)
               sec = Math.min(sec, sliderEnd - 10);
-              // No puede alejarse más de 15s del fin
               sec = Math.max(sec, sliderEnd - 15);
-              // No puede ser negativo
               sliderStart = Math.max(0, sec);
             } else {
-              // No puede quedar a menos de 10s del inicio
               sec = Math.max(sec, sliderStart + 10);
-              // No puede superar 15s del inicio
               sec = Math.min(sec, sliderStart + 15);
-              // No puede pasar del total de la canción
               sliderEnd = Math.min(sec, trackDuration);
             }
             render();
           }
-
           function onUp() {
             handle.removeEventListener('pointermove', onMove);
             handle.removeEventListener('pointerup',   onUp);
           }
-
           handle.addEventListener('pointermove', onMove);
           handle.addEventListener('pointerup',   onUp);
         });
       }
 
-      attachDrag(hStart, true);
-      attachDrag(hEnd,   false);
+      // Mover el clip completo (agarrando el bloque verde)
+      range.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        range.setPointerCapture(e.pointerId);
+        const clipLen    = sliderEnd - sliderStart;
+        const anchorSec  = secFromX(e.clientX);
+        const startAtDown = sliderStart;
+
+        function onMove(ev) {
+          const deltaSec = secFromX(ev.clientX) - anchorSec;
+          let newStart = startAtDown + deltaSec;
+          newStart = Math.max(0, Math.min(newStart, trackDuration - clipLen));
+          sliderStart = newStart;
+          sliderEnd   = newStart + clipLen;
+          render();
+        }
+        function onUp() {
+          range.removeEventListener('pointermove', onMove);
+          range.removeEventListener('pointerup',   onUp);
+        }
+        range.addEventListener('pointermove', onMove);
+        range.addEventListener('pointerup',   onUp);
+      });
+
+      // Saltar el clip a donde toques en la pista
+      newTrack.addEventListener('pointerdown', e => {
+        if (e.target === range || e.target === hStart || e.target === hEnd) return;
+        const clipLen = (sliderEnd - sliderStart) || 15;
+        const sec = secFromX(e.clientX);
+        let newStart = sec - clipLen / 2;
+        newStart = Math.max(0, Math.min(newStart, trackDuration - clipLen));
+        sliderStart = newStart;
+        sliderEnd   = newStart + clipLen;
+        render();
+      });
+
+      attachResize(hStart, true);
+      attachResize(hEnd,   false);
       render();
     }
 
@@ -475,16 +547,16 @@ function prefillFromURL() {
     fileInput.addEventListener('change',  e => validateFile(e.target.files[0]));
 
     function setupCharCounter(inputId, counterId, max) {
-  const input   = document.getElementById(inputId);
-  const counter = document.getElementById(counterId);
-  input.addEventListener('input', () => {
-    const len = input.value.length;
-    counter.textContent = `${len}/${max}`;
-    counter.classList.toggle('near-limit', len >= max * 0.9);
-  });
-}
-setupCharCounter('titulo', 'tituloCounter', 60);
-setupCharCounter('descripcion', 'descripcionCounter', 300);
+      const input   = document.getElementById(inputId);
+      const counter = document.getElementById(counterId);
+      input.addEventListener('input', () => {
+        const len = input.value.length;
+        counter.textContent = `${len}/${max}`;
+        counter.classList.toggle('near-limit', len >= max * 0.9);
+      });
+    }
+    setupCharCounter('titulo', 'tituloCounter', 60);
+    setupCharCounter('descripcion', 'descripcionCounter', 300);
 
     function validateFile(file) {
       const errEl = document.getElementById('fileError');
@@ -512,7 +584,7 @@ setupCharCounter('descripcion', 'descripcionCounter', 300);
 
     // ════════════════════════════════════════════
     // AUTOCOMPLETE DE JUEGO — RAWG API
-    // La consola se asigna SOLO desde aquí.
+    // La consola se asigna SOLO desde aquí (o desde el prefill de Explorar).
     // El usuario no puede escribir el juego a mano y publicar.
     // ════════════════════════════════════════════
     const RAWG_KEY = '3207549bccd14954b04fa8e64840ec00';
@@ -534,9 +606,9 @@ setupCharCounter('descripcion', 'descripcionCounter', 300);
     };
 
     function resizeRawgImage(url, width = 150) {
-  if (!url) return '';
-  return url.includes('/media/') ? url.replace('/media/', `/media/resize/${width}/-/`) : url;
-}
+      if (!url) return '';
+      return url.includes('/media/') ? url.replace('/media/', `/media/resize/${width}/-/`) : url;
+    }
 
     let juegoDebounce = null;
     const juegoInput = document.getElementById('juego');
@@ -545,9 +617,9 @@ setupCharCounter('descripcion', 'descripcionCounter', 300);
 
     // Si el usuario edita el campo manualmente, desconfirma el juego
     juegoInput.addEventListener('input', () => {
-  juegoConfirmado = false;
-  imagenFromRawg  = '';
-      document.getElementById('juegoImgWrap').style.display = 'none'; // ← nuevo
+      juegoConfirmado = false;
+      imagenFromRawg  = '';
+      document.getElementById('juegoImgWrap').style.display = 'none';
       document.getElementById('consola').value = '';
       juegoHint.className = 'juego-lock-hint';
       juegoHint.textContent = 'Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.';
@@ -569,10 +641,10 @@ setupCharCounter('descripcion', 'descripcionCounter', 300);
         const results = data.results || [];
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
-sugBox.innerHTML = results.map(g => `
-  <div class="juego-sug-item" data-id="${g.id}">
-    <span>${g.name}${g.released ? ` <span style="color:var(--text-dim);font-size:.75rem">(${g.released.slice(0,4)})</span>` : ''}</span>
-  </div>`).join('');
+        sugBox.innerHTML = results.map(g => `
+          <div class="juego-sug-item" data-id="${g.id}">
+            <span>${g.name}${g.released ? ` <span style="color:var(--text-dim);font-size:.75rem">(${g.released.slice(0,4)})</span>` : ''}</span>
+          </div>`).join('');
         sugBox.style.display = 'block';
 
         sugBox.querySelectorAll('.juego-sug-item').forEach((el, i) => {
@@ -585,40 +657,39 @@ sugBox.innerHTML = results.map(g => `
     }
 
     function seleccionarJuego(game) {
-  juegoInput.value   = game.name;
-  sugBox.style.display = 'none';
-  juegoConfirmado    = true;
-  imagenFromRawg     = resizeRawgImage(game.background_image); // ← esto sigue siendo lo que se guarda en Firestore
+      juegoInput.value   = game.name;
+      sugBox.style.display = 'none';
+      juegoConfirmado    = true;
+      imagenFromRawg     = resizeRawgImage(game.background_image);
 
-  const imgWrap = document.getElementById('juegoImgWrap');
-  const imgEl   = document.getElementById('juegoImg');
-  if (game.background_image) {
-    imgEl.onerror = () => { imgWrap.style.display = 'none'; };
-    imgEl.src = game.background_image; // ← usar la original acá, no la redimensionada
-    imgWrap.style.display = 'block';
-  } else {
-    imgWrap.style.display = 'none';
-  }
+      const imgWrap = document.getElementById('juegoImgWrap');
+      const imgEl   = document.getElementById('juegoImg');
+      if (game.background_image) {
+        imgEl.onerror = () => { imgWrap.style.display = 'none'; };
+        imgEl.src = game.background_image;
+        imgWrap.style.display = 'block';
+      } else {
+        imgWrap.style.display = 'none';
+      }
 
-  // Detectar plataforma — recorre en orden de especificidad (ps4 antes que playstation)
-  const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
-  let matched = null;
-  for (const p of platforms) {
-    const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
-    if (key) { matched = PLATFORM_MAP[key]; break; }
-  }
+      const platforms = (game.platforms || []).map(p => p.platform.name.toLowerCase());
+      let matched = null;
+      for (const p of platforms) {
+        const key = Object.keys(PLATFORM_MAP).find(k => p.includes(k));
+        if (key) { matched = PLATFORM_MAP[key]; break; }
+      }
 
-const consolaSelect = document.getElementById('consola');
-  if (matched) {
-    consolaSelect.value = matched;
-    juegoHint.className  = 'juego-lock-hint ok';
-    juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
-  } else {
-    consolaSelect.value  = 'Otra';
-    juegoHint.className  = 'juego-lock-hint ok';
-    juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
-  }
-}
+      const consolaSelect = document.getElementById('consola');
+      if (matched) {
+        consolaSelect.value = matched;
+        juegoHint.className  = 'juego-lock-hint ok';
+        juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
+      } else {
+        consolaSelect.value  = 'Otra';
+        juegoHint.className  = 'juego-lock-hint ok';
+        juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
+      }
+    }
 
     // ════════════════════════════════════════════
     // PUBLICAR
@@ -634,7 +705,6 @@ const consolaSelect = document.getElementById('consola');
       if (!titulo)    { window.showToast('Ponle un título.','error'); return; }
       if (!juego)     { window.showToast('Escribe el nombre del juego.','error'); return; }
 
-      // ── Bloqueo: debe haber seleccionado de la lista ──
       if (!juegoConfirmado) {
         window.showToast('Selecciona el juego de la lista de sugerencias, no lo escribas a mano.','error');
         juegoInput.focus();
