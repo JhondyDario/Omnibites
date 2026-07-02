@@ -244,11 +244,6 @@
       object-fit: contain;
       display: block;
     }
-    .card-actions .reaction-btn.loading {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
     .state-msg {
       text-align: center;
       padding: 4rem 1rem;
@@ -358,9 +353,7 @@
     <div id="resultsList"></div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
-    import { buildMp3Blob } from '../js/id3-cover.js';
     import { auth } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -598,18 +591,6 @@
         .replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    function cleanAlbumForFilename(album) {
-      return album
-        .replace(/\/.*$/, '')
-        .replace(/\[.*?\]/g, '')
-        .replace(/\(.*?\)/g, '')
-        .replace(/original soundtrack/gi, '')
-        .replace(/soundtrack/gi, 'OST')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 60);
-    }
-
     function renderResults(items, query) {
       const header = document.getElementById('resultsHeader');
       const list   = document.getElementById('resultsList');
@@ -651,10 +632,6 @@
           <div class="card-actions">
             <button class="reaction-btn" title="Añadir soundbite" onclick="compartir(${i})">
               <img src="../assets/icons/add.png" alt="Añadir"/>
-            </button>
-            <button class="reaction-btn" id="dlBtn-${i}" title="Descargar MP3"
-              onclick="descargarMP3(${i}, '${item.url}', '${escape(item.album)}', '${escape(item.title)}')">
-              <img src="../assets/icons/download.png" alt="Descargar"/>
             </button>
             <a class="reaction-btn" title="Ver fuente en Archive.org"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
@@ -759,68 +736,6 @@
     }
 
     window.seekTo = function(e, idx, totalSecs) {};
-
-    window.descargarMP3 = async function(idx, url, albumEsc, titleEsc) {
-      const btn = document.getElementById(`dlBtn-${idx}`);
-      btn.classList.add('loading');
-      try {
-        const ctx = getAudioCtx();
-        if (ctx.state === 'suspended') await ctx.resume();
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('fetch error');
-        const buf     = await ctx.decodeAudioData(await res.arrayBuffer());
-        const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 2);
-        const startAt  = buf.duration > 30 ? Math.min(maxStart, buf.duration * 0.15) : 0;
-        const dur      = Math.min(CLIP_DURATION, buf.duration - startAt);
-        const offCtx   = new OfflineAudioContext(1, Math.floor(dur * 44100), 44100);
-        const src      = offCtx.createBufferSource();
-        src.buffer = buf;
-        const gain = offCtx.createGain();
-        gain.gain.setValueAtTime(0, 0);
-        gain.gain.linearRampToValueAtTime(1, FADE_DURATION);
-        gain.gain.setValueAtTime(1, dur - FADE_DURATION);
-        gain.gain.linearRampToValueAtTime(0, dur);
-        src.connect(gain); gain.connect(offCtx.destination);
-        src.start(0, startAt, dur);
-        const rendered = await offCtx.startRendering();
-        const mp3Data  = encodeToMP3(rendered);
-        const item     = window._items?.[idx];
-        const imgUrl   = item?.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
-        const blob     = await buildMp3Blob(mp3Data, imgUrl);
-        const album    = unescape(albumEsc);
-        const filename = `${cleanAlbumForFilename(album)} [Omnibites].mp3`
-          .replace(/[<>:"/\\|?*]/g, '').slice(0, 100);
-        const a = document.createElement('a');
-        a.href     = URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(a.href);
-        btn.classList.remove('loading');
-      } catch (e) {
-        console.error(e);
-        btn.classList.remove('loading');
-      }
-    };
-
-    function encodeToMP3(audioBuffer) {
-      const sampleRate = audioBuffer.sampleRate;
-      const samples    = audioBuffer.getChannelData(0);
-      const mp3enc     = new lamejs.Mp3Encoder(1, sampleRate, 128);
-      const blockSize  = 1152;
-      const mp3Data    = [];
-      const int16      = new Int16Array(samples.length);
-      for (let i = 0; i < samples.length; i++) {
-        int16[i] = Math.max(-32768, Math.min(32767, samples[i] * 32767));
-      }
-      for (let i = 0; i < int16.length; i += blockSize) {
-        const chunk   = int16.subarray(i, i + blockSize);
-        const encoded = mp3enc.encodeBuffer(chunk);
-        if (encoded.length > 0) mp3Data.push(new Uint8Array(encoded));
-      }
-      const end = mp3enc.flush();
-      if (end.length > 0) mp3Data.push(new Uint8Array(end));
-      return mp3Data;
-    }
 
     // ── Añadir soundbite: viaja el juego, consola e imagen ya confirmados ──
     window.compartir = function(idx) {
