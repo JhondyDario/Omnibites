@@ -2,9 +2,6 @@
 
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
 ### The retro community for video game soundbites
-
-[![Live](https://img.shields.io/badge/%20Website%20-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
-
 <p align="center" dir="auto">
   <a href="https://discord.gg/iisu" rel="nofollow">Review Soundbites</a> ·
   <a href="https://iisu.network" rel="nofollow">Explore Music</a> ·
