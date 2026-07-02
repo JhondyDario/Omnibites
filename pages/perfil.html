@@ -159,6 +159,15 @@
     <img src="../assets/reactions/fav.png" alt="Favoritos"/>
     <strong id="statFavs">0</strong>
   </div>
+    <div class="pstat-item">
+    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <strong id="statSeguidores">0</strong>
+  </div>
+  <div class="pstat-divider"></div>
+  <div class="pstat-item">
+    <img src="../assets/icons/following.png" alt="Siguiendo"/>
+    <strong id="statSiguiendo">0</strong>
+  </div>
 </div>
 
     <div class="collapse-section" id="sec-mios">
@@ -251,18 +260,24 @@
       let nombre = user.displayName || 'Jugador';
       let favIds = [];
 
-      if (snap.exists()) {
-        const d = snap.data();
-        nombre         = d.nombre || nombre;
-        selectedAvatar = d.avatar || 'avatar1';
-        favIds         = d.favoritos || [];
-      } else {
+if (snap.exists()) {
+  const d = snap.data();
+  nombre         = d.nombre || nombre;
+  selectedAvatar = d.avatar || 'avatar1';
+  favIds         = d.favoritos || [];
+  document.getElementById('statSiguiendo').textContent = (d.siguiendo || []).length;
+} else {
         await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
       }
 
       document.getElementById('userName').textContent = nombre;
       applyAvatar(selectedAvatar);
       document.getElementById('statFavs').textContent = favIds.length;
+
+      try {
+  const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', user.uid)));
+  document.getElementById('statSeguidores').textContent = followersSnap.size;
+} catch { document.getElementById('statSeguidores').textContent = '0'; }
 
       const q = query(collection(db,'audios'), where('autorId','==',user.uid));
       const aSnap = await getDocs(q);
