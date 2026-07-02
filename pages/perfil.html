@@ -300,8 +300,8 @@
     const total = Math.ceil(dataMios.length / PAGE_SIZE);
     el.innerHTML = slice.map(a => `
       <div class="mini-sb-card" id="mini-${a.id}">
-        <div class="mini-sb-info">
-          <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+<div class="mini-sb-info">
+          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a>
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
         </div>
         <div class="mini-sb-actions">
@@ -323,8 +323,8 @@
     const total = Math.ceil(dataFavs.length / PAGE_SIZE);
     el.innerHTML = slice.map(a => `
       <div class="mini-sb-card" id="fav-mini-${a.id}">
-        <div class="mini-sb-info">
-          <div class="mini-sb-title">${a.titulo||'Sin título'}</div>
+<div class="mini-sb-info">
+          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a>
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
         </div>
         <div class="mini-sb-actions">
