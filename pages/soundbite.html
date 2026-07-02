@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <title>Verifica tu correo — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .verify-page{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
+    .verify-card{background:var(--bg2);border:1px solid var(--gold);border-radius:12px;padding:2.5rem 2rem;max-width:440px;width:100%;text-align:center;}
+    .verify-icon{font-size:3rem;margin-bottom:1rem;}
+    .verify-card h1{font-family:var(--font-pixel);font-size:.78rem;color:var(--gold);margin-bottom:.75rem;}
+    .verify-card p{color:var(--text-dim);font-size:.85rem;line-height:1.7;margin-bottom:1.5rem;}
+    .verify-email{color:var(--neon);font-weight:600;}
+    .btn-row{display:flex;flex-direction:column;gap:.75rem;}
+    .resend-cool{font-size:.75rem;color:var(--text-dim);margin-top:.5rem;}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+<a href="../index.html" class="logo">
+  <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+  <span class="logo-text">OMNI<span>BITES</span></span>
+</a>
+    <div class="nav-links">
+      <a href="comunidad.html">Comunidad</a>
+      <a href="explorar.html">Explorar</a>
+      <a href="subir.html">Añadir</a>   
+      <a href="jugadores.html">Jugadores</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Comunidad</a>
+    <a href="explorar.html">Explorar</a>
+    <a href="subir.html">Añadir</a>   
+    <a href="jugadores.html">Jugadores</a>
+  </div>
+
+  <main class="verify-page">
+    <div class="verify-card">
+      <div class="verify-icon">✉️</div>
+      <h1>Verifica tu correo</h1>
+      <p>Para usar Omnibites necesitas verificar tu cuenta. Te enviamos un enlace a <span class="verify-email" id="userEmail">tu correo</span>.<br/><br/>Revisa tu bandeja de entrada (y el spam, por si acaso).</p>
+      <div class="btn-row">
+        <button class="btn-primary" id="checkBtn">Ya lo verifiqué</button>
+        <button class="btn-outline" id="resendBtn">Reenviar correo</button>
+        <p class="resend-cool" id="cooldown"></p>
+      </div>
+      <p style="margin-top:1.5rem;font-size:.75rem;color:var(--text-dim)">
+        ¿Correo incorrecto? <a href="#" id="logoutLink" style="color:var(--neon)">Cerrar sesión</a> y regístrate de nuevo.
+      </p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Hecho con amor para la comunidad</p>
+      <div class="footer-links">
+        <a href="legal.html">Licencia</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+      </div>
+      <a href="../index.html" class="logo">
+        <span class="logo-text">OMNI<span>BITES</span></span>
+      </a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { auth } from '../js/firebase-config.js';
+    import { onAuthStateChanged, sendEmailVerification, signOut, reload }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    let currentUser = null;
+    let cooldownTimer = null;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
+      if (user.emailVerified) { window.location.href = ROOT + '/index.html'; return; }
+      currentUser = user;
+      document.getElementById('userEmail').textContent = user.email || '';
+    });
+
+    document.getElementById('checkBtn').addEventListener('click', async () => {
+      if (!currentUser) return;
+      const btn = document.getElementById('checkBtn');
+      btn.textContent = 'Verificando...'; btn.disabled = true;
+      try {
+        await reload(currentUser);
+        if (currentUser.emailVerified) {
+          window.showToast && window.showToast('Correo verificado. ¡Bienvenido!');
+          setTimeout(() => window.location.href = ROOT + '/index.html', 1000);
+        } else {
+          window.showToast && window.showToast('Aún no verificado. Revisa tu correo.', 'error');
+          btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
+        }
+      } catch(e) {
+        btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      }
+    });
+
+    document.getElementById('resendBtn').addEventListener('click', async () => {
+      if (!currentUser || cooldownTimer) return;
+      try {
+        await sendEmailVerification(currentUser);
+        window.showToast && window.showToast('Correo reenviado');
+        startCooldown(60);
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      }
+    });
+
+    function startCooldown(secs) {
+      const btn  = document.getElementById('resendBtn');
+      const cool = document.getElementById('cooldown');
+      btn.disabled = true;
+      let remaining = secs;
+      cooldownTimer = setInterval(() => {
+        remaining--;
+        cool.textContent = `Puedes reenviar en ${remaining}s`;
+        if (remaining <= 0) {
+          clearInterval(cooldownTimer); cooldownTimer = null;
+          btn.disabled = false; cool.textContent = '';
+        }
+      }, 1000);
+    }
+
+    document.getElementById('logoutLink').addEventListener('click', async e => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = ROOT + '/pages/login.html';
+    });
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+</body>
+</html>
