@@ -4,7 +4,6 @@
 ### The retro community for video game soundbites
 
 [![Live](https://img.shields.io/badge/%20Website%20-008000?style=for-the-badge&logoColor=black)](https://jhondydario.github.io/Omnibites/)
-[![YouTube](https://img.shields.io/badge/%20YouTube%20-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/c/jhondyjd)
 
 <p align="center" dir="auto">
   <a href="https://discord.gg/iisu" rel="nofollow">Review Soundbites</a> ·
