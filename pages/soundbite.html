@@ -21,6 +21,10 @@
     .sb-meta-neon{color:var(--neon);font-weight:600;}
     .sb-meta-dot{color:var(--border);}
 
+    .edit-btns-col{display:flex;flex-direction:column;gap:.5rem;}
+    .edit-title-form select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
+    .edit-title-form select:focus{border-color:var(--neon);}
+
     .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
     .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;}
     .edit-title-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);padding:.5rem 1rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:border-color .2s,color .2s;display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
@@ -111,11 +115,16 @@
         <span id="sbConsolaMeta" class="sb-meta-neon"></span>
       </div>
 
-      <div class="sb-detail-img-row">
+<div class="sb-detail-img-row">
         <img id="sbImage" class="sb-detail-img" src="" alt=""/>
-        <button class="edit-title-btn" id="editTitleBtn" style="display:none">
-          <img src="../assets/icons/camera.png" alt=""/> Editar título
-        </button>
+        <div class="edit-btns-col">
+          <button class="edit-title-btn" id="editTitleBtn" style="display:none">
+            <img src="../assets/icons/camera.png" alt=""/> Editar soundtrack
+          </button>
+          <button class="edit-title-btn" id="editCategoriaBtn" style="display:none">
+            <img src="../assets/icons/camera.png" alt=""/> Editar categoría
+          </button>
+        </div>
       </div>
 
       <div class="sb-detail-header" id="titleDisplay">
@@ -123,12 +132,19 @@
         <p class="sb-detail-juego" id="sbJuego"></p>
       </div>
 
-      <div class="edit-title-form" id="editTitleForm">
-        <input type="text" id="editTitleInput" maxlength="60"/>
-        <div class="edit-char-count" id="editCharCount">0/60</div>
+<div class="edit-title-form" id="editCategoriaForm">
+        <select id="editCategoriaSelect">
+          <option value="orquestal">Orquestal e Instrumental</option>
+          <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
+          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
+          <option value="rock-metal">Rock, Metal e Industrial</option>
+          <option value="jazz">Jazz y Dark Jazz / Noir</option>
+          <option value="hibrido">Soundtracks Híbridos</option>
+          <option value="licenciada">Música Licenciada</option>
+        </select>
         <div class="edit-title-actions">
-          <button class="btn-primary" id="saveTitleBtn">Guardar</button>
-          <button class="btn-outline" id="cancelTitleBtn">Cancelar</button>
+          <button class="btn-primary" id="saveCategoriaBtn">Guardar</button>
+          <button class="btn-outline" id="cancelCategoriaBtn">Cancelar</button>
         </div>
       </div>
 
@@ -200,8 +216,20 @@
 
     function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
     function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
-    function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
+    const CATEGORIA_LABELS = {
+      orquestal: 'Orquestal e Instrumental',
+      chiptune: 'Chiptune (8-Bit / 16-Bit)',
+      electronica: 'Electrónica (EDM, Synthwave, Lo-Fi)',
+      'rock-metal': 'Rock, Metal e Industrial',
+      jazz: 'Jazz y Dark Jazz / Noir',
+      hibrido: 'Soundtracks Híbridos',
+      licenciada: 'Música Licenciada'
+    };
+    
+    function categoriaLabel(slug) { return CATEGORIA_LABELS[slug] || slug || 'soundbite'; }
+    
     function showAuthPrompt() {
       const existing = document.querySelector('.auth-prompt');
       if (existing) existing.remove();
@@ -262,7 +290,7 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
       autorLink.textContent = sbData.autorNombre || 'Anónimo';
       autorLink.href = `jugador.html?uid=${sbData.autorId || ''}`;
 
-      document.getElementById('sbClasificacion').textContent = sbData.categoria || 'soundbite';
+document.getElementById('sbClasificacion').textContent = categoriaLabel(sbData.categoria);
       document.getElementById('sbConsolaMeta').textContent = sbData.consola || '—';
 
       document.getElementById('sbTotal').textContent = sbData.duracion || '0:15';
@@ -280,10 +308,10 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
       if (currentUser) applyUserState();
     }
 
-    function updateEditButtonVisibility() {
-      const btn = document.getElementById('editTitleBtn');
+function updateEditButtonVisibility() {
       const isOwner = currentUser && sbData && currentUser.uid === sbData.autorId;
-      btn.style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('editTitleBtn').style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('editCategoriaBtn').style.display = isOwner ? 'flex' : 'none';
     }
 
     async function applyUserState() {
@@ -321,13 +349,44 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
     }
 
     // ── EDITAR TÍTULO ──
-    document.getElementById('editTitleBtn').addEventListener('click', () => {
+document.getElementById('editTitleBtn').addEventListener('click', () => {
+      document.getElementById('editCategoriaForm').style.display = 'none';
       document.getElementById('titleDisplay').style.display = 'none';
       document.getElementById('editTitleForm').style.display = 'flex';
       const input = document.getElementById('editTitleInput');
       input.value = sbData.titulo || '';
       document.getElementById('editCharCount').textContent = `${input.value.length}/60`;
       input.focus();
+    });
+
+    document.getElementById('editCategoriaBtn').addEventListener('click', () => {
+      document.getElementById('editTitleForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'block';
+      document.getElementById('editCategoriaForm').style.display = 'flex';
+      document.getElementById('editCategoriaSelect').value = sbData.categoria || '';
+    });
+
+    document.getElementById('cancelCategoriaBtn').addEventListener('click', () => {
+      document.getElementById('editCategoriaForm').style.display = 'none';
+    });
+
+    document.getElementById('saveCategoriaBtn').addEventListener('click', async () => {
+      if (!currentUser || currentUser.uid !== sbData.autorId) return;
+      const nueva = document.getElementById('editCategoriaSelect').value;
+      if (!nueva) { window.showToast && window.showToast('Selecciona una categoría.', 'error'); return; }
+      const btn = document.getElementById('saveCategoriaBtn');
+      btn.disabled = true; btn.textContent = 'Guardando...';
+      try {
+        await updateDoc(doc(db,'audios',sbId), { categoria: nueva });
+        sbData.categoria = nueva;
+        document.getElementById('sbClasificacion').textContent = categoriaLabel(nueva);
+        document.getElementById('editCategoriaForm').style.display = 'none';
+        window.showToast && window.showToast('Categoría actualizada');
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Guardar';
+      }
     });
 
     document.getElementById('editTitleInput').addEventListener('input', e => {
