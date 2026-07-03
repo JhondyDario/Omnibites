@@ -326,14 +326,22 @@
       }
     });
 
+// decodeURIComponent puede tronar si el valor ya viene decodificado por
+    // URLSearchParams y contiene un "%" suelto (común en títulos largos de
+    // Archive.org). Con esto evitamos que un decode roto tumbe el resto de la función.
+    function safeDecode(str) {
+      try { return decodeURIComponent(str); }
+      catch { return str; }
+    }
+
     function prefillFromURL() {
       const p = new URLSearchParams(window.location.search);
       if (p.get('url')) {
         document.getElementById('audioUrl').value = p.get('url');
         loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
       }
-      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo')).slice(0, 60).trim();
-      if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
+      if (p.get('titulo')) document.getElementById('titulo').value = safeDecode(p.get('titulo')).slice(0, 60).trim();
+      if (p.get('imagen')) imagenFromArchive = safeDecode(p.get('imagen'));
       document.getElementById('titulo').dispatchEvent(new Event('input'));
 
       // ── Juego, consola e imagen ya confirmados desde Explorar ──
@@ -342,7 +350,7 @@
       const juegoImgParam = p.get('juegoImagen');
 
       if (juegoParam && consolaParam) {
-        const nombreJuego = decodeURIComponent(juegoParam);
+        const nombreJuego = safeDecode(juegoParam);
         juegoInput.value = nombreJuego;
         juegoConfirmado   = true;
         document.getElementById('consola').value = consolaParam;
@@ -350,7 +358,7 @@
         juegoHint.textContent = `✓ ${nombreJuego} seleccionado — consola asignada automáticamente`;
 
       if (juegoImgParam) {
-          const decodedImg = decodeURIComponent(juegoImgParam);
+          const decodedImg = safeDecode(juegoImgParam);
           imagenFromRawg = decodedImg; // misma URL que se muestra — sin resize, prioridad garantizada
           const imgWrap = document.getElementById('juegoImgWrap');
           const imgEl   = document.getElementById('juegoImg');
@@ -360,7 +368,7 @@
         }
       } else if (juegoParam) {
         // Solo el nombre, sin consola confirmada — el usuario debe seleccionarlo de la lista igual
-        document.getElementById('juego').value = decodeURIComponent(juegoParam);
+        document.getElementById('juego').value = safeDecode(juegoParam);
       }
     }
 
