@@ -27,16 +27,33 @@ function writeSyncSafe(buf, offset, val) {
 }
 
 // Descarga una imagen y la comprime a JPEG chiquito (máx 300px, calidad 0.72)
+async function fetchAsBitmap(url) {
+  const res = await fetch(url, { mode: 'cors' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const blob = await res.blob();
+  return createImageBitmap(blob);
+}
+
 export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
   if (!imgUrl) return null;
+  let bitmap = null;
+
+  // Intento 1: fetch directo a la fuente original
   try {
-export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
-  if (!imgUrl) return null;
+    bitmap = await fetchAsBitmap(imgUrl);
+  } catch (e1) {
+    // Intento 2: proxy con CORS habilitado (para cuando archive.org u otra fuente no manda el header)
+    console.warn('Fetch directo bloqueado, probando proxy CORS:', imgUrl, '—', e1.message);
+    try {
+      const proxied = `https://images.weserv.nl/?url=${encodeURIComponent(imgUrl.replace(/^https?:\/\//, ''))}`;
+      bitmap = await fetchAsBitmap(proxied);
+    } catch (e2) {
+      console.warn('Portada no embebida — falló también el proxy:', e2.message);
+      return null;
+    }
+  }
+
   try {
-    const res = await fetch(imgUrl, { mode: 'cors' });
-    if (!res.ok) throw new Error('img fetch failed: HTTP ' + res.status);
-    const blob = await res.blob();
-    const bitmap = await createImageBitmap(blob);
     const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
     const w = Math.max(1, Math.round(bitmap.width  * scale));
     const h = Math.max(1, Math.round(bitmap.height * scale));
@@ -47,8 +64,8 @@ export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
     if (!outBlob) return null;
     return new Uint8Array(await outBlob.arrayBuffer());
   } catch (e) {
-    console.warn('Portada no embebida (CORS o imagen inválida):', imgUrl, '—', e.message);
-    return null; // CORS bloqueado o imagen inválida — no rompe la descarga
+    console.warn('Error procesando portada:', e.message);
+    return null;
   }
 }
 
