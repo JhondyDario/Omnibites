@@ -334,13 +334,12 @@
       }
       if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo')).slice(0, 60).trim();
       if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
+      document.getElementById('titulo').dispatchEvent(new Event('input'));
 
       // ── Juego, consola e imagen ya confirmados desde Explorar ──
       const juegoParam    = p.get('juego');
       const consolaParam  = p.get('consola');
       const juegoImgParam = p.get('juegoImagen');
-      document.getElementById('titulo').dispatchEvent(new Event('input'));
-
 
       if (juegoParam && consolaParam) {
         const nombreJuego = decodeURIComponent(juegoParam);
