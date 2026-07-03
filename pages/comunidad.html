@@ -110,10 +110,11 @@
     </div>
   </div>
 
-  <div class="com-grid">
+<div class="com-grid">
     <div class="com-cards" id="sbGrid">
       <div style="grid-column:1/-1" class="empty-state"><div class="spinner"></div><p>Cargando soundbites...</p></div>
     </div>
+    <div id="sbPaginator"></div>
   </div>
 
 <script type="module">
@@ -128,12 +129,19 @@ import {
 let currentUser = null;
 let allItems = [];
 let commentCountMap = {};
+const PAGE_SIZE = 10;
+let currentPage = 0;
     let activeConsola = '', activeCat = '', activeSort = 'reciente';
 
     onAuthStateChanged(auth, u => { currentUser = u; });
 
-  async function loadCommentCounts() {
-  await Promise.all(allItems.map(async a => {
+async function loadCommentCounts(items) {
+  await Promise.all(items.map(async a => {
+    if (commentCountMap[a.id] !== undefined) {
+      const el = document.getElementById(`ccount-${a.id}`);
+      if (el) el.textContent = commentCountMap[a.id];
+      return;
+    }
     try {
       const snap = await getCountFromServer(collection(db, 'audios', a.id, 'comentarios'));
       commentCountMap[a.id] = snap.data().count;
@@ -154,27 +162,51 @@ let commentCountMap = {};
       }
     }
 
-    function render() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      let items = allItems.filter(a => {
-        const mc = !activeConsola || a.consola === activeConsola;
-        const mcat = !activeCat || a.categoria === activeCat;
-        const ms = !search
-          || (a.titulo||'').toLowerCase().includes(search)
-          || (a.juego||'').toLowerCase().includes(search)
-          || (a.autorNombre||'').toLowerCase().includes(search);
-        return mc && mcat && ms;
-      });
-      if (activeSort === 'love') items.sort((a,b) => (b.reactions?.love||0)-(a.reactions?.love||0));
-      if (activeSort === 'reciente') items.sort((a,b) => (b.creadoEn?.seconds||0)-(a.creadoEn?.seconds||0));
+function render() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let items = allItems.filter(a => {
+    const mc = !activeConsola || a.consola === activeConsola;
+    const mcat = !activeCat || a.categoria === activeCat;
+    const ms = !search
+      || (a.titulo||'').toLowerCase().includes(search)
+      || (a.juego||'').toLowerCase().includes(search)
+      || (a.autorNombre||'').toLowerCase().includes(search);
+    return mc && mcat && ms;
+  });
+  if (activeSort === 'love') items.sort((a,b) => (b.reactions?.love||0)-(a.reactions?.love||0));
+  if (activeSort === 'reciente') items.sort((a,b) => (b.creadoEn?.seconds||0)-(a.creadoEn?.seconds||0));
 
-      const grid = document.getElementById('sbGrid');
-      if (!items.length) {
-        grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
-        return;
-      }
-      grid.innerHTML = items.map(a => sbCard(a)).join('');
-    }
+  const grid = document.getElementById('sbGrid');
+  const pagEl = document.getElementById('sbPaginator');
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
+    pagEl.innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.ceil(items.length / PAGE_SIZE);
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  const slice = items.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+  grid.innerHTML = slice.map(a => sbCard(a)).join('');
+  pagEl.innerHTML = comPaginatorHTML(currentPage, totalPages);
+  loadCommentCounts(slice);
+}
+
+function comPaginatorHTML(current, total) {
+  if (total <= 1) return '';
+  let html = '<div class="paginator">';
+  for (let i = 0; i < total; i++) {
+    html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goComPage(${i})">${i + 1}</button>`;
+  }
+  return html + '</div>';
+}
+
+window.goComPage = function(page) {
+  currentPage = page;
+  render();
+  document.querySelector('.com-header').scrollIntoView({ behavior: 'smooth' });
+};
 
 function sbCard(a) {
   const r = a.reactions || { love:0, meh:0 };
@@ -454,16 +486,15 @@ window.playSB = async function(id, url, ts, te){
 
     function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
 
-    document.getElementById('searchBtn').addEventListener('click', render);
-    document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') render(); });
-  document.getElementById('searchInput').addEventListener('input', render);
-    document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; render(); });
-    document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; render(); });
-    document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; render(); });
+document.getElementById('searchBtn').addEventListener('click', () => { currentPage=0; render(); });
+document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter'){ currentPage=0; render(); } });
+document.getElementById('searchInput').addEventListener('input', () => { currentPage=0; render(); });
+document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; currentPage=0; render(); });
+document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; currentPage=0; render(); });
+document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; currentPage=0; render(); });
 
     await loadSoundbites();
     await loadUserData();
-    loadCommentCounts(); // sin await — corre en segundo plano, no bloquea el render inicial
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
