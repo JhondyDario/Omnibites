@@ -366,23 +366,26 @@ if (favIds.length > 0) {
     if (key === 'favs') { pageFavs = page; renderFavsPage(); }
   };
 
-  window.deleteMio = async function(id) {
+window.deleteMio = async function(id) {
     if (!confirm('¿Eliminar este soundbite?')) return;
     try {
       await deleteDoc(doc(db,'audios',id));
       dataMios = dataMios.filter(a => a.id !== id);
       if (pageMios > 0 && pageMios >= Math.ceil(dataMios.length / PAGE_SIZE)) pageMios--;
       renderMiosPage();
+      document.getElementById('statAudios').textContent = dataMios.length;
+      document.getElementById('statLove').textContent = dataMios.reduce((s,a)=>s+(a.reactions?.love||0),0);
       window.showToast&&window.showToast('Soundbite eliminado');
     } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
   };
 
-  window.removeFav = async function(id) {
+window.removeFav = async function(id) {
     try {
       await updateDoc(doc(db,'usuarios',currentUser.uid),{favoritos:arrayRemove(id)});
       dataFavs = dataFavs.filter(a => a.id !== id);
       if (pageFavs > 0 && pageFavs >= Math.ceil(dataFavs.length / PAGE_SIZE)) pageFavs--;
       renderFavsPage();
+      document.getElementById('statFavs').textContent = dataFavs.length;
       window.showToast&&window.showToast('Eliminado de favoritos');
     } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
   };
