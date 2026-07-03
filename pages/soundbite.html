@@ -194,8 +194,8 @@
         <p id="sbDescripcion"></p>
       </div>
 
-      <div class="sbox">
-        <h2>Comentarios</h2>
+<div class="sbox">
+        <h2>Comentarios <span id="commentCount" style="color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
         <div class="comment-box" id="commentForm" style="display:none">
           <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="300"></textarea>
           <div class="comment-char-count" id="charCount">0/500</div>
@@ -676,12 +676,13 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
     }
 
     // ── COMENTARIOS ──
-    async function loadComments() {
+async function loadComments() {
       const list = document.getElementById('commentsList');
       list.innerHTML = '<div class="empty-mini">Cargando comentarios...</div>';
       try {
         const q = query(collection(db,'audios',sbId,'comentarios'), orderBy('creadoEn','desc'));
         const snap = await getDocs(q);
+        document.getElementById('commentCount').textContent = snap.size ? `(${snap.size})` : '';
         if (snap.empty) { list.innerHTML = '<div class="empty-mini">Sé el primero en comentar.</div>'; return; }
         list.innerHTML = snap.docs.map(d => {
           const c = d.data();

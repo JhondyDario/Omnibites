@@ -44,6 +44,8 @@ onAuthStateChanged(auth, async user => {
 function renderNav(user, nombre, avatar) {
   const el = document.getElementById('nav-auth');
   if (!el) return;
+  const onPerfil = location.pathname.includes('/perfil.html');
+  if (user && onPerfil) { el.innerHTML = ''; return; }
   if (user) {
     const name = nombre || user.email?.split('@')[0] || 'Jugador';
     const initial = name.charAt(0).toUpperCase();
