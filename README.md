@@ -11,7 +11,7 @@
 
 ### OMNIBITES
 
-Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs directly in your browser.
+Omnibites is a web community where gamers can **find, listen to, rate, download, and share soundbites from their favorite video games**. It runs entirely in your browser, with no installation required.
 
 A soundbite is a 15-second clip with an automatic fade-in and fade-out — that classic effect you might remember from selecting a game on a Nintendo screen, where the music would play softly before jumping into the main menu.
 
@@ -58,7 +58,7 @@ The mobile app is still in planning, and no official APK exists yet — any you 
 **Compatibility**
 
 Omnibites integrates seamlessly with **iiSU** and other retro frontends that support custom soundbite playback.  
-Because all soundbites are stored in **MP3 format** and limited to **10–15 seconds**, they are extremely lightweight — typically between **200 and 300 kbps**, rarely exceeding **400 kpbs per clip**. This ensures fast loading, smooth playback, and excellent audio quality across compatible platforms.  
+Because all soundbites are delivered in **MP3** format and limited to **10–15 seconds**, they are extremely lightweight — typically between **200 and 300 kbps**, rarely exceeding **400 kpbs per clip**. This ensures fast loading, smooth playback, and excellent audio quality across compatible platforms.  
   
 Using open formats and minimal metadata makes it easy to extend or embed soundbites into any frontend that supports custom audio hooks or media previews.
 
@@ -66,13 +66,14 @@ Using open formats and minimal metadata makes it easy to extend or embed soundbi
 
 ### Contribution
 
-The platform **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. Game info and cover art are pulled from a public video game database. Copyright is respected, and only openly accessible content is used. The service is free and ad‑free. If you enjoy what you see or simply want the project to keep growing, you can support the developer directly:  
+Omnibites is designed to be lightweight and community-driven. Audio playback is powered by publicly available digital audio libraries, while game information and cover artwork are retrieved from public video game databases and image services. The project respects copyright and only uses content that is publicly accessible.
+
+The service is completely free and ad-free. If you enjoy Omnibites or simply want to help the project continue growing, you can support its development:
 
 <div align="center">
 
 [![PayPal](https://img.shields.io/badge/Omnibites-PayPal-003087?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ)
 
-*Your support helps cover development, improvements, and eventually the server for upcoming features.*  
+*Your support helps fund development, new features, infrastructure, and the long-term growth of Omnibites.*
 
-<div align="center">
 </div>
