@@ -116,22 +116,32 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 <script type="module">
-  import { buildMp3Blob } from '../js/id3-cover.js';
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      collection, getDocs, query, orderBy, doc,
-      updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  collection, getDocs, query, orderBy, doc,
+  updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove, getCountFromServer
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    let currentUser = null;
-    let allItems = [];
+let currentUser = null;
+let allItems = [];
+let commentCountMap = {};
     let activeConsola = '', activeCat = '', activeSort = 'reciente';
 
     onAuthStateChanged(auth, u => { currentUser = u; });
+
+  async function loadCommentCounts() {
+  await Promise.all(allItems.map(async a => {
+    try {
+      const snap = await getCountFromServer(collection(db, 'audios', a.id, 'comentarios'));
+      commentCountMap[a.id] = snap.data().count;
+      const el = document.getElementById(`ccount-${a.id}`);
+      if (el) el.textContent = commentCountMap[a.id];
+    } catch (e) { /* si falla, se queda en 0 — no rompe nada */ }
+  }));
+}
 
     async function loadSoundbites() {
       try {
@@ -204,8 +214,9 @@ function sbCard(a) {
               <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
   <img src="../assets/reactions/fav.png" alt="Favorito"/>
 </button>
-<button class="icon-btn icon-btn-dl" onclick="dlSB('${a.url}','${(a.titulo||'soundbite').replace(/'/g,'')}','${(a.imagen||'').replace(/'/g,'')}')" title="Descargar">
-<img src="../assets/reactions/download.png" alt="Descargar"/>
+<button class="icon-btn icon-btn-comments" onclick="location.href='soundbite.html?id=${a.id}'" title="Comentarios">
+  <img src="../assets/icons/comments.png" alt="Comentarios"/>
+  <span class="icon-count">${commentCountMap[a.id] ?? 0}</span>
 </button>
             </div>
           </div>
@@ -430,57 +441,6 @@ window.playSB = async function(id, url, ts, te){
     }, 3000);
   }
 };
-  
-    window.dlSB=async function(url,titulo){
-      const btn = event?.target?.closest('.icon-btn');
-      if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity='.3'; btn.disabled=true; }
-      try{
-        const response = await fetch(url, {mode:'cors'});
-        if(!response.ok) throw new Error('HTTP '+response.status);
-        const arrayBuf = await response.arrayBuffer();
-        const ctx=getCtx();
-        if(ctx.state==='suspended') await ctx.resume();
-        const buf = await ctx.decodeAudioData(arrayBuf);
-        const dur = Math.min(15, buf.duration);
-        const sampleRate = Math.min(buf.sampleRate, 44100);
-        const offCtx = new OfflineAudioContext(1, Math.floor(dur*sampleRate), sampleRate);
-        const src = offCtx.createBufferSource();
-        src.buffer = buf;
-        const gain = offCtx.createGain();
-        gain.gain.setValueAtTime(0, 0);
-        gain.gain.linearRampToValueAtTime(1, Math.min(2, dur*0.15));
-        gain.gain.setValueAtTime(1, Math.max(dur-2, dur*0.85));
-        gain.gain.linearRampToValueAtTime(0, dur);
-        src.connect(gain); gain.connect(offCtx.destination); src.start(0, 0, dur);
-        const rendered = await offCtx.startRendering();
-        const samples = rendered.getChannelData(0);
-        const int16 = new Int16Array(samples.length);
-        for(let i=0;i<samples.length;i++)
-          int16[i]=Math.max(-32768,Math.min(32767,Math.round(samples[i]*32767)));
-        if(typeof lamejs === 'undefined') throw new Error('lamejs not loaded');
-        const enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
-        const mp3 = []; const bs = 1152;
-        for(let i=0;i<int16.length;i+=bs){
-          const chunk = int16.subarray(i, Math.min(i+bs, int16.length));
-          const d = enc.encodeBuffer(chunk);
-          if(d.length>0) mp3.push(new Uint8Array(d));
-        }
-        const end = enc.flush();
-        if(end.length>0) mp3.push(new Uint8Array(end));
-  const blob = await buildMp3Blob(mp3, imagen);
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `${titulo.slice(0,50)} [Omnibites].mp3`.replace(/[<>:"/\\|?*]/g,'');
-        a.click();
-        setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-        window.showToast&&window.showToast('Descargando MP3');
-      }catch(e){
-        console.error('dlSB error:',e);
-        window.showToast&&window.showToast('Error al descargar.','error');
-      } finally {
-        if(btn){ const img=btn.querySelector('img'); if(img) img.style.opacity=''; btn.disabled=false; }
-      }
-    };
 
     function showAuthPrompt() {
       const existing = document.querySelector('.auth-prompt');
@@ -503,6 +463,7 @@ window.playSB = async function(id, url, ts, te){
 
     await loadSoundbites();
     await loadUserData();
+    loadCommentCounts(); // sin await — corre en segundo plano, no bloquea el render inicial
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
