@@ -273,7 +273,6 @@ if (snap.exists()) {
 
       document.getElementById('userName').textContent = nombre;
       applyAvatar(selectedAvatar);
-      document.getElementById('statFavs').textContent = favIds.length;
 
       try {
   const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', user.uid)));
@@ -287,7 +286,7 @@ if (snap.exists()) {
       document.getElementById('statLove').textContent = totalLove;
       renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
 
-      if (favIds.length > 0) {
+if (favIds.length > 0) {
         const favAudios = [];
         for (const fid of favIds) {
           try {
@@ -295,8 +294,10 @@ if (snap.exists()) {
             if (fs.exists()) favAudios.push({id:fs.id,...fs.data()});
           } catch {}
         }
+        document.getElementById('statFavs').textContent = favAudios.length;
         renderFavs(favAudios);
       } else {
+        document.getElementById('statFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>';
       }
     } catch(e) {
