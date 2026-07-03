@@ -747,9 +747,13 @@
       const end      = Math.round(Math.min(start + 15, totalDur));
       const imagenAudio = item.archiveId ? `https://archive.org/services/img/${item.archiveId}` : '';
 
+const tituloRecortado = item.title.length > 60
+        ? item.title.slice(0, 60).trim()
+        : item.title;
+
       const params = new URLSearchParams({
         url: item.url,
-        titulo: item.title,
+        titulo: tituloRecortado,
         trimStart: start,
         trimEnd: end,
         imagen: imagenAudio
