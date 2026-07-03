@@ -332,7 +332,7 @@
         document.getElementById('audioUrl').value = p.get('url');
         loadAudioUrl(p.get('url'), parseFloat(p.get('trimStart') || 0), parseFloat(p.get('trimEnd') || 15));
       }
-      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo'));
+      if (p.get('titulo')) document.getElementById('titulo').value = decodeURIComponent(p.get('titulo')).slice(0, 60).trim();
       if (p.get('imagen')) imagenFromArchive = decodeURIComponent(p.get('imagen'));
 
       // ── Juego, consola e imagen ya confirmados desde Explorar ──
@@ -376,6 +376,7 @@
 
     document.getElementById('loadBtn').addEventListener('click', () =>
       loadAudioUrl(document.getElementById('audioUrl').value.trim()));
+    document.getElementById('titulo').dispatchEvent(new Event('input'));
 
     function loadAudioUrl(url, startHint = 0, endHint = 15) {
       const errEl = document.getElementById('urlError');
