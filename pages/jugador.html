@@ -320,7 +320,6 @@ window.toggleFollow = async function() {
       document.getElementById('pubAvatarFallback').textContent = nombre.charAt(0).toUpperCase();
       document.getElementById('pubName').textContent = nombre;
       document.title = `${nombre} — Omnibites`;
-      document.getElementById('pubStatFavs').textContent = favIds.length;
 
       try {
   const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', uid)));
@@ -393,7 +392,7 @@ maybeRenderFollow();
       renderMiosPage();
 
       // Cargar favoritos
-      if (favIds.length > 0) {
+if (favIds.length > 0) {
         const favAudios = [];
         for (const fid of favIds) {
           try {
@@ -402,8 +401,10 @@ maybeRenderFollow();
           } catch {}
         }
         dataFavs = favAudios;
+        document.getElementById('pubStatFavs').textContent = favAudios.length;
         renderFavsPage();
       } else {
+        document.getElementById('pubStatFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML =
           '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>';
       }
