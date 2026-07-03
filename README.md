@@ -66,8 +66,7 @@ Using open formats and minimal metadata makes it easy to extend or embed soundbi
 
 ### Contribution
 
-The platform **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. Game info and cover art are pulled from a public video game database. Copyright is respected, and only openly accessible content is used.  
-The service is free and ad‑free. If you enjoy what you see or simply want the project to keep growing, you can support the developer directly:  
+The platform **does not store audio files** on its servers. All audio comes directly from Archive.org, a non-profit digital preservation repository. Game info and cover art are pulled from a public video game database. Copyright is respected, and only openly accessible content is used. The service is free and ad‑free. If you enjoy what you see or simply want the project to keep growing, you can support the developer directly:  
 
 <div align="center">
 
