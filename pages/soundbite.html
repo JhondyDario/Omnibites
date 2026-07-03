@@ -59,7 +59,9 @@
     }
 
     .icon-btn-report:hover{border-color:var(--danger);background:rgba(248,113,113,.07);}
-.icon-btn-report:hover img{opacity:1;filter:drop-shadow(0 0 4px var(--danger));}
+    .icon-btn-report:hover img{opacity:1;filter:drop-shadow(0 0 4px var(--danger));}
+    .icon-btn-report.active-report{border-color:var(--danger);background:rgba(248,113,113,.07);cursor:default;}
+    .icon-btn-report.active-report img{opacity:1;filter:drop-shadow(0 0 4px var(--danger));}
   </style>
 </head>
 <body>
@@ -185,7 +187,7 @@
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      doc, getDoc, updateDoc, collection, getDocs, addDoc, query, orderBy,
+      doc, getDoc, updateDoc, collection, getDocs, addDoc, query, orderBy, where,
       arrayUnion, arrayRemove, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -219,7 +221,7 @@
       currentUser = user;
       document.getElementById('commentForm').style.display = user ? 'block' : 'none';
       document.getElementById('loginPrompt').style.display = user ? 'none' : 'block';
-      if (sbData) updateEditButtonVisibility();
+      if (sbData) { updateEditButtonVisibility(); applyUserState(); }
     });
 
     async function init() {
@@ -287,17 +289,35 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
     async function applyUserState() {
       try {
         const snap = await getDoc(doc(db,'usuarios',currentUser.uid));
-        if (!snap.exists()) return;
-        const data = snap.data();
-        const myReact = (data.reacciones || {})[sbId];
-        if (myReact) {
-          const btn = document.getElementById(myReact === 'love' ? 'rLove' : 'rMeh');
-          if (btn) btn.classList.add(`active-${myReact}`);
-        }
-        if ((data.favoritos || []).includes(sbId)) {
-          document.getElementById('favBtn').classList.add('active-fav');
+        if (snap.exists()) {
+          const data = snap.data();
+          const myReact = (data.reacciones || {})[sbId];
+          if (myReact) {
+            const btn = document.getElementById(myReact === 'love' ? 'rLove' : 'rMeh');
+            if (btn) btn.classList.add(`active-${myReact}`);
+          }
+          if ((data.favoritos || []).includes(sbId)) {
+            document.getElementById('favBtn').classList.add('active-fav');
+          }
         }
       } catch {}
+
+      // ── Verifica si este usuario ya reportó este soundbite ──
+      try {
+        const repQ = query(
+          collection(db, 'reportes'),
+          where('audioId', '==', sbId),
+          where('reportadoPor', '==', currentUser.uid)
+        );
+        const repSnap = await getDocs(repQ);
+        if (!repSnap.empty) marcarReportButtonComoEnviado();
+      } catch(e) { console.warn('No se pudo verificar reporte previo:', e.message); }
+    }
+
+    function marcarReportButtonComoEnviado() {
+      const btn = document.getElementById('reportBtn');
+      btn.classList.add('active-report');
+      btn.title = 'Ya reportaste este soundbite';
     }
 
     // ── EDITAR TÍTULO ──
@@ -399,6 +419,41 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
           window.showToast && window.showToast('Guardado en favoritos');
         }
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
+    }
+
+    // ── REPORTAR ──
+    // Registro simple en Firestore: colección "reportes" en la raíz.
+    // Un click, un registro. Nada de correos ni popups — se revisa desde
+    // Firebase Console → Firestore Database → colección "reportes".
+    async function reportarSB() {
+      if (!currentUser) { showAuthPrompt(); return; }
+      const btn = document.getElementById('reportBtn');
+      if (btn.classList.contains('active-report')) {
+        window.showToast && window.showToast('Ya reportaste este soundbite.');
+        return;
+      }
+      if (!confirm('¿Reportar este soundbite? Un moderador lo revisará.')) return;
+
+      btn.disabled = true;
+      try {
+        const reportadoPorNombre = await getNombreUsuario(currentUser.uid);
+        await addDoc(collection(db, 'reportes'), {
+          audioId: sbId,
+          audioTitulo: sbData.titulo || 'Sin título',
+          audioJuego: sbData.juego || '—',
+          audioAutorId: sbData.autorId || '',
+          audioAutorNombre: sbData.autorNombre || 'Anónimo',
+          reportadoPor: currentUser.uid,
+          reportadoPorNombre,
+          creadoEn: serverTimestamp()
+        });
+        marcarReportButtonComoEnviado();
+        window.showToast && window.showToast('Reporte registrado. Gracias por avisar.');
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     // ── REPRODUCTOR ──
@@ -599,6 +654,7 @@ if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttri
     document.getElementById('favBtn').addEventListener('click', toggleFavSB);
     document.getElementById('sbPlayBtn').addEventListener('click', togglePlaySB);
     document.getElementById('dlBtn').addEventListener('click', downloadSB);
+    document.getElementById('reportBtn').addEventListener('click', reportarSB);
     document.getElementById('shareBtn').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(location.href);
