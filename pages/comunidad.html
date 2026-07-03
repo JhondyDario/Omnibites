@@ -120,139 +120,141 @@
 <script type="module">
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  collection, getDocs, query, orderBy, doc,
-  updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove, getCountFromServer
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      collection, getDocs, query, orderBy, limit, doc,
+      updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-let currentUser = null;
-let allItems = [];
-let commentCountMap = {};
-const PAGE_SIZE = 10;
-let currentPage = 0;
+    let currentUser = null;
+
+    // ── Estrategia de carga: 50 más recientes por defecto, colección completa
+    // solo cuando el usuario busca o filtra (se cachea, se pide una sola vez) ──
+    let recentItems  = [];
+    let allItemsFull = null;
+    const PAGE_SIZE = 10;
+    let currentPage = 0;
     let activeConsola = '', activeCat = '', activeSort = 'reciente';
 
     onAuthStateChanged(auth, u => { currentUser = u; });
 
-async function loadCommentCounts(items) {
-  await Promise.all(items.map(async a => {
-    if (commentCountMap[a.id] !== undefined) {
-      const el = document.getElementById(`ccount-${a.id}`);
-      if (el) el.textContent = commentCountMap[a.id];
-      return;
-    }
-    try {
-      const snap = await getCountFromServer(collection(db, 'audios', a.id, 'comentarios'));
-      commentCountMap[a.id] = snap.data().count;
-      const el = document.getElementById(`ccount-${a.id}`);
-      if (el) el.textContent = commentCountMap[a.id];
-    } catch (e) { /* si falla, se queda en 0 — no rompe nada */ }
-  }));
-}
-
     async function loadSoundbites() {
       try {
-        const snap = await getDocs(collection(db,'audios'));
-        allItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        render();
+        const q = query(collection(db,'audios'), orderBy('creadoEn','desc'), limit(50));
+        const snap = await getDocs(q);
+        recentItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        await render();
       } catch(e) {
         document.getElementById('sbGrid').innerHTML =
           '<div class="empty-state"><p>Error al cargar. Recarga la página.</p></div>';
       }
     }
 
-function render() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  let items = allItems.filter(a => {
-    const mc = !activeConsola || a.consola === activeConsola;
-    const mcat = !activeCat || a.categoria === activeCat;
-    const ms = !search
-      || (a.titulo||'').toLowerCase().includes(search)
-      || (a.juego||'').toLowerCase().includes(search)
-      || (a.autorNombre||'').toLowerCase().includes(search);
-    return mc && mcat && ms;
-  });
-  if (activeSort === 'love') items.sort((a,b) => (b.reactions?.love||0)-(a.reactions?.love||0));
-  if (activeSort === 'reciente') items.sort((a,b) => (b.creadoEn?.seconds||0)-(a.creadoEn?.seconds||0));
+    async function ensureFullData() {
+      if (allItemsFull) return allItemsFull;
+      const snap = await getDocs(collection(db,'audios'));
+      allItemsFull = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      return allItemsFull;
+    }
 
-  const grid = document.getElementById('sbGrid');
-  const pagEl = document.getElementById('sbPaginator');
-  if (!items.length) {
-    grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
-    pagEl.innerHTML = '';
-    return;
-  }
+    async function render() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const hayFiltrosActivos = !!search || !!activeConsola || !!activeCat || activeSort === 'love';
 
-  const totalPages = Math.ceil(items.length / PAGE_SIZE);
-  if (currentPage >= totalPages) currentPage = totalPages - 1;
-  const slice = items.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+      let source = recentItems;
+      if (hayFiltrosActivos) {
+        if (!allItemsFull) {
+          document.getElementById('sbGrid').innerHTML =
+            '<div class="empty-state"><div class="spinner"></div><p>Buscando en toda la biblioteca...</p></div>';
+        }
+        source = await ensureFullData();
+      }
 
-  grid.innerHTML = slice.map(a => sbCard(a)).join('');
-  pagEl.innerHTML = comPaginatorHTML(currentPage, totalPages);
-  loadCommentCounts(slice);
-}
+      let items = source.filter(a => {
+        const mc = !activeConsola || a.consola === activeConsola;
+        const mcat = !activeCat || a.categoria === activeCat;
+        const ms = !search
+          || (a.titulo||'').toLowerCase().includes(search)
+          || (a.juego||'').toLowerCase().includes(search)
+          || (a.autorNombre||'').toLowerCase().includes(search);
+        return mc && mcat && ms;
+      });
+      if (activeSort === 'love') items.sort((a,b) => (b.reactions?.love||0)-(a.reactions?.love||0));
+      if (activeSort === 'reciente') items.sort((a,b) => (b.creadoEn?.seconds||0)-(a.creadoEn?.seconds||0));
 
-function comPaginatorHTML(current, total) {
-  if (total <= 1) return '';
-  let html = '<div class="paginator">';
-  for (let i = 0; i < total; i++) {
-    html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goComPage(${i})">${i + 1}</button>`;
-  }
-  return html + '</div>';
-}
+      const grid = document.getElementById('sbGrid');
+      const pagEl = document.getElementById('sbPaginator');
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
+        pagEl.innerHTML = '';
+        return;
+      }
 
-window.goComPage = function(page) {
-  currentPage = page;
-  render();
-  document.querySelector('.com-header').scrollIntoView({ behavior: 'smooth' });
-};
+      const totalPages = Math.ceil(items.length / PAGE_SIZE);
+      if (currentPage >= totalPages) currentPage = totalPages - 1;
+      const slice = items.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
-function sbCard(a) {
-  const r = a.reactions || { love:0, meh:0 };
-  const imgSrc = a.imagen || `${ROOT}/assets/avatars/avatar0.png`;
-  return `
-    <div class="sb-card" id="card-${a.id}">
-<div class="sb-head">
-        <img class="sb-thumb" src="${imgSrc}" alt="" loading="lazy" style="cursor:pointer"
-             onclick="location.href='soundbite.html?id=${a.id}'"
-             onerror="this.onerror=null;this.src='${ROOT}/assets/avatars/avatar0.png'"/>
-        <div class="sb-head-info">
-          <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-          <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
-        </div>
-      </div>
-      <div class="sb-player">
-<button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">
-  <img src="../assets/icons/play.png" alt="Play"/>
-</button>
-<div class="sb-prog-wrap">
-              <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
-              <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
+      grid.innerHTML = slice.map(a => sbCard(a)).join('');
+      pagEl.innerHTML = comPaginatorHTML(currentPage, totalPages);
+      if (currentUser) await loadUserData();
+    }
+
+    function comPaginatorHTML(current, total) {
+      if (total <= 1) return '';
+      let html = '<div class="paginator">';
+      for (let i = 0; i < total; i++) {
+        html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="goComPage(${i})">${i + 1}</button>`;
+      }
+      return html + '</div>';
+    }
+
+    window.goComPage = function(page) {
+      currentPage = page;
+      render();
+      document.querySelector('.com-header').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    function sbCard(a) {
+      const r = a.reactions || { love:0, meh:0 };
+      const imgSrc = a.imagen || `${ROOT}/assets/avatars/avatar0.png`;
+      return `
+        <div class="sb-card" id="card-${a.id}">
+    <div class="sb-head">
+            <img class="sb-thumb" src="${imgSrc}" alt="" loading="lazy" style="cursor:pointer"
+                 onclick="location.href='soundbite.html?id=${a.id}'"
+                 onerror="this.onerror=null;this.src='${ROOT}/assets/avatars/avatar0.png'"/>
+            <div class="sb-head-info">
+              <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
+              <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
             </div>
           </div>
-          <div class="sb-footer">
-            <div class="sb-reactions">
-              <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
-  <img src="../assets/reactions/love.png" alt="Me encanta"/>
-  <span class="icon-count">${r.love||0}</span>
-</button>
-<button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
-  <img src="../assets/reactions/meh.png" alt="Regular"/>
-  <span class="icon-count">${r.meh||0}</span>
-</button>
-            </div>
-            <div class="sb-actions">
-              <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-  <img src="../assets/reactions/fav.png" alt="Favorito"/>
-</button>
-<button class="icon-btn icon-btn-comments" onclick="location.href='soundbite.html?id=${a.id}'" title="Comentarios">
-  <img src="../assets/icons/comments.png" alt="Comentarios"/>
-  <span class="icon-count">${commentCountMap[a.id] ?? 0}</span>
-</button>
-            </div>
-          </div>
-        </div>`;
+          <div class="sb-player">
+    <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">
+      <img src="../assets/icons/play.png" alt="Play"/>
+    </button>
+    <div class="sb-prog-wrap">
+                  <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
+                  <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
+                </div>
+              </div>
+              <div class="sb-footer">
+                <div class="sb-reactions">
+                  <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
+      <img src="../assets/reactions/love.png" alt="Me encanta"/>
+      <span class="icon-count">${r.love||0}</span>
+    </button>
+    <button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
+      <img src="../assets/reactions/meh.png" alt="Regular"/>
+      <span class="icon-count">${r.meh||0}</span>
+    </button>
+                </div>
+                <div class="sb-actions">
+                  <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
+      <img src="../assets/reactions/fav.png" alt="Favorito"/>
+    </button>
+                </div>
+              </div>
+            </div>`;
     }
 
     async function loadUserData() {
@@ -343,136 +345,130 @@ function sbCard(a) {
       try {
         await deleteDoc(doc(db,'audios',id));
         document.getElementById(`card-${id}`)?.remove();
-        allItems = allItems.filter(a => a.id !== id);
+        recentItems = recentItems.filter(a => a.id !== id);
+        if (allItemsFull) allItemsFull = allItemsFull.filter(a => a.id !== id);
         window.showToast && window.showToast('Soundbite eliminado');
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
-  const CLIP=15,FADE=2;
+    let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
+    const CLIP=15,FADE=2;
     function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-function stopSB(isPause=false){
-  playToken++;
-  if(activeSource){
-    try{
-      // activeSource ahora es un HTMLAudioElement, no un AudioBufferSourceNode
-      if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
-      activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
-      activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-      // Pausar el <audio> 150ms después del fade
-      const elAudio = activeSource;
-      setTimeout(() => { try{ elAudio.pause(); }catch{} }, 150);
-    }catch{}
-    activeSource = activeGain = null;
-  }
-  clearInterval(progIv);
-  if(activeSBId){
-    const b = document.getElementById(`sbplay-${activeSBId}`);
-    if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.classList.remove('playing'); b.disabled=false; }
-    if(!isPause){
-      const p = document.getElementById(`sbprog-${activeSBId}`);
-      if(p) p.style.width='0%';
-      const c = document.getElementById(`sbcur-${activeSBId}`);
-      if(c) c.textContent='0:00';
-      pausedAt = 0;
+    function stopSB(isPause=false){
+      playToken++;
+      if(activeSource){
+        try{
+          if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
+          activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+          const elAudio = activeSource;
+          setTimeout(() => { try{ elAudio.pause(); }catch{} }, 150);
+        }catch{}
+        activeSource = activeGain = null;
+      }
+      clearInterval(progIv);
+      if(activeSBId){
+        const b = document.getElementById(`sbplay-${activeSBId}`);
+        if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.classList.remove('playing'); b.disabled=false; }
+        if(!isPause){
+          const p = document.getElementById(`sbprog-${activeSBId}`);
+          if(p) p.style.width='0%';
+          const c = document.getElementById(`sbcur-${activeSBId}`);
+          if(c) c.textContent='0:00';
+          pausedAt = 0;
+        }
+      }
+      activeSBId = null;
     }
-  }
-  activeSBId = null;
-}
 
-window.playSB = async function(id, url, ts, te){
-  if(activeSBId === id){
-    pausedAt    = lastElapsed;
-    pausedSBId  = id;
-    stopSB(true);
-    return;
-  }
-  const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
-  pausedSBId = null;
-  stopSB();
- 
-  const myToken = ++playToken;
-  const btn = document.getElementById(`sbplay-${id}`);
-  if(!btn) return;
- 
-  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
-  btn.disabled  = true;
- 
-  try{
-    const ctx = getCtx();
-    if(ctx.state === 'suspended') await ctx.resume();
- 
-    // ── Streaming: usa HTMLAudioElement en vez de fetch+decodeAudioData ──
-    // El navegador descarga por partes, no espera el archivo completo
-    const audioEl = new Audio();
-    audioEl.crossOrigin = 'anonymous';
-    audioEl.preload     = 'auto';
-    audioEl.src         = url;
- 
-    await new Promise((resolve, reject) => {
-      audioEl.addEventListener('loadedmetadata', resolve, { once:true });
-      audioEl.addEventListener('error',          reject,  { once:true });
-    });
- 
-    if(myToken !== playToken){
-      btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
-      return;
-    }
- 
-    const baseStart     = Math.min(ts || 0, audioEl.duration - 1);
-    const dur           = Math.min((te || 15) - (ts || 0), CLIP, audioEl.duration - baseStart);
-    const safeResume    = Math.min(resumeOffset, dur - 0.1);
-    audioEl.currentTime = baseStart + safeResume;
- 
-    const source    = ctx.createMediaElementSource(audioEl);
-    const gain      = ctx.createGain();
-    const remaining = dur - safeResume;
- 
-    // Fade in / fade out
-    gain.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
-    if(safeResume < FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
-    gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
- 
-    source.connect(gain);
-    gain.connect(ctx.destination);
-    await audioEl.play();
- 
-    activeSource = audioEl;
-    activeGain   = gain;
-    activeSBId   = id;
-    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
-    btn.classList.add('playing'); btn.disabled = false;
- 
-    // Parar automáticamente al terminar el clip
-    const endTimeout = setTimeout(() => {
-      if(activeSBId === id && myToken === playToken) stopSB();
-    }, remaining * 1000);
-    activeSource._endTimeout = endTimeout;
- 
-    // Barra de progreso
-    const t0 = ctx.currentTime;
-    progIv = setInterval(() => {
-      if(myToken !== playToken){ clearInterval(progIv); return; }
-      const el = safeResume + (ctx.currentTime - t0);
-      lastElapsed = el;
-      const p = document.getElementById(`sbprog-${id}`);
-      const c = document.getElementById(`sbcur-${id}`);
-      if(p) p.style.width = (Math.min(el, dur) / dur * 100) + '%';
-      if(c) c.textContent = fmt(el);
-      if(el >= dur) clearInterval(progIv);
-    }, 100);
- 
-  }catch(e){
-    if(myToken !== playToken) return;
-    const b = document.getElementById(`sbplay-${id}`);
-    if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
-    setTimeout(() => {
-      const b = document.getElementById(`sbplay-${id}`);
-      if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
-    }, 3000);
-  }
-};
+    window.playSB = async function(id, url, ts, te){
+      if(activeSBId === id){
+        pausedAt    = lastElapsed;
+        pausedSBId  = id;
+        stopSB(true);
+        return;
+      }
+      const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
+      pausedSBId = null;
+      stopSB();
+
+      const myToken = ++playToken;
+      const btn = document.getElementById(`sbplay-${id}`);
+      if(!btn) return;
+
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.disabled  = true;
+
+      try{
+        const ctx = getCtx();
+        if(ctx.state === 'suspended') await ctx.resume();
+
+        const audioEl = new Audio();
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.preload     = 'auto';
+        audioEl.src         = url;
+
+        await new Promise((resolve, reject) => {
+          audioEl.addEventListener('loadedmetadata', resolve, { once:true });
+          audioEl.addEventListener('error',          reject,  { once:true });
+        });
+
+        if(myToken !== playToken){
+          btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
+          return;
+        }
+
+        const baseStart     = Math.min(ts || 0, audioEl.duration - 1);
+        const dur           = Math.min((te || 15) - (ts || 0), CLIP, audioEl.duration - baseStart);
+        const safeResume    = Math.min(resumeOffset, dur - 0.1);
+        audioEl.currentTime = baseStart + safeResume;
+
+        const source    = ctx.createMediaElementSource(audioEl);
+        const gain      = ctx.createGain();
+        const remaining = dur - safeResume;
+
+        gain.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
+        if(safeResume < FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
+        gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        await audioEl.play();
+
+        activeSource = audioEl;
+        activeGain   = gain;
+        activeSBId   = id;
+        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+        btn.classList.add('playing'); btn.disabled = false;
+
+        const endTimeout = setTimeout(() => {
+          if(activeSBId === id && myToken === playToken) stopSB();
+        }, remaining * 1000);
+        activeSource._endTimeout = endTimeout;
+
+        const t0 = ctx.currentTime;
+        progIv = setInterval(() => {
+          if(myToken !== playToken){ clearInterval(progIv); return; }
+          const el = safeResume + (ctx.currentTime - t0);
+          lastElapsed = el;
+          const p = document.getElementById(`sbprog-${id}`);
+          const c = document.getElementById(`sbcur-${id}`);
+          if(p) p.style.width = (Math.min(el, dur) / dur * 100) + '%';
+          if(c) c.textContent = fmt(el);
+          if(el >= dur) clearInterval(progIv);
+        }, 100);
+
+      }catch(e){
+        if(myToken !== playToken) return;
+        const b = document.getElementById(`sbplay-${id}`);
+        if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
+        setTimeout(() => {
+          const b = document.getElementById(`sbplay-${id}`);
+          if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
+        }, 3000);
+      }
+    };
 
     function showAuthPrompt() {
       const existing = document.querySelector('.auth-prompt');
@@ -486,15 +482,14 @@ window.playSB = async function(id, url, ts, te){
 
     function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
 
-document.getElementById('searchBtn').addEventListener('click', () => { currentPage=0; render(); });
-document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter'){ currentPage=0; render(); } });
-document.getElementById('searchInput').addEventListener('input', () => { currentPage=0; render(); });
-document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; currentPage=0; render(); });
-document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; currentPage=0; render(); });
-document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; currentPage=0; render(); });
+    document.getElementById('searchBtn').addEventListener('click', () => { currentPage=0; render(); });
+    document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter'){ currentPage=0; render(); } });
+    document.getElementById('searchInput').addEventListener('input', () => { currentPage=0; render(); });
+    document.getElementById('consolaFilter').addEventListener('change', e => { activeConsola=e.target.value; currentPage=0; render(); });
+    document.getElementById('catFilter').addEventListener('change', e => { activeCat=e.target.value; currentPage=0; render(); });
+    document.getElementById('sortFilter').addEventListener('change', e => { activeSort=e.target.value; currentPage=0; render(); });
 
     await loadSoundbites();
-    await loadUserData();
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
