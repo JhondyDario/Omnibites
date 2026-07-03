@@ -662,7 +662,7 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
         const blob = await buildMp3Blob(mp3, sbData.imagen || '');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${sbData.juego || '', · (sbData.titulo || 'soundbite').slice(0,50)} · Omnibites.mp3`.replace(/[<>:"/\\|?*]/g, '');
+        a.download = `${sbData.juego || 'Juego'} · ${(sbData.titulo || 'soundbite').slice(0, 50)} · Omnibites.mp3`.replace(/[<>:"/\\|?*]/g, '');
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
         window.showToast && window.showToast('Descargando MP3');
