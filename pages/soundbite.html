@@ -172,8 +172,11 @@
         <button class="icon-btn" id="shareBtn" title="Compartir">
           <img src="../assets/icons/share.png" alt="Compartir"/>
         </button>
-        <button class="icon-btn icon-btn-report" id="reportBtn" title="Reportar">
+<button class="icon-btn icon-btn-report" id="reportBtn" title="Reportar">
           <img src="../assets/icons/report.png" alt="Reportar"/>
+        </button>
+        <button class="icon-btn icon-btn-report" id="deleteSBBtn" title="Eliminar" style="display:none">
+          <img src="../assets/reactions/delete.png" alt="Eliminar"/>
         </button>
       </div>
 
@@ -194,18 +197,27 @@
         </div>
         <div id="commentsList" style="margin-top:1.25rem"></div>
       </div>
-    </div>
+</div>
   </main>
+
+  <div class="popup-overlay" id="deleteSBPopup" style="display:none">
+    <div class="popup-box">
+      <h3>Eliminar soundbite</h3>
+      <p>Esta acción no se puede deshacer. El soundbite se eliminará permanentemente para todos.</p>
+      <div class="popup-actions">
+        <button class="btn-outline" id="cancelDeleteSB">Cancelar</button>
+        <button class="btn-danger" id="confirmDeleteSB">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
     import { buildMp3Blob } from '../js/id3-cover.js';
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      doc, getDoc, updateDoc, collection, getDocs, addDoc, query, orderBy, where,
-      arrayUnion, arrayRemove, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, orderBy, where,
+    arrayUnion, arrayRemove, serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     const sbId = new URLSearchParams(location.search).get('id');
@@ -312,6 +324,7 @@ function updateEditButtonVisibility() {
       const isOwner = currentUser && sbData && currentUser.uid === sbData.autorId;
       document.getElementById('editTitleBtn').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('editCategoriaBtn').style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('deleteSBBtn').style.display = isOwner ? 'flex' : 'none';
     }
 
     async function applyUserState() {
@@ -722,8 +735,29 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
         window.showToast && window.showToast('No se pudo copiar el enlace', 'error');
       }
     });
-    document.getElementById('backBtn').addEventListener('click', e => {
-      e.preventDefault();
+document.getElementById('deleteSBBtn').addEventListener('click', () => {
+      if (!currentUser || currentUser.uid !== sbData.autorId) return;
+      document.getElementById('deleteSBPopup').style.display = 'flex';
+    });
+
+    document.getElementById('cancelDeleteSB').addEventListener('click', () => {
+      document.getElementById('deleteSBPopup').style.display = 'none';
+    });
+
+    document.getElementById('confirmDeleteSB').addEventListener('click', async () => {
+      const btn = document.getElementById('confirmDeleteSB');
+      btn.disabled = true; btn.textContent = 'Eliminando...';
+      try {
+        await deleteDoc(doc(db, 'audios', sbId));
+        window.location.href = ROOT + '/pages/comunidad.html?deleted_sb=1';
+      } catch(e) {
+        btn.disabled = false; btn.textContent = 'Sí, eliminar';
+        document.getElementById('deleteSBPopup').style.display = 'none';
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      }
+    });
+
+    document.getElementById('backBtn').addEventListener('click', e => {e.preventDefault();
       if (document.referrer && document.referrer.includes(location.host)) history.back();
       else window.location.href = ROOT + '/pages/comunidad.html';
     });
