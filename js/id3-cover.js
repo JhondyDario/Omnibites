@@ -30,8 +30,11 @@ function writeSyncSafe(buf, offset, val) {
 export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
   if (!imgUrl) return null;
   try {
+export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
+  if (!imgUrl) return null;
+  try {
     const res = await fetch(imgUrl, { mode: 'cors' });
-    if (!res.ok) throw new Error('img fetch failed');
+    if (!res.ok) throw new Error('img fetch failed: HTTP ' + res.status);
     const blob = await res.blob();
     const bitmap = await createImageBitmap(blob);
     const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
@@ -43,7 +46,8 @@ export async function getCoverJpegBytes(imgUrl, maxSize = 300, quality = 0.72) {
     const outBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
     if (!outBlob) return null;
     return new Uint8Array(await outBlob.arrayBuffer());
-  } catch {
+  } catch (e) {
+    console.warn('Portada no embebida (CORS o imagen inválida):', imgUrl, '—', e.message);
     return null; // CORS bloqueado o imagen inválida — no rompe la descarga
   }
 }
