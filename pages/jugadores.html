@@ -200,13 +200,21 @@ usersSnap.docs.forEach(d => {
   });
 });
 
-allPlayers = usersSnap.docs.map(d => ({
-  uid: d.id,
-  ...d.data(),
-  audios: audioCountMap[d.id] || 0,
-  love:   loveCountMap[d.id]  || 0,
-  seguidores: followersCountMap[d.id] || 0
-}));
+// IDs de audios que realmente existen — para filtrar favoritos huérfanos sin lecturas extra
+const validAudioIds = new Set(audiosSnap.docs.map(d => d.id));
+
+allPlayers = usersSnap.docs.map(d => {
+  const data = d.data();
+  const favsReal = (data.favoritos || []).filter(id => validAudioIds.has(id)).length;
+  return {
+    uid: d.id,
+    ...data,
+    audios: audioCountMap[d.id] || 0,
+    love:   loveCountMap[d.id]  || 0,
+    seguidores: followersCountMap[d.id] || 0,
+    favs: favsReal
+  };
+});
 
         render('');
       } catch(e) {
@@ -230,7 +238,7 @@ allPlayers = usersSnap.docs.map(d => ({
       grid.innerHTML = filtered.map(p => {
         const name = p.nombre || 'Jugador';
         const initial = name.charAt(0).toUpperCase();
-        const favs = (p.favoritos || []).length;
+        const favs = p.favs;
         const avatarHTML = p.avatar
           ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
                onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
