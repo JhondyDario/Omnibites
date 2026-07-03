@@ -55,11 +55,11 @@
       margin-bottom: 1.25rem;
       text-align: center;
     }
-    .juego-img-frame {
+.juego-img-frame {
       display: inline-block;
       position: relative;
-      width: 130px;
-      height: 180px;
+      width: 150px;
+      height: 150px;
       border-radius: 10px;
       padding: 3px;
       background: linear-gradient(130deg, var(--neon), var(--purple), var(--cyan), var(--neon));
@@ -348,9 +348,9 @@
         juegoHint.className   = 'juego-lock-hint ok';
         juegoHint.textContent = `✓ ${nombreJuego} seleccionado — consola asignada automáticamente`;
 
-        if (juegoImgParam) {
+      if (juegoImgParam) {
           const decodedImg = decodeURIComponent(juegoImgParam);
-          imagenFromRawg = resizeRawgImage(decodedImg);
+          imagenFromRawg = decodedImg; // misma URL que se muestra — sin resize, prioridad garantizada
           const imgWrap = document.getElementById('juegoImgWrap');
           const imgEl   = document.getElementById('juegoImg');
           imgEl.onerror = () => { imgWrap.style.display = 'none'; };
@@ -697,7 +697,7 @@
       juegoInput.value   = game.name;
       sugBox.style.display = 'none';
       juegoConfirmado    = true;
-      imagenFromRawg     = resizeRawgImage(game.background_image);
+      imagenFromRawg     = game.background_image || ''; // misma URL que se muestra — sin resize, prioridad garantizada
 
       const imgWrap = document.getElementById('juegoImgWrap');
       const imgEl   = document.getElementById('juegoImg');
