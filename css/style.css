@@ -317,6 +317,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .icon-btn-dl.active-dl { border-color: var(--cyan); background: rgba(103,232,249,.07); }
 .icon-btn-dl.active-dl img { opacity: 1; filter: drop-shadow(0 0 4px var(--cyan)); } 
 
+/* ── COMENTARIOS (cyan) ── */
+.icon-btn-comments:hover { border-color: var(--cyan); background: rgba(103,232,249,.07); }
+.icon-btn-comments:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--cyan)); }
+
 /* Tamaño mobile */
 @media(max-width: 480px) {
   .icon-btn img { width: 22px; height: 22px; }
