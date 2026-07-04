@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Ajustes — Omnibites</title>
+  <title>Settings — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -36,70 +36,70 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
 </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <main class="settings-page" id="settingsMain" style="display:none">
-    <a href="perfil.html" class="btn-back">← Volver al perfil</a>
-    <h1>Ajustes</h1>
+    <a href="perfil.html" class="btn-back">← Back to profile</a>
+    <h1>Settings</h1>
 
     <div class="sbox">
-      <h2>Información de cuenta</h2>
+      <h2>Account Information</h2>
 <div style="padding:.65rem 0;border-bottom:1px solid var(--border);">
-  <label style="font-size:.78rem;color:var(--text-dim);display:block;margin-bottom:.4rem;">Nombre de usuario</label>
+  <label style="font-size:.78rem;color:var(--text-dim);display:block;margin-bottom:.4rem;">Username</label>
   <div class="form-group" style="margin:0;">
-<input type="text" id="nombreInput" placeholder="Tu nombre" maxlength="10"/>
+<input type="text" id="nombreInput" placeholder="Your name" maxlength="10"/>
   </div>
 </div>
 <div id="nombreErr" style="color:var(--danger);font-size:.75rem;margin-top:.3rem;display:none"></div>
-<div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Nombre actualizado.</div>      <div class="info-row"><label>Correo</label><span id="infoEmail">—</span></div>
-      <div class="info-row"><label>Método de acceso</label><span id="infoMetodo">—</span></div>
-      <div class="info-row"><label>Cuenta creada</label><span id="infoFecha">—</span></div>
-      <div class="info-row"><label>Correo verificado</label><span id="infoVerif">—</span></div>
+<div id="nombreOk"  style="color:var(--neon);font-size:.75rem;margin-top:.3rem;display:none">Name updated.</div>      <div class="info-row"><label>Email</label><span id="infoEmail">—</span></div>
+      <div class="info-row"><label>Sign-in method</label><span id="infoMetodo">—</span></div>
+      <div class="info-row"><label>Account created</label><span id="infoFecha">—</span></div>
+      <div class="info-row"><label>Email verified</label><span id="infoVerif">—</span></div>
 <button class="btn-primary" id="saveNombreBtn" style="display:block;margin-left:auto;margin-right:auto;margin-top:1.25rem;padding:.5rem 1.5rem;font-size:.82rem;">
-  Guardar cambios
+  Save changes
 </button>
     </div>
 
     <div class="sbox">
-      <h2>Contraseña</h2>
-      <div id="googleNote" class="note" style="display:none">Tu cuenta usa Google. Puedes añadir una contraseña para entrar también con correo y contraseña.</div>
-      <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPass" placeholder="Mínimo 8 caracteres"/></div>
-      <div class="form-group"><label>Confirmar contraseña</label><input type="password" id="confirmPass" placeholder="Repite la contraseña"/></div>
+      <h2>Password</h2>
+      <div id="googleNote" class="note" style="display:none">Your account uses Google. You can add a password to also sign in with email and password.</div>
+      <div class="form-group"><label>New password</label><input type="password" id="newPass" placeholder="Minimum 8 characters"/></div>
+      <div class="form-group"><label>Confirm password</label><input type="password" id="confirmPass" placeholder="Repeat the password"/></div>
       <div id="passErr" class="field-err" style="display:none"></div>
-      <div id="passOk"  class="field-ok" style="display:none">Contraseña actualizada.</div>
-<button class="btn-primary" id="savePassBtn" style="margin-top:.5rem;display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Guardar contraseña</button>    
+      <div id="passOk"  class="field-ok" style="display:none">Password updated.</div>
+<button class="btn-primary" id="savePassBtn" style="margin-top:.5rem;display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Save password</button>    
     </div>
 
     <div class="sbox">
-      <h2>Eliminar cuenta</h2>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">Esta acción eliminará todos tus datos permanentemente y no se puede deshacer.</p>
-<button class="btn-danger" id="deleteBtn" style="display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Eliminar mi cuenta</button>    </div>
+      <h2>Delete Account</h2>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:1rem">This action will permanently delete all your data and cannot be undone.</p>
+<button class="btn-danger" id="deleteBtn" style="display:block;margin-left:auto;margin-right:auto;padding:.5rem 1.5rem;font-size:.82rem;">Delete my account</button>    </div>
   </main>
 
   <div class="popup-overlay" id="deletePopup" style="display:none">
     <div class="popup-box">
-      <h3>Eliminar cuenta</h3>
-      <p>Perderás todos tus soundbites y datos permanentemente.<br/>Escribe tu correo para confirmar:</p>
+      <h3>Delete account</h3>
+      <p>You will permanently lose all your soundbites and data.<br/>Type your email to confirm:</p>
       <input type="email" id="confirmEmail" style="width:100%;margin-bottom:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.6rem .9rem;font-size:.9rem;font-family:var(--font-body);outline:none;"/>
       <div id="deleteErr" style="color:var(--danger);font-size:.78rem;margin-bottom:.75rem;display:none"></div>
       <div class="popup-actions">
-        <button class="btn-outline" id="cancelDelete">Cancelar</button>
-        <button class="btn-danger" id="confirmDelete">Sí, eliminar</button>
+        <button class="btn-outline" id="cancelDelete">Cancel</button>
+        <button class="btn-danger" id="confirmDelete">Yes, delete</button>
       </div>
     </div>
   </div>
@@ -125,10 +125,10 @@
       if (isGoogle) document.getElementById('googleNote').style.display = 'block';
 
       document.getElementById('infoEmail').textContent  = user.email || '—';
-      document.getElementById('infoMetodo').textContent = isGoogle ? 'Google' : 'Correo y contraseña';
+      document.getElementById('infoMetodo').textContent = isGoogle ? 'Google' : 'Email and password';
       document.getElementById('infoFecha').textContent  = user.metadata.creationTime
-        ? new Date(user.metadata.creationTime).toLocaleDateString('es-ES') : '—';
-      document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Sí' : 'Pendiente';
+        ? new Date(user.metadata.creationTime).toLocaleDateString('en-US') : '—';
+      document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Yes' : 'Pending';
       document.getElementById('infoVerif').style.color  = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
 
       try {
@@ -146,14 +146,14 @@
       const errEl = document.getElementById('nombreErr');
       const okEl  = document.getElementById('nombreOk');
       errEl.style.display='none'; okEl.style.display='none';
-      if (!raw) { errEl.textContent='Escribe un nombre.'; errEl.style.display='block'; return; }
-      if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Solo letras, números y espacios.'; errEl.style.display='block'; return; }
-      if (raw.length < 5) { errEl.textContent='Mínimo 5 caracteres.'; errEl.style.display='block'; return; }
-      if (raw.length > 10) { errEl.textContent='Máximo 10 caracteres.'; errEl.style.display='block'; return; }
+      if (!raw) { errEl.textContent='Enter a name.'; errEl.style.display='block'; return; }
+      if (!/^[a-zA-Z0-9 ]+$/.test(raw)) { errEl.textContent='Letters, numbers, and spaces only.'; errEl.style.display='block'; return; }
+      if (raw.length < 5) { errEl.textContent='Minimum 5 characters.'; errEl.style.display='block'; return; }
+      if (raw.length > 10) { errEl.textContent='Maximum 10 characters.'; errEl.style.display='block'; return; }
       try {
         const snap = await getDocs(query(collection(db,'usuarios'), where('nombre','==',raw)));
         const taken = snap.docs.some(d => d.id !== currentUser.uid);
-        if (taken) { errEl.textContent='Ese nombre ya está en uso. Elige otro.'; errEl.style.display='block'; return; }
+        if (taken) { errEl.textContent='That name is already taken. Choose another one.'; errEl.style.display='block'; return; }
         await updateDoc(doc(db,'usuarios',currentUser.uid), { nombre: raw });
         try {
           const audiosSnap = await getDocs(query(collection(db,'audios'), where('autorId','==',currentUser.uid)));
@@ -171,11 +171,11 @@
       const errEl=document.getElementById('passErr');
       const okEl=document.getElementById('passOk');
       errEl.style.display='none'; okEl.style.display='none';
-      if(!np||!cp){errEl.textContent='Completa ambos campos.';errEl.style.display='block';return;}
-      if(np.length<8){errEl.textContent='Mínimo 8 caracteres.';errEl.style.display='block';return;}
-      if(!/[0-9]/.test(np)){errEl.textContent='Debe incluir al menos un número.';errEl.style.display='block';return;}
-      if(!/[a-zA-Z]/.test(np)){errEl.textContent='Debe incluir al menos una letra.';errEl.style.display='block';return;}
-      if(np!==cp){errEl.textContent='Las contraseñas no coinciden.';errEl.style.display='block';return;}
+      if(!np||!cp){errEl.textContent='Complete both fields.';errEl.style.display='block';return;}
+      if(np.length<8){errEl.textContent='Minimum 8 characters.';errEl.style.display='block';return;}
+      if(!/[0-9]/.test(np)){errEl.textContent='Must include at least one number.';errEl.style.display='block';return;}
+      if(!/[a-zA-Z]/.test(np)){errEl.textContent='Must include at least one letter.';errEl.style.display='block';return;}
+      if(np!==cp){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
       try {
         if(isGoogle){
           const cred=EmailAuthProvider.credential(currentUser.email,np);
@@ -189,9 +189,9 @@
       } catch(e) {
         if(e.code==='auth/provider-already-linked'){
           try{await updatePassword(currentUser,np);okEl.style.display='block';}
-          catch(e2){errEl.textContent=e2.code==='auth/requires-recent-login'?'Cierra sesión, vuelve a entrar y repite.':e2.message;errEl.style.display='block';}
+          catch(e2){errEl.textContent=e2.code==='auth/requires-recent-login'?'Sign out, sign back in, and try again.':e2.message;errEl.style.display='block';}
         } else {
-          errEl.textContent=e.code==='auth/requires-recent-login'?'Cierra sesión, vuelve a entrar y repite.':e.message;
+          errEl.textContent=e.code==='auth/requires-recent-login'?'Sign out, sign back in, and try again.':e.message;
           errEl.style.display='block';
         }
       }
@@ -209,10 +209,10 @@
       const typed=(document.getElementById('confirmEmail').value||'').trim().toLowerCase();
       const actual=(currentUser.email||'').toLowerCase();
       const errEl=document.getElementById('deleteErr');
-      if(!typed){errEl.textContent='Escribe tu correo.';errEl.style.display='block';return;}
-      if(typed!==actual){errEl.textContent='El correo no coincide.';errEl.style.display='block';return;}
+      if(!typed){errEl.textContent='Enter your email.';errEl.style.display='block';return;}
+      if(typed!==actual){errEl.textContent='The email doesn\'t match.';errEl.style.display='block';return;}
       const btn=document.getElementById('confirmDelete');
-      btn.textContent='Eliminando...';btn.disabled=true;
+      btn.textContent='Deleting...';btn.disabled=true;
       try {
         const audiosSnap = await getDocs(query(collection(db,'audios'),where('autorId','==',currentUser.uid)));
         for(const d of audiosSnap.docs) await deleteDoc(d.ref);
@@ -221,11 +221,11 @@
         await deleteUser(currentUser);
         window.location.href=ROOT+'/index.html?deleted=1';
       } catch(e) {
-        btn.textContent='Sí, eliminar';btn.disabled=false;
+        btn.textContent='Yes, delete';btn.disabled=false;
         document.getElementById('deletePopup').style.display='none';
         window.showToast&&window.showToast(
           e.code==='auth/requires-recent-login'
-            ? 'Cierra sesión, vuelve a entrar e intenta de nuevo.'
+            ? 'Sign out, sign back in, and try again.'
             : 'Error: '+e.message, 'error');
       }
     });
@@ -235,11 +235,11 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
