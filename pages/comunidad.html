@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -15,28 +15,28 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
 </a>
     <div class="nav-links">
-<a href="comunidad.html" class="active-comunidad">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+<a href="comunidad.html" class="active-comunidad">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-<a href="comunidad.html" class="active-comunidad">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+<a href="comunidad.html" class="active-comunidad">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <div class="com-header">
-    <h1>Soundbites de la Comunidad</h1>
+    <h1>Community Soundbites</h1>
 <div class="com-search">
   <div style="position:relative;flex:1">
-    <input type="text" id="searchInput" placeholder="Buscar por título, juego o usuario..."
+    <input type="text" id="searchInput" placeholder="Search by title, game, or user..."
       style="width:100%;padding-right:3rem"/>
     <button id="searchBtn" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);
       background:none;border:none;cursor:pointer;padding:.25rem;opacity:.55;
@@ -50,9 +50,9 @@
 
   <div class="filters">
     <div class="filter-group">
-      <label>Consola:</label>
+      <label>Console:</label>
       <select id="consolaFilter">
-        <option value="">Todas</option>
+        <option value="">All</option>
         <optgroup label="Nintendo">
           <option value="NES">NES / Famicom</option>
           <option value="SNES">Super Nintendo</option>
@@ -81,38 +81,38 @@
           <option value="Xbox">Xbox Original</option>
           <option value="Xbox360">Xbox 360</option>
         </optgroup>
-        <optgroup label="Otros">
+        <optgroup label="Other">
           <option value="Arcade">Arcade</option>
           <option value="PC">PC / DOS</option>
-          <option value="Otra">Otra</option>
+          <option value="Otra">Other</option>
         </optgroup>
       </select>
     </div>
     <div class="filter-group">
-      <label>Categoría:</label>
+      <label>Category:</label>
       <select id="catFilter">
-        <option value="">Todas</option>
-        <option value="orquestal">Orquestal e Instrumental</option>
+        <option value="">All</option>
+        <option value="orquestal">Orchestral & Instrumental</option>
         <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-        <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-        <option value="rock-metal">Rock, Metal e Industrial</option>
-        <option value="jazz">Jazz y Dark Jazz / Noir</option>
-        <option value="hibrido">Soundtracks Híbridos</option>
-        <option value="licenciada">Música Licenciada</option>
+        <option value="electronica">Electronic (EDM, Synthwave, Lo-Fi)</option>
+        <option value="rock-metal">Rock, Metal & Industrial</option>
+        <option value="jazz">Jazz & Dark Jazz / Noir</option>
+        <option value="hibrido">Hybrid Soundtracks</option>
+        <option value="licenciada">Licensed Music</option>
       </select>
     </div>
     <div class="filter-group" style="margin-left:auto">
-      <label>Ordenar:</label>
+      <label>Sort:</label>
       <select id="sortFilter">
-        <option value="reciente">Más reciente</option>
-        <option value="love">Más amados</option>
+        <option value="reciente">Most recent</option>
+        <option value="love">Most loved</option>
       </select>
     </div>
   </div>
 
 <div class="com-grid">
     <div class="com-cards" id="sbGrid">
-      <div style="grid-column:1/-1" class="empty-state"><div class="spinner"></div><p>Cargando soundbites...</p></div>
+      <div style="grid-column:1/-1" class="empty-state"><div class="spinner"></div><p>Loading soundbites...</p></div>
     </div>
     <div id="sbPaginator"></div>
   </div>
@@ -146,7 +146,7 @@
         await render();
       } catch(e) {
         document.getElementById('sbGrid').innerHTML =
-          '<div class="empty-state"><p>Error al cargar. Recarga la página.</p></div>';
+          '<div class="empty-state"><p>Error loading. Reload the page.</p></div>';
       }
     }
 
@@ -165,7 +165,7 @@
       if (hayFiltrosActivos) {
         if (!allItemsFull) {
           document.getElementById('sbGrid').innerHTML =
-            '<div class="empty-state"><div class="spinner"></div><p>Buscando en toda la biblioteca...</p></div>';
+            '<div class="empty-state"><div class="spinner"></div><p>Searching the full library...</p></div>';
         }
         source = await ensureFullData();
       }
@@ -185,7 +185,7 @@
       const grid = document.getElementById('sbGrid');
       const pagEl = document.getElementById('sbPaginator');
       if (!items.length) {
-        grid.innerHTML = '<div class="empty-state"><p>No hay soundbites con esos filtros.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Subir el primero</a></div>';
+        grid.innerHTML = '<div class="empty-state"><p>No soundbites match those filters.</p><a href="subir.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Upload the first one</a></div>';
         pagEl.innerHTML = '';
         return;
       }
@@ -224,8 +224,8 @@
                  onclick="location.href='soundbite.html?id=${a.id}'"
                  onerror="this.onerror=null;this.src='${ROOT}/assets/avatars/avatar0.png'"/>
             <div class="sb-head-info">
-              <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Sin título'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
-              <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anónimo'}</a></div>
+              <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Untitled'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
+              <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anonymous'}</a></div>
             </div>
           </div>
           <div class="sb-player">
@@ -239,18 +239,18 @@
               </div>
               <div class="sb-footer">
                 <div class="sb-reactions">
-                  <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Me encanta">
-      <img src="../assets/reactions/love.png" alt="Me encanta"/>
+                  <button class="icon-btn icon-btn-love" onclick="react('${a.id}','love')" id="r-love-${a.id}" title="Love it">
+      <img src="../assets/reactions/love.png" alt="Love it"/>
       <span class="icon-count">${r.love||0}</span>
     </button>
-    <button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Regular">
-      <img src="../assets/reactions/meh.png" alt="Regular"/>
+    <button class="icon-btn icon-btn-meh" onclick="react('${a.id}','meh')" id="r-meh-${a.id}" title="Meh">
+      <img src="../assets/reactions/meh.png" alt="Meh"/>
       <span class="icon-count">${r.meh||0}</span>
     </button>
                 </div>
                 <div class="sb-actions">
-                  <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorito">
-      <img src="../assets/reactions/fav.png" alt="Favorito"/>
+                  <button class="icon-btn icon-btn-fav" id="fav-${a.id}" onclick="toggleFav('${a.id}')" title="Favorite">
+      <img src="../assets/reactions/fav.png" alt="Favorite"/>
     </button>
                 </div>
               </div>
@@ -330,24 +330,24 @@
         if (isActive) {
           await updateDoc(ref, { favoritos: arrayRemove(id) });
           btn.classList.remove('active-fav');
-          window.showToast && window.showToast('Eliminado de favoritos');
+          window.showToast && window.showToast('Removed from favorites');
         } else {
           await updateDoc(ref, { favoritos: arrayUnion(id) });
           btn.classList.add('active-fav');
-          window.showToast && window.showToast('Guardado en favoritos');
+          window.showToast && window.showToast('Saved to favorites');
         }
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
     window.deleteSB = async function(id) {
       if (!currentUser) return;
-      if (!confirm('¿Eliminar este soundbite? Esta acción no se puede deshacer.')) return;
+      if (!confirm('Delete this soundbite? This action cannot be undone.')) return;
       try {
         await deleteDoc(doc(db,'audios',id));
         document.getElementById(`card-${id}`)?.remove();
         recentItems = recentItems.filter(a => a.id !== id);
         if (allItemsFull) allItemsFull = allItemsFull.filter(a => a.id !== id);
-        window.showToast && window.showToast('Soundbite eliminado');
+        window.showToast && window.showToast('Soundbite deleted');
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
@@ -396,7 +396,7 @@
       const btn = document.getElementById(`sbplay-${id}`);
       if(!btn) return;
 
-      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
       btn.disabled  = true;
 
       try{
@@ -475,7 +475,7 @@
       if (existing) { existing.remove(); }
       const el = document.createElement('div');
       el.className = 'auth-prompt';
-      el.innerHTML = `Debes iniciar sesión para votar y guardar favoritos.<a href="${ROOT}/pages/login.html">Entrar</a>`;
+      el.innerHTML = `Sign in to vote and save favorites.<a href="${ROOT}/pages/login.html">Sign in</a>`;
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 4000);
     }
@@ -496,11 +496,11 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
