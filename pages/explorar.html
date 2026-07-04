@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Explorar — Omnibites</title>
+  <title>Explore — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -302,31 +302,31 @@
       <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html" class="active-explorar">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+    <a href="explorar.html" class="active-explorar">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html" class="active-explorar">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html" class="active-explorar">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <!-- BÚSQUEDA -->
   <div class="search-section">
-    <h1>Buscar música</h1>
-    <p class="search-hint">Escribe el nombre de un juego y selecciónalo de la lista para ver sus soundtracks.</p>
+    <h1>Search music</h1>
+    <p class="search-hint">Type a game name and select it from the list to see its soundtracks.</p>
     <div class="search-bar">
       <div class="search-bar-inner">
         <input type="text" id="searchInput"
-          placeholder="Ej: Super Mario 64..." />
+          placeholder="E.g: Super Mario 64..." />
         <div id="searchSuggestions"></div>
       </div>
     </div>
@@ -338,16 +338,16 @@
       <img id="sgbImg" src="" alt=""/>
       <div class="sgb-info">
         <div class="sgb-name" id="sgbName"></div>
-        <div class="sgb-hint">Soundtracks encontrados en Archive.org para este juego</div>
+        <div class="sgb-hint">Soundtracks found on Archive.org for this game</div>
       </div>
-      <button id="sgbClear">Cambiar juego</button>
+      <button id="sgbClear">Change game</button>
     </div>
 
     <div id="relatedWrap" style="display:none" class="related-wrap"></div>
     <div id="stateMsg" class="state-msg">
       <div class="emoji"></div>
-      <p>Busca un juego para encontrar sus audios</p>
-      <small>Encuentra miles de soundtracks gratuitos</small>
+      <p>Search a game to find its audio</p>
+      <small>Find thousands of free soundtracks</small>
     </div>
     <div id="resultsHeader" style="display:none" class="results-header"></div>
     <div id="resultsList"></div>
@@ -469,7 +469,7 @@
       document.getElementById('relatedWrap').style.display = 'none';
       const state = document.getElementById('stateMsg');
       state.style.display = 'block';
-      state.innerHTML = `<p>Busca un juego para encontrar sus audios</p><small>Encuentra miles de soundtracks gratuitos</small>`;
+      state.innerHTML = `<p>Search a game to find its audio</p><small>Find thousands of free soundtracks</small>`;
     });
 
     // ══════════════════════════════════════════════
@@ -573,7 +573,7 @@
           id:        doc.identifier + '/' + f.name,
           title:     cleanName(f.name),
           album:     doc.title || doc.identifier,
-          creator:   doc.creator || 'Desconocido',
+          creator:   doc.creator || 'Unknown',
           year:      doc.year || '',
           duration:  f.length ? formatTime(parseFloat(f.length)) : '—',
           seconds:   f.length ? parseFloat(f.length) : 0,
@@ -598,7 +598,7 @@
 
       state.style.display  = 'none';
       header.style.display = 'block';
-      header.innerHTML     = `Encontrados <strong>${items.length}</strong> audios para "<strong>${query}</strong>" — Preview: 15 seg con fade`;
+      header.innerHTML     = `Found <strong>${items.length}</strong> audio for "<strong>${query}</strong>" — Preview: 15 sec with fade`;
 
       list.innerHTML = items.map((item, i) => `
         <div class="result-card" id="card-${i}">
@@ -630,12 +630,12 @@
           </div>
 
           <div class="card-actions">
-            <button class="reaction-btn" title="Añadir soundbite" onclick="compartir(${i})">
-              <img src="../assets/icons/add.png" alt="Añadir"/>
+            <button class="reaction-btn" title="Add soundbite" onclick="compartir(${i})">
+              <img src="../assets/icons/add.png" alt="Add"/>
             </button>
-            <a class="reaction-btn" title="Ver fuente en Archive.org"
+            <a class="reaction-btn" title="View source on Archive.org"
               href="https://archive.org/details/${item.archiveId}" target="_blank">
-              <img src="../assets/icons/source.png" alt="Fuente"/>
+              <img src="../assets/icons/source.png" alt="Source"/>
             </a>
           </div>
         </div>
@@ -658,7 +658,7 @@
         return;
       }
       stopActive(false);
-      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
       btn.disabled  = true;
       try {
         const ctx = getAudioCtx();
@@ -706,7 +706,7 @@
       } catch (e) {
         console.error(e);
         if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
-        alert('No se pudo cargar este audio. Prueba con otro resultado.');
+        alert('This audio could not be loaded. Try another result.');
       }
     };
 
@@ -797,7 +797,7 @@ const tituloRecortado = item.title.length > 60
       }
       wrap.style.display = 'block';
       wrap.innerHTML = `
-        <strong>Búsquedas relacionadas:</strong><br/>
+        <strong>Related searches:</strong><br/>
         ${related.slice(0, 5).map(g =>
           `<span class="related-chip" onclick="quickSearch('${g}')">${g}</span>`
         ).join('')}`;
@@ -811,21 +811,21 @@ const tituloRecortado = item.title.length > 60
       document.getElementById('stateMsg').style.display = 'block';
       document.getElementById('stateMsg').innerHTML = `
         <div class="spinner"></div>
-        <p>Buscando en Archive.org...</p>
-        <small>Esto puede tardar unos segundos</small>`;
+        <p>Searching Archive.org...</p>
+        <small>This may take a few seconds</small>`;
     }
     function showEmpty(q) {
       document.getElementById('stateMsg').innerHTML = `
         <div class="emoji">😔</div>
-        <p>No encontramos audios para "<strong>${q}</strong>"</p>
-        <small>Prueba con el nombre en inglés o solo el nombre del juego</small>`;
+        <p>We couldn't find any audio for "<strong>${q}</strong>"</p>
+        <small>Try the game's English/US title, or just its name</small>`;
       document.getElementById('stateMsg').style.display = 'block';
     }
     function showError() {
       document.getElementById('stateMsg').innerHTML = `
         <div class="emoji">⚠️</div>
-        <p>Error de conexión con Archive.org</p>
-        <small>Verifica tu internet e inténtalo de nuevo</small>`;
+        <p>Connection error with Archive.org</p>
+        <small>Check your internet connection and try again</small>`;
     }
 
     function formatTime(s) {
@@ -850,11 +850,11 @@ const tituloRecortado = item.title.length > 60
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
