@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Mi Perfil — Omnibites</title>
+  <title>My Profile — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -106,38 +106,38 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
 </a> 
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <main class="profile-page" id="profileMain" style="display:none">
-    <h1>Mi Perfil</h1>
+    <h1>My Profile</h1>
 
     <div class="verify-banner" id="verifyBanner" style="display:none">
-      <p>Tu correo aún no está verificado. Revisa tu bandeja de entrada.</p>
-      <button id="resendVerify">Reenviar correo</button>
+      <p>Your email hasn't been verified yet. Check your inbox.</p>
+      <button id="resendVerify">Resend email</button>
     </div>
 
     <div style="text-align:center;margin-bottom:1.5rem">
-      <div class="avatar-wrap" id="avatarWrap" title="Cambiar avatar">
+      <div class="avatar-wrap" id="avatarWrap" title="Change avatar">
         <img id="avatarImg" src="../assets/avatars/avatar1.png" alt="Avatar"
              onerror="this.style.display='none';document.getElementById('avFallback').style.display='flex'"/>
         <div class="avatar-fallback" id="avFallback" style="display:none"></div>
 <div class="avatar-edit-hint">
-  <img src="../assets/icons/camera.png" alt="Editar" style="width:24px;height:24px;object-fit:contain;display:block;"/>
+  <img src="../assets/icons/camera.png" alt="Edit" style="width:24px;height:24px;object-fit:contain;display:block;"/>
 </div>
       </div>
       <div id="userName" style="font-weight:700;font-size:1.1rem;margin-bottom:.2rem"></div>
@@ -151,46 +151,46 @@
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <img src="../assets/reactions/love.png" alt="Love it"/>
     <strong id="statLove">0</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
+    <img src="../assets/reactions/fav.png" alt="Favorites"/>
     <strong id="statFavs">0</strong>
   </div>
     <div class="pstat-divider"></div>
     <div class="pstat-item">
-    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <img src="../assets/icons/followers.png" alt="Followers"/>
     <strong id="statSeguidores">0</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/icons/following.png" alt="Siguiendo"/>
+    <img src="../assets/icons/following.png" alt="Following"/>
     <strong id="statSiguiendo">0</strong>
   </div>
 </div>
 
     <div class="collapse-section" id="sec-mios">
       <div class="collapse-header" onclick="toggleSection('mios')">
-        <h3>Mis Soundbites creados</h3>
+        <h3>My Created Soundbites</h3>
         <span class="collapse-arrow" id="arrow-mios">▾</span>
       </div>
       <div class="collapse-body" id="body-mios">
         <div id="list-mios" style="margin-top:.25rem">
-          <div class="empty-mini">Cargando...</div>
+          <div class="empty-mini">Loading...</div>
         </div>
       </div>
     </div>
 
     <div class="collapse-section" id="sec-favs">
       <div class="collapse-header" onclick="toggleSection('favs')">
-        <h3>Soundbites Favoritos</h3>
+        <h3>Favorite Soundbites</h3>
         <span class="collapse-arrow" id="arrow-favs">▾</span>
       </div>
       <div class="collapse-body" id="body-favs">
         <div id="list-favs" style="margin-top:.25rem">
-          <div class="empty-mini">Cargando...</div>
+          <div class="empty-mini">Loading...</div>
         </div>
       </div>
     </div>
@@ -201,27 +201,27 @@
     padding:.6rem 1.4rem; border-radius:20px;
     font-size:.85rem;
   ">
-<img src="../assets/icons/settings.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Ajustes 
+<img src="../assets/icons/settings.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Settings 
   </a>
   <button class="btn-signout" id="signOutBtn" style="
     display:flex; align-items:center; gap:.5rem;
     padding:.6rem 1.4rem; border-radius:20px;
     font-size:.85rem;
   ">
-<img src="../assets/icons/logout.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Cerrar sesión
+<img src="../assets/icons/logout.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Sign out
   </button>
 </div>
   </main>
 
   <div class="avatar-modal" id="avatarModal" style="display:none">
     <div class="avatar-modal-box">
-      <h3>Elige tu avatar</h3>
+      <h3>Choose your avatar</h3>
       <div class="avatar-grid-modal" id="avatarGrid">
         <!-- se llena automáticamente por JS -->
       </div>
       <div class="modal-actions">
-        <button class="btn-outline" id="cancelAvatar">Cancelar</button>
-        <button class="btn-primary" id="saveAvatar">Guardar</button>
+        <button class="btn-outline" id="cancelAvatar">Cancel</button>
+        <button class="btn-primary" id="saveAvatar">Save</button>
       </div>
     </div>
   </div>
@@ -258,7 +258,7 @@
     try {
       const ref  = doc(db,'usuarios',user.uid);
       const snap = await getDoc(ref);
-      let nombre = user.displayName || 'Jugador';
+      let nombre = user.displayName || 'Player';
       let favIds = [];
 
 if (snap.exists()) {
@@ -298,7 +298,7 @@ if (favIds.length > 0) {
         renderFavs(favAudios);
       } else {
         document.getElementById('statFavs').textContent = 0;
-        document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>';
+        document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No favorites yet.</div>';
       }
     } catch(e) {
       console.error('Perfil error:',e.message);
@@ -312,18 +312,18 @@ if (favIds.length > 0) {
 
   function renderMiosPage() {
     const el = document.getElementById('list-mios');
-    if (!dataMios.length) { el.innerHTML = '<div class="empty-mini">No has subido soundbites aún.</div>'; return; }
+    if (!dataMios.length) { el.innerHTML = '<div class="empty-mini">You haven\'t uploaded any soundbites yet.</div>'; return; }
     const slice = dataMios.slice(pageMios * PAGE_SIZE, (pageMios + 1) * PAGE_SIZE);
     const total = Math.ceil(dataMios.length / PAGE_SIZE);
     el.innerHTML = slice.map(a => `
       <div class="mini-sb-card" id="mini-${a.id}">
 <div class="mini-sb-info">
-          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a>
+          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Untitled'}</a>
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.consola||'—'}</div>
         </div>
         <div class="mini-sb-actions">
-<button class="icon-btn icon-danger" onclick="deleteMio('${a.id}')" title="Eliminar">
-  <img src="../assets/reactions/delete.png" alt="Eliminar"/>
+<button class="icon-btn icon-danger" onclick="deleteMio('${a.id}')" title="Delete">
+  <img src="../assets/reactions/delete.png" alt="Delete"/>
 </button>
 </div>
       </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
@@ -335,18 +335,18 @@ if (favIds.length > 0) {
 
   function renderFavsPage() {
     const el = document.getElementById('list-favs');
-    if (!dataFavs.length) { el.innerHTML = '<div class="empty-mini">No tienes favoritos aún.</div>'; return; }
+    if (!dataFavs.length) { el.innerHTML = '<div class="empty-mini">No favorites yet.</div>'; return; }
     const slice = dataFavs.slice(pageFavs * PAGE_SIZE, (pageFavs + 1) * PAGE_SIZE);
     const total = Math.ceil(dataFavs.length / PAGE_SIZE);
     el.innerHTML = slice.map(a => `
       <div class="mini-sb-card" id="fav-mini-${a.id}">
 <div class="mini-sb-info">
-          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Sin título'}</a>
+          <a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo||'Untitled'}</a>
           <div class="mini-sb-meta">${a.juego||'—'} · ${a.autorNombre||'—'}</div>
         </div>
         <div class="mini-sb-actions">
-<button class="icon-btn icon-danger" onclick="removeFav('${a.id}')" title="Quitar de favoritos">
-  <img src="../assets/reactions/delete.png" alt="Quitar"/>
+<button class="icon-btn icon-danger" onclick="removeFav('${a.id}')" title="Remove from favorites">
+  <img src="../assets/reactions/delete.png" alt="Remove"/>
 </button>
 </div>
       </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
@@ -367,7 +367,7 @@ if (favIds.length > 0) {
   };
 
 window.deleteMio = async function(id) {
-    if (!confirm('¿Eliminar este soundbite?')) return;
+    if (!confirm('Delete this soundbite?')) return;
     try {
       await deleteDoc(doc(db,'audios',id));
       dataMios = dataMios.filter(a => a.id !== id);
@@ -375,7 +375,7 @@ window.deleteMio = async function(id) {
       renderMiosPage();
       document.getElementById('statAudios').textContent = dataMios.length;
       document.getElementById('statLove').textContent = dataMios.reduce((s,a)=>s+(a.reactions?.love||0),0);
-      window.showToast&&window.showToast('Soundbite eliminado');
+      window.showToast&&window.showToast('Soundbite deleted');
     } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
   };
 
@@ -386,7 +386,7 @@ window.removeFav = async function(id) {
       if (pageFavs > 0 && pageFavs >= Math.ceil(dataFavs.length / PAGE_SIZE)) pageFavs--;
       renderFavsPage();
       document.getElementById('statFavs').textContent = dataFavs.length;
-      window.showToast&&window.showToast('Eliminado de favoritos');
+      window.showToast&&window.showToast('Removed from favorites');
     } catch(e) { window.showToast&&window.showToast('Error: '+e.message,'error'); }
   };
 
@@ -457,12 +457,12 @@ window.removeFav = async function(id) {
     try {
       await updateDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar });
       document.getElementById('avatarModal').style.display = 'none';
-      window.showToast && window.showToast('Avatar guardado');
+      window.showToast && window.showToast('Avatar saved');
     } catch {
       try {
         await setDoc(doc(db,'usuarios',currentUser.uid), { avatar: selectedAvatar }, { merge: true });
         document.getElementById('avatarModal').style.display = 'none';
-        window.showToast && window.showToast('Avatar guardado');
+        window.showToast && window.showToast('Avatar saved');
       } catch(e2) { window.showToast && window.showToast('Error: ' + e2.message, 'error'); }
     }
   });
@@ -473,7 +473,7 @@ window.removeFav = async function(id) {
   });
 
   document.getElementById('resendVerify')?.addEventListener('click', async()=>{
-    try { await sendEmailVerification(currentUser); window.showToast&&window.showToast('Correo enviado'); }
+    try { await sendEmailVerification(currentUser); window.showToast&&window.showToast('Email sent'); }
     catch(e){ window.showToast&&window.showToast('Error: '+e.message,'error'); }
   });
     </script>
@@ -483,11 +483,11 @@ window.removeFav = async function(id) {
 
     <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
