@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Perfil — Omnibites</title>
+  <title>Profile — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -120,29 +120,29 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <main class="pub-profile" id="pubMain">
-    <a href="jugadores.html" class="btn-back">← Jugadores</a>
+    <a href="jugadores.html" class="btn-back">← Players</a>
 
     <div id="loadingState" class="state-msg">
       <div class="spinner"></div>
-      <p>Cargando perfil...</p>
+      <p>Loading profile...</p>
     </div>
 
     <div id="profileContent" style="display:none">
@@ -155,7 +155,7 @@
 
 <button class="follow-btn" id="followBtn" style="display:none" onclick="toggleFollow()">
   <img src="../assets/icons/follow.png" alt=""/>
-  <span class="follow-label">Seguir</span>
+  <span class="follow-label">Follow</span>
 </button>
       
 <div class="pstat-single">
@@ -165,59 +165,59 @@
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <img src="../assets/reactions/love.png" alt="Love it"/>
     <strong id="pubStatLove">0</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
+    <img src="../assets/reactions/fav.png" alt="Favorites"/>
     <strong id="pubStatFavs">0</strong>
   </div>
     <div class="pstat-divider"></div>
     <div class="pstat-item">
-    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <img src="../assets/icons/followers.png" alt="Followers"/>
     <strong id="pubStatSeguidores">0</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="pstat-item">
-    <img src="../assets/icons/following.png" alt="Siguiendo"/>
+    <img src="../assets/icons/following.png" alt="Following"/>
     <strong id="pubStatSiguiendo">0</strong>
   </div>
 </div>
       <div class="collapse-section">
         <div class="collapse-header" onclick="toggleSec('mios')">
-          <h3>Soundbites subidos</h3>
+          <h3>Uploaded Soundbites</h3>
           <span class="collapse-arrow open" id="arrow-mios">▾</span>
         </div>
         <div class="collapse-body open" id="body-mios">
-          <div id="list-mios"><div class="empty-mini">Cargando...</div></div>
+          <div id="list-mios"><div class="empty-mini">Loading...</div></div>
         </div>
       </div>
 
       <div class="collapse-section">
         <div class="collapse-header" onclick="toggleSec('favs')">
-          <h3>Favoritos</h3>
+          <h3>Favorites</h3>
           <span class="collapse-arrow" id="arrow-favs">▾</span>
         </div>
         <div class="collapse-body" id="body-favs">
-          <div id="list-favs"><div class="empty-mini">Cargando...</div></div>
+          <div id="list-favs"><div class="empty-mini">Loading...</div></div>
         </div>
       </div>
     </div>
 
     <div id="notFound" style="display:none" class="state-msg">
-      <p>No se encontró este jugador.</p>
-      <a href="jugadores.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Volver a Jugadores</a>
+      <p>This player wasn't found.</p>
+      <a href="jugadores.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Back to Players</a>
     </div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
@@ -247,7 +247,7 @@ function showAuthPrompt() {
   if (existing) existing.remove();
   const el = document.createElement('div');
   el.className = 'auth-prompt';
-  el.innerHTML = `Debes iniciar sesión para esto.<a href="${ROOT}/pages/login.html">Entrar</a>`;
+  el.innerHTML = `Sign in to do this.<a href="${ROOT}/pages/login.html">Sign in</a>`;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 4000);
 }
@@ -262,7 +262,7 @@ async function maybeRenderFollow() {
     const misSeguidos = meSnap.exists() ? (meSnap.data().siguiendo || []) : [];
     const isFollowing = misSeguidos.includes(uid);
     btn.classList.toggle('following', isFollowing);
-    btn.querySelector('.follow-label').textContent = isFollowing ? 'Siguiendo' : 'Seguir';
+    btn.querySelector('.follow-label').textContent = isFollowing ? 'Following' : 'Follow';
   } catch {}
 }
 
@@ -277,13 +277,13 @@ window.toggleFollow = async function() {
     if (isFollowing) {
       await updateDoc(ref, { siguiendo: arrayRemove(uid) });
       btn.classList.remove('following');
-      btn.querySelector('.follow-label').textContent = 'Seguir';
-      window.showToast && window.showToast('Dejaste de seguir');
+      btn.querySelector('.follow-label').textContent = 'Follow';
+      window.showToast && window.showToast('Unfollowed');
     } else {
       await updateDoc(ref, { siguiendo: arrayUnion(uid) });
       btn.classList.add('following');
-      btn.querySelector('.follow-label').textContent = 'Siguiendo';
-      window.showToast && window.showToast('Ahora sigues a este jugador');
+      btn.querySelector('.follow-label').textContent = 'Following';
+      window.showToast && window.showToast('You are now following this player');
     }
     const countSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains',uid)));
     document.getElementById('pubStatSeguidores').textContent = countSnap.size;
@@ -312,7 +312,7 @@ window.toggleFollow = async function() {
       }
 
       const data   = snap.data();
-      const nombre = data.nombre || 'Jugador';
+      const nombre = data.nombre || 'Player';
       const avatar = data.avatar || 'avatar1';
       const favIds = data.favoritos || [];
 
@@ -347,14 +347,14 @@ maybeRenderFollow();
       function renderMiosPage() {
         const el = document.getElementById('list-mios');
         if (!dataMios.length) {
-          el.innerHTML = '<div class="empty-mini">Este jugador aún no ha subido soundbites.</div>';
+          el.innerHTML = '<div class="empty-mini">This player hasn\'t uploaded any soundbites yet.</div>';
           return;
         }
         const slice = dataMios.slice(pageMios * PAGE_SIZE, (pageMios + 1) * PAGE_SIZE);
         const total = Math.ceil(dataMios.length / PAGE_SIZE);
         el.innerHTML = slice.map(a => `
           <div class="mini-sb-card">
-<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Sin título'}</a>
+<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Untitled'}</a>
 <div class="mini-sb-meta">${a.juego || '—'} · ${a.consola || '—'}</div>
           </div>`).join('') + paginatorHTML(pageMios, total, 'mios');
       }
@@ -362,14 +362,14 @@ maybeRenderFollow();
       function renderFavsPage() {
         const el = document.getElementById('list-favs');
         if (!dataFavs.length) {
-          el.innerHTML = '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>';
+          el.innerHTML = '<div class="empty-mini">This player has no favorites yet.</div>';
           return;
         }
         const slice = dataFavs.slice(pageFavs * PAGE_SIZE, (pageFavs + 1) * PAGE_SIZE);
         const total = Math.ceil(dataFavs.length / PAGE_SIZE);
         el.innerHTML = slice.map(a => `
           <div class="mini-sb-card">
-<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Sin título'}</a>
+<a class="mini-sb-title" href="soundbite.html?id=${a.id}" style="display:block;color:inherit;text-decoration:none">${a.titulo || 'Untitled'}</a>
 <div class="mini-sb-meta">${a.juego || '—'} · ${a.autorNombre || '—'}</div>
           </div>`).join('') + paginatorHTML(pageFavs, total, 'favs');
       }
@@ -406,7 +406,7 @@ if (favIds.length > 0) {
       } else {
         document.getElementById('pubStatFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML =
-          '<div class="empty-mini">Este jugador no tiene favoritos aún.</div>';
+          '<div class="empty-mini">This player has no favorites yet.</div>';
       }
 
       // Mostrar contenido — ESTO es lo que faltaba llegar
@@ -414,7 +414,7 @@ if (favIds.length > 0) {
       document.getElementById('profileContent').style.display = 'block';
 
     } catch(e) {
-      document.getElementById('loadingState').innerHTML = '<p>Error al cargar el perfil.</p>';
+      document.getElementById('loadingState').innerHTML = '<p>Error loading profile.</p>';
       console.error(e);
     }
   }
