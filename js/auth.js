@@ -31,7 +31,7 @@ onAuthStateChanged(auth, async user => {
         nombre = snap.data().nombre || null;
         avatar = snap.data().avatar || null;
       } else {
-        const n = user.displayName || user.email?.split('@')[0] || 'Jugador';
+        const n = user.displayName || user.email?.split('@')[0] || 'Player';
         await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn: serverTimestamp(), audiosSubidos:0 });
         nombre = n; avatar = 'avatar1';
       }
@@ -47,7 +47,7 @@ function renderNav(user, nombre, avatar) {
   const onPerfil = location.pathname.includes('/perfil.html');
   if (user && onPerfil) { el.innerHTML = ''; return; }
   if (user) {
-    const name = nombre || user.email?.split('@')[0] || 'Jugador';
+    const name = nombre || user.email?.split('@')[0] || 'Player';
     const initial = name.charAt(0).toUpperCase();
     const avatarHTML = avatar
       ? `<img class="nav-avatar" src="${ROOT}/assets/avatars/${avatar}.png" alt=""
@@ -60,7 +60,7 @@ function renderNav(user, nombre, avatar) {
         <span class="nav-user-name">${name.split(' ')[0]}</span>
       </a>`;
   } else {
-    el.innerHTML = `<a href="${ROOT}/pages/login.html" class="nav-login-btn">Entrar</a>`;
+    el.innerHTML = `<a href="${ROOT}/pages/login.html" class="nav-login-btn">Sign in</a>`;
   }
 }
 
@@ -68,11 +68,11 @@ function renderMobile(user, nombre) {
   const el = document.getElementById('mobile-auth');
   if (!el) return;
   if (user) {
-    const name = nombre || user.email?.split('@')[0] || 'Jugador';
+    const name = nombre || user.email?.split('@')[0] || 'Player';
     // Solo el nombre como link al perfil — sin botón de cerrar sesión (está en perfil.html)
     el.innerHTML = `<a href="${ROOT}/pages/perfil.html" class="mobile-perfil-link">${name}</a>`;
   } else {
-    el.innerHTML = `<a href="${ROOT}/pages/login.html">Entrar</a>`;
+    el.innerHTML = `<a href="${ROOT}/pages/login.html">Sign in</a>`;
   }
 }
 
