@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Jugadores — Omnibites</title>
+  <title>Players — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -120,46 +120,46 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>    
-      <a href="jugadores.html" class="active-jugadores">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>    
+      <a href="jugadores.html" class="active-jugadores">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>    
-    <a href="jugadores.html" class="active-jugadores">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>    
+    <a href="jugadores.html" class="active-jugadores">Players</a>
   </div>
 
   <main class="players-page">
-    <h1>Jugadores</h1>
+    <h1>Players</h1>
     <div class="players-search">
-  <input type="text" id="searchInput" placeholder="Buscar jugador por nombre..."/>
-  <button class="players-search-btn" id="searchBtn" title="Buscar">
-    <img src="../assets/icons/search.png" alt="Buscar"/>
+  <input type="text" id="searchInput" placeholder="Search player by name..."/>
+  <button class="players-search-btn" id="searchBtn" title="Search">
+    <img src="../assets/icons/search.png" alt="Search"/>
   </button>
     </div>
     <div id="playersGrid" class="players-grid">
       <div class="state-msg" style="grid-column:1/-1">
         <div class="spinner"></div>
-        <p>Cargando jugadores...</p>
+        <p>Loading players...</p>
       </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
@@ -219,7 +219,7 @@ allPlayers = usersSnap.docs.map(d => {
         render('');
       } catch(e) {
         document.getElementById('playersGrid').innerHTML =
-          '<div class="state-msg" style="grid-column:1/-1"><p>Error al cargar jugadores.</p></div>';
+          '<div class="state-msg" style="grid-column:1/-1"><p>Error loading players.</p></div>';
       }
     }
 
@@ -231,12 +231,12 @@ allPlayers = usersSnap.docs.map(d => {
         : allPlayers;
 
       if (!filtered.length) {
-        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No se encontró ningún jugador.</p></div>';
+        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No player found.</p></div>';
         return;
       }
 
       grid.innerHTML = filtered.map(p => {
-        const name = p.nombre || 'Jugador';
+        const name = p.nombre || 'Player';
         const initial = name.charAt(0).toUpperCase();
         const favs = p.favs;
         const avatarHTML = p.avatar
@@ -256,17 +256,17 @@ allPlayers = usersSnap.docs.map(d => {
   </div>
   <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <img src="../assets/reactions/love.png" alt="Love it"/>
     <strong>${p.love}</strong>
   </div>
 <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
+    <img src="../assets/reactions/fav.png" alt="Favorites"/>
     <strong>${favs}</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <img src="../assets/icons/followers.png" alt="Followers"/>
     <strong>${p.seguidores}</strong>
   </div>
 </div>
