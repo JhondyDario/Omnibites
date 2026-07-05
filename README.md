@@ -3,9 +3,9 @@
 [![Omnibites](https://jhondydario.github.io/Omnibites/assets/og-banner.png)](https://jhondydario.github.io/Omnibites/)
 ### The retro community for video game soundbites
 <p align="center" dir="auto">
-  <a href="https://discord.gg/iisu" rel="nofollow">Review Soundbites</a> ·
-  <a href="https://iisu.network" rel="nofollow">Explore Music</a> ·
-  <a href="https://github.com/iisu-network/iiSU/releases">Create Soundbite</a>
+<a href="https://jhondydario.github.io/Omnibites/pages/comunidad.html">Review Soundbites</a> ·
+<a href="https://jhondydario.github.io/Omnibites/pages/explorar.html">Explore Music</a> ·
+<a href="https://jhondydario.github.io/Omnibites/pages/subir.html">Create Soundbite</a>
 </p>
 </div>
 
