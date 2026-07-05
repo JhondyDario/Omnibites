@@ -293,6 +293,7 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getCachedRawgResults, setCachedRawgResults } from '../js/rawg-cache.js';
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser  = null;
@@ -682,9 +683,13 @@
 
     async function buscarJuegos(q) {
       try {
-        const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
-        const data = await res.json();
-        const results = data.results || [];
+        let results = getCachedRawgResults(q, 6);
+        if (!results) {
+          const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
+          const data = await res.json();
+          results = data.results || [];
+          setCachedRawgResults(q, 6, results);
+        }
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
         sugBox.innerHTML = results.map(g => `
