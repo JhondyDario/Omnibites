@@ -168,87 +168,122 @@
   </footer>
 
   <script type="module">
-    import { db } from '../js/firebase-config.js';
-    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, getDocs, query, where, orderBy, limit }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-let allPlayers = [];
-let audioCountMap = {};
-let loveCountMap  = {};
-let followersCountMap = {};
-    async function loadPlayers() {
+    const DEFAULT_LIMIT = 30; // también el máximo que soporta el operador 'in' de Firestore
+
+    let currentUser = null;
+    onAuthStateChanged(auth, u => {
+      currentUser = u;
+      // Re-renderiza con los mismos datos ya cargados para actualizar el link "es mi perfil"
+      render(document.getElementById('searchInput').value);
+    });
+
+    // ── Nivel 1: unos pocos jugadores por defecto (sin escanear toda la colección) ──
+    let defaultPlayers = null;
+    async function loadDefaultPlayers() {
       try {
-        const [usersSnap, audiosSnap] = await Promise.all([
-          getDocs(collection(db, 'usuarios')),
-          getDocs(collection(db, 'audios'))
-        ]);
+        const usersQ = query(collection(db, 'usuarios'), orderBy('creadoEn', 'desc'), limit(DEFAULT_LIMIT));
+        const usersSnap = await getDocs(usersQ);
+        const baseUsers = usersSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
+        const uids = baseUsers.map(u => u.uid);
 
-        // Contar audios por usuario
-        audiosSnap.docs.forEach(d => {
-  const uid  = d.data().autorId;
-  const love = d.data().reactions?.love || 0;
-  if (uid) {
-    audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
-    loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
-  }
-});
+        let audioCountMap = {}, loveCountMap = {};
+        if (uids.length) {
+          const audiosQ = query(collection(db, 'audios'), where('autorId', 'in', uids));
+          const audiosSnap = await getDocs(audiosQ);
+          audiosSnap.docs.forEach(d => {
+            const uid = d.data().autorId;
+            const love = d.data().reactions?.love || 0;
+            audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+            loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
+          });
+        }
 
-usersSnap.docs.forEach(d => {
-  const sig = d.data().siguiendo || [];
-  sig.forEach(uidSeguido => {
-    followersCountMap[uidSeguido] = (followersCountMap[uidSeguido] || 0) + 1;
-  });
-});
+        // Seguidores: una consulta chiquita por cada jugador visible (acotado a DEFAULT_LIMIT)
+        const followerCounts = await Promise.all(baseUsers.map(async u => {
+          try {
+            const snap = await getDocs(query(collection(db, 'usuarios'), where('siguiendo', 'array-contains', u.uid)));
+            return snap.size;
+          } catch { return 0; }
+        }));
 
-// IDs de audios que realmente existen — para filtrar favoritos huérfanos sin lecturas extra
-const validAudioIds = new Set(audiosSnap.docs.map(d => d.id));
-
-allPlayers = usersSnap.docs.map(d => {
-  const data = d.data();
-  const favsReal = (data.favoritos || []).filter(id => validAudioIds.has(id)).length;
-  return {
-    uid: d.id,
-    ...data,
-    audios: audioCountMap[d.id] || 0,
-    love:   loveCountMap[d.id]  || 0,
-    seguidores: followersCountMap[d.id] || 0,
-    favs: favsReal
-  };
-});
-
-        render('');
+        defaultPlayers = baseUsers.map((u, i) => ({
+          ...u,
+          audios: audioCountMap[u.uid] || 0,
+          love: loveCountMap[u.uid] || 0,
+          seguidores: followerCounts[i] || 0,
+          // Conteo crudo de favoritos, sin filtrar huérfanos, para no tener que leer toda la colección de audios
+          favs: (u.favoritos || []).length
+        }));
       } catch(e) {
-        document.getElementById('playersGrid').innerHTML =
-          '<div class="state-msg" style="grid-column:1/-1"><p>Error loading players.</p></div>';
+        console.error('Error loading default players:', e.message);
+        defaultPlayers = [];
       }
     }
 
-    function render(search) {
-      const grid = document.getElementById('playersGrid');
-      const q = search.toLowerCase().trim();
-      const filtered = q
-        ? allPlayers.filter(p => (p.nombre || '').toLowerCase().includes(q))
-        : allPlayers;
+    // ── Nivel 2: colección completa, solo se pide si el usuario busca (se cachea) ──
+    let fullPlayers = null;
+    async function ensureFullPlayers() {
+      if (fullPlayers) return fullPlayers;
+      const [usersSnap, audiosSnap] = await Promise.all([
+        getDocs(collection(db, 'usuarios')),
+        getDocs(collection(db, 'audios'))
+      ]);
 
-      if (!filtered.length) {
-        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No player found.</p></div>';
-        return;
-      }
+      const audioCountMap = {}, loveCountMap = {}, followersCountMap = {};
+      audiosSnap.docs.forEach(d => {
+        const uid  = d.data().autorId;
+        const love = d.data().reactions?.love || 0;
+        if (uid) {
+          audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+          loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
+        }
+      });
+      usersSnap.docs.forEach(d => {
+        const sig = d.data().siguiendo || [];
+        sig.forEach(uidSeguido => {
+          followersCountMap[uidSeguido] = (followersCountMap[uidSeguido] || 0) + 1;
+        });
+      });
 
-      grid.innerHTML = filtered.map(p => {
-        const name = p.nombre || 'Player';
-        const initial = name.charAt(0).toUpperCase();
-        const favs = p.favs;
-        const avatarHTML = p.avatar
-          ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
-               onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
-             <div class="player-avatar-fallback" style="display:none">${initial}</div>`
-          : `<div class="player-avatar-fallback">${initial}</div>`;
+      const validAudioIds = new Set(audiosSnap.docs.map(d => d.id));
 
-        return `
-          <a class="player-card" href="jugador.html?uid=${p.uid}">
-            ${avatarHTML}
-            <div class="player-name">${name}</div>
+      fullPlayers = usersSnap.docs.map(d => {
+        const data = d.data();
+        const favsReal = (data.favoritos || []).filter(id => validAudioIds.has(id)).length;
+        return {
+          uid: d.id,
+          ...data,
+          audios: audioCountMap[d.id] || 0,
+          love:   loveCountMap[d.id]  || 0,
+          seguidores: followersCountMap[d.id] || 0,
+          favs: favsReal
+        };
+      });
+      return fullPlayers;
+    }
+
+    function cardHTML(p) {
+      const name = p.nombre || 'Player';
+      const initial = name.charAt(0).toUpperCase();
+      const avatarHTML = p.avatar
+        ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
+             onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
+           <div class="player-avatar-fallback" style="display:none">${initial}</div>`
+        : `<div class="player-avatar-fallback">${initial}</div>`;
+
+      const isMe = currentUser && currentUser.uid === p.uid;
+      const href = isMe ? 'perfil.html' : `jugador.html?uid=${p.uid}`;
+
+      return `
+        <a class="player-card" href="${href}">
+          ${avatarHTML}
+          <div class="player-name">${name}</div>
 <div class="player-stats">
   <div class="player-stat-item">
     <img src="../assets/icons/soundbite.png" alt="Soundbites"/>
@@ -262,7 +297,7 @@ allPlayers = usersSnap.docs.map(d => {
 <div class="pstat-divider"></div>
   <div class="player-stat-item">
     <img src="../assets/reactions/fav.png" alt="Favorites"/>
-    <strong>${favs}</strong>
+    <strong>${p.favs}</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="player-stat-item">
@@ -270,8 +305,33 @@ allPlayers = usersSnap.docs.map(d => {
     <strong>${p.seguidores}</strong>
   </div>
 </div>
-          </a>`;
-      }).join('');
+        </a>`;
+    }
+
+    async function render(search) {
+      const grid = document.getElementById('playersGrid');
+      const q = (search || '').toLowerCase().trim();
+
+      let source;
+      if (q) {
+        if (!fullPlayers) {
+          grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><div class="spinner"></div><p>Searching all players...</p></div>';
+        }
+        source = await ensureFullPlayers();
+      } else {
+        source = defaultPlayers || [];
+      }
+
+      const filtered = q
+        ? source.filter(p => (p.nombre || '').toLowerCase().includes(q))
+        : source;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No player found.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(cardHTML).join('');
     }
 
     document.getElementById('searchBtn').addEventListener('click', () => {
@@ -284,7 +344,10 @@ allPlayers = usersSnap.docs.map(d => {
       if (e.key === 'Enter') render(e.target.value);
     });
 
-    loadPlayers();
+    (async function init() {
+      await loadDefaultPlayers();
+      render('');
+    })();
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>
