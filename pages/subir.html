@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Crear Soundbite — Omnibites</title>
+  <title>Create Soundbite — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -101,61 +101,61 @@
       <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html" class="active-subir">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html" class="active-subir">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html" class="active-subir">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html" class="active-subir">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <div id="authWall" style="display:none;padding:2rem 1.5rem;">
     <div class="auth-wall">
-      <h2>Necesitas una cuenta</h2>
-      <p>Para crear y publicar soundbites debes iniciar sesión o registrarte. Es gratis.</p>
+      <h2>You need an account</h2>
+      <p>To create and publish soundbites you need to sign in or register. It's free.</p>
       <div class="aw-btns">
-        <a href="registro.html" class="btn-primary">Registrarme</a>
-        <a href="login.html" class="btn-outline">Ya tengo cuenta</a>
+        <a href="registro.html" class="btn-primary">Sign up</a>
+        <a href="login.html" class="btn-outline">I already have an account</a>
       </div>
     </div>
   </div>
 
   <main id="mainForm" class="editor-page" style="display:none">
-    <h1>Crear Soundbite</h1>
+    <h1>Create Soundbite</h1>
 
     <!-- PASO 1 -->
     <div class="editor-box" style="margin-bottom:1.5rem">
-      <p class="step-label">PASO 1 — Fuente del audio</p>
+      <p class="step-label">STEP 1 — Audio source</p>
       <div class="tab-row">
-        <button class="tab-btn active" data-tab="url">URL de Archive.org</button>
-        <button class="tab-btn" data-tab="file">Subir desde mi dispositivo</button>
+        <button class="tab-btn active" data-tab="url">Archive.org URL</button>
+        <button class="tab-btn" data-tab="file">Upload from my device</button>
       </div>
 
       <div class="tab-panel active" id="tab-url">
         <div class="url-wrap">
           <input type="url" id="audioUrl" placeholder="https://archive.org/download/..."/>
-          <button class="btn-primary" id="loadBtn">Cargar</button>
+          <button class="btn-primary" id="loadBtn">Load</button>
         </div>
         <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.8">
-          Fuentes compatibles: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong> o cualquier enlace directo a .mp3 / .ogg.<br/>
-          Lo más fácil: usa <a href="explorar.html" style="color:var(--neon);font-weight:600">Explorar música</a> y pulsa "Añadir Soundbite".
+          Compatible sources: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong>, or any direct link to .mp3 / .ogg.<br/>
+          Easiest way: use <a href="explorar.html" style="color:var(--neon);font-weight:600">Explore music</a> and click "Add Soundbite".
         </p>
         <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
       </div>
 
       <div class="tab-panel" id="tab-file">
         <div class="drop-zone" id="dropZone">
-          <p>Arrastra tu archivo aquí o haz clic</p>
-          <small>Solo MP3 · Entre 10 y 15 segundos</small>
+          <p>Drag your file here or click</p>
+          <small>MP3 only · Between 10 and 15 seconds</small>
           <input type="file" id="fileInput" accept=".mp3,audio/mpeg"/>
         </div>
         <div id="fileError" class="file-err" style="display:none"></div>
@@ -165,9 +165,9 @@
 
     <!-- PASO 2 -->
     <div id="previewSection" class="editor-box locked" style="margin-bottom:1.5rem">
-      <p class="step-label">PASO 2 — Define el recorte</p>
+      <p class="step-label">STEP 2 — Define the trim</p>
 
-      <div id="lockMsg" class="lock-msg">🔒 Carga un audio en el Paso 1 para desbloquear el recorte</div>
+      <div id="lockMsg" class="lock-msg">🔒 Load an audio in Step 1 to unlock the trim</div>
 
       <div id="trimContent">
         <audio id="audioPlayer" crossorigin="anonymous" style="display:none"></audio>
@@ -181,27 +181,27 @@
           </div>
         </div>
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:-.4rem;margin-bottom:.85rem">
-          Arrastra el bloque verde para mover el clip, los bordes para ajustarlo, o toca cualquier parte de la pista para saltar ahí.
+          Drag the green block to move the clip, the edges to resize it, or tap anywhere on the track to jump there.
         </p>
 
         <div class="time-disp">
-          <span>Inicio: <span id="startDisp">0:00</span></span>
-          <span>Fin: <span id="endDisp">0:15</span></span>
+          <span>Start: <span id="startDisp">0:00</span></span>
+          <span>End: <span id="endDisp">0:15</span></span>
           <span>Clip: <span id="selDisp">15s</span></span>
         </div>
         <input type="hidden" id="trimStart" value="0"/>
         <input type="hidden" id="trimEnd"   value="15"/>
 
         <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-          <button class="btn-primary" id="playSelBtn">▶ Escuchar clip</button>
-          <button class="btn-outline"  id="stopBtn">◼ Detener</button>
+          <button class="btn-primary" id="playSelBtn">▶ Listen to clip</button>
+          <button class="btn-outline"  id="stopBtn">◼ Stop</button>
         </div>
       </div>
     </div>
 
     <!-- PASO 3 -->
     <div class="editor-box">
-      <p class="step-label">PASO 3 — Información</p>
+      <p class="step-label">STEP 3 — Information</p>
 
       <div id="juegoImgWrap" style="display:none">
         <div class="juego-img-frame">
@@ -210,36 +210,36 @@
       </div>
 
       <div class="form-group" style="position:relative">
-        <label>1. Busca el nombre del juego *</label>
-        <input type="text" id="juego" placeholder="Escribe y selecciona de la lista..." autocomplete="off"/>
+        <label>1. Search for the game name *</label>
+        <input type="text" id="juego" placeholder="Type and select from the list..." autocomplete="off"/>
         <div id="juegoSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:240px;overflow-y:auto;z-index:50"></div>
-        <p class="juego-lock-hint" id="juegoHint">Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.</p>
+        <p class="juego-lock-hint" id="juegoHint">You must select a game from the list to publish. This automatically assigns the console.</p>
       </div>
 
       <div class="form-group">
-        <label>2. Título del soundbite *</label>
-        <input type="text" id="titulo" placeholder="Ej: Tema principal — Star Fox Assault" maxlength="60"/>
+        <label>2. Soundbite title *</label>
+        <input type="text" id="titulo" placeholder="E.g: Main theme — Star Fox Assault" maxlength="60"/>
         <p class="char-counter" id="tituloCounter">0/60</p>
       </div>
 
       <div class="form-group">
-        <label>3. Categoría *</label>
+        <label>3. Category *</label>
         <select id="categoria">
-          <option value="">— Selecciona —</option>
-          <option value="orquestal">Orquestal e Instrumental</option>
+          <option value="">— Select —</option>
+          <option value="orquestal">Orchestral & Instrumental</option>
           <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-          <option value="rock-metal">Rock, Metal e Industrial</option>
-          <option value="jazz">Jazz y Dark Jazz / Noir</option>
-          <option value="hibrido">Soundtracks Híbridos</option>
-          <option value="licenciada">Música Licenciada</option>
+          <option value="electronica">Electronic (EDM, Synthwave, Lo-Fi)</option>
+          <option value="rock-metal">Rock, Metal & Industrial</option>
+          <option value="jazz">Jazz & Dark Jazz / Noir</option>
+          <option value="hibrido">Hybrid Soundtracks</option>
+          <option value="licenciada">Licensed Music</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>4. Consola <span style="color:var(--text-dim);font-size:.72rem">(se asigna al elegir el juego)</span></label>
+        <label>4. Console <span style="color:var(--text-dim);font-size:.72rem">(assigned when you choose the game)</span></label>
         <select id="consola" disabled>
-          <option value="">— Elige un juego primero —</option>
+          <option value="">— Choose a game first —</option>
           <optgroup label="Nintendo">
             <option value="NES">NES / Famicom</option>
             <option value="SNES">Super Nintendo (SNES)</option>
@@ -268,23 +268,23 @@
             <option value="Xbox">Xbox Original</option>
             <option value="Xbox360">Xbox 360</option>
           </optgroup>
-          <optgroup label="Otros">
+          <optgroup label="Other">
             <option value="Arcade">Arcade</option>
             <option value="Atari">Atari</option>
             <option value="Neo-Geo">Neo Geo</option>
             <option value="PC">PC / DOS</option>
-            <option value="Otra">Otra</option>
+            <option value="Otra">Other</option>
           </optgroup>
         </select>
       </div>
 
       <div class="form-group">
-        <label>5. Descripción (opcional)</label>
-        <textarea id="descripcion" maxlength="300" placeholder="¿En qué momento del juego suena? ¿Qué lo hace especial?"></textarea>
+        <label>5. Description (optional)</label>
+        <textarea id="descripcion" maxlength="300" placeholder="When does it play in the game? What makes it special?"></textarea>
         <p class="char-counter" id="descripcionCounter">0/300</p>
       </div>
 
-      <button class="btn-primary form-submit" id="submitBtn">Publicar Soundbite</button>
+      <button class="btn-primary form-submit" id="submitBtn">Publish Soundbite</button>
     </div>
   </main>
 
@@ -293,6 +293,7 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getCachedRawgResults, setCachedRawgResults } from '../js/rawg-cache.js';
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser  = null;
@@ -310,8 +311,8 @@
     async function getNombreUsuario(uid) {
       try {
         const snap = await getDoc(doc(db, 'usuarios', uid));
-        return snap.exists() ? (snap.data().nombre || 'Jugador') : 'Jugador';
-      } catch { return 'Jugador'; }
+        return snap.exists() ? (snap.data().nombre || 'Player') : 'Player';
+      } catch { return 'Player'; }
     }
 
     onAuthStateChanged(auth, user => {
@@ -355,7 +356,7 @@
         juegoConfirmado   = true;
         document.getElementById('consola').value = consolaParam;
         juegoHint.className   = 'juego-lock-hint ok';
-        juegoHint.textContent = `✓ ${nombreJuego} seleccionado — consola asignada automáticamente`;
+        juegoHint.textContent = `✓ ${nombreJuego} selected — console assigned automatically`;
 
       if (juegoImgParam) {
           const decodedImg = safeDecode(juegoImgParam);
@@ -389,7 +390,7 @@
     function loadAudioUrl(url, startHint = 0, endHint = 15) {
       const errEl = document.getElementById('urlError');
       errEl.style.display = 'none';
-      if (!url) { errEl.textContent = 'Pega un enlace primero.'; errEl.style.display = 'block'; return; }
+      if (!url) { errEl.textContent = 'Paste a link first.'; errEl.style.display = 'block'; return; }
       audioPlayer.src = url;
       audioPlayer.load();
       audioPlayer.onloadedmetadata = () => {
@@ -399,11 +400,11 @@
         if (end - start < 10) end   = Math.min(start + 15, dur);
         if (end - start < 10) start = Math.max(0, end - 10);
         setupTrimSlider(dur, start, end);
-        document.getElementById('durationInfo').textContent = `Duración total: ${fmt(dur)} — arrastra el bloque para mover el clip, los bordes para ajustarlo (10–15 seg)`;
+        document.getElementById('durationInfo').textContent = `Total duration: ${fmt(dur)} — drag the block to move the clip, the edges to resize it (10–15 sec)`;
         document.getElementById('previewSection').classList.remove('locked');
       };
       audioPlayer.onerror = () => {
-        errEl.textContent = 'No se pudo cargar. Usa un enlace directo a MP3/OGG.';
+        errEl.textContent = 'Could not load it. Use a direct link to MP3/OGG.';
         errEl.style.display = 'block';
         document.getElementById('previewSection').classList.add('locked');
       };
@@ -610,7 +611,7 @@
       errEl.style.display = 'none'; okEl.style.display = 'none';
       if (!file) return;
       if (file.type !== 'audio/mpeg' && !file.name.endsWith('.mp3')) {
-        errEl.textContent = 'Solo se aceptan archivos MP3.'; errEl.style.display = 'block'; return;
+        errEl.textContent = 'Only MP3 files are accepted.'; errEl.style.display = 'block'; return;
       }
       const tmpUrl = URL.createObjectURL(file);
       const tmp    = new Audio(tmpUrl);
@@ -618,12 +619,12 @@
         const dur = tmp.duration;
         URL.revokeObjectURL(tmpUrl);
         if (dur < 10 || dur > 15) {
-          errEl.textContent = `El archivo dura ${dur.toFixed(1)}s. Debe ser entre 10 y 15 segundos.`;
+          errEl.textContent = `The file is ${dur.toFixed(1)}s long. It must be between 10 and 15 seconds.`;
           errEl.style.display = 'block'; localFileUrl = null; return;
         }
         localFileUrl      = URL.createObjectURL(file);
         localFileDuration = dur;
-        okEl.textContent  = `${file.name} — ${dur.toFixed(1)}s listo para publicar`;
+        okEl.textContent  = `${file.name} — ${dur.toFixed(1)}s ready to publish`;
         okEl.style.display = 'block';
       };
     }
@@ -668,7 +669,7 @@
       document.getElementById('juegoImgWrap').style.display = 'none';
       document.getElementById('consola').value = '';
       juegoHint.className = 'juego-lock-hint';
-      juegoHint.textContent = 'Debes seleccionar un juego de la lista para poder publicar. Esto asigna la consola automáticamente.';
+      juegoHint.textContent = 'You must select a game from the list to publish. This automatically assigns the console.';
 
       clearTimeout(juegoDebounce);
       const val = juegoInput.value.trim();
@@ -682,9 +683,13 @@
 
     async function buscarJuegos(q) {
       try {
-        const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
-        const data = await res.json();
-        const results = data.results || [];
+        let results = getCachedRawgResults(q, 6);
+        if (!results) {
+          const res  = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
+          const data = await res.json();
+          results = data.results || [];
+          setCachedRawgResults(q, 6, results);
+        }
         if (!results.length) { sugBox.style.display = 'none'; return; }
 
         sugBox.innerHTML = results.map(g => `
@@ -729,11 +734,11 @@
       if (matched) {
         consolaSelect.value = matched;
         juegoHint.className  = 'juego-lock-hint ok';
-        juegoHint.textContent = `✓ ${game.name} seleccionado — consola asignada automáticamente`;
+        juegoHint.textContent = `✓ ${game.name} selected — console assigned automatically`;
       } else {
         consolaSelect.value  = 'Otra';
         juegoHint.className  = 'juego-lock-hint ok';
-        juegoHint.textContent = `✓ ${game.name} seleccionado — consola no detectada, se asignó "Otra"`;
+        juegoHint.textContent = `✓ ${game.name} selected — console not detected, assigned "Other"`;
       }
     }
 
@@ -741,43 +746,43 @@
     // PUBLICAR
     // ════════════════════════════════════════════
     document.getElementById('submitBtn').addEventListener('click', async () => {
-      if (!currentUser) { window.showToast('Inicia sesión primero.','error'); return; }
+      if (!currentUser) { window.showToast('Sign in first.','error'); return; }
 
       const titulo    = document.getElementById('titulo').value.trim();
       const juego     = document.getElementById('juego').value.trim();
       const consola   = document.getElementById('consola').value;
       const categoria = document.getElementById('categoria').value;
 
-      if (!titulo)    { window.showToast('Ponle un título.','error'); return; }
-      if (!juego)     { window.showToast('Escribe el nombre del juego.','error'); return; }
+      if (!titulo)    { window.showToast('Give it a title.','error'); return; }
+      if (!juego)     { window.showToast('Enter the game name.','error'); return; }
 
       if (!juegoConfirmado) {
-        window.showToast('Selecciona el juego de la lista de sugerencias, no lo escribas a mano.','error');
+        window.showToast('Select the game from the suggestions list, don\'t type it manually.','error');
         juegoInput.focus();
         return;
       }
 
-      if (!consola)   { window.showToast('No se pudo detectar la consola. Intenta con otro juego.','error'); return; }
-      if (!categoria) { window.showToast('Selecciona la categoría.','error'); return; }
+      if (!consola)   { window.showToast('Could not detect the console. Try a different game.','error'); return; }
+      if (!categoria) { window.showToast('Select the category.','error'); return; }
 
       let url = '', trimStart = 0, trimEnd = 15;
       if (activeTab === 'url') {
         url = document.getElementById('audioUrl').value.trim();
-        if (!url) { window.showToast('Pega un enlace de audio.','error'); return; }
+        if (!url) { window.showToast('Paste an audio link.','error'); return; }
         trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
         trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || 15;
         const clipDur = trimEnd - trimStart;
-        if (clipDur < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
-        if (clipDur > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
+        if (clipDur < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
+        if (clipDur > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
       } else {
-        if (!localFileUrl)        { window.showToast('Selecciona un archivo MP3 válido (10-15 seg).','error'); return; }
-        if (localFileDuration < 10) { window.showToast('El clip debe durar al menos 10 segundos.','error'); return; }
-        if (localFileDuration > 15) { window.showToast('El clip no puede durar más de 15 segundos.','error'); return; }
+        if (!localFileUrl)        { window.showToast('Select a valid MP3 file (10-15 sec).','error'); return; }
+        if (localFileDuration < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
+        if (localFileDuration > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
         url = localFileUrl; trimEnd = localFileDuration;
       }
 
       const btn = document.getElementById('submitBtn');
-      btn.disabled = true; btn.textContent = 'Publicando...';
+      btn.disabled = true; btn.textContent = 'Publishing...';
 
       try {
         const autorNombre = await getNombreUsuario(currentUser.uid);
@@ -795,7 +800,7 @@
             trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
             autorNombre, imagen: imagenFromRawg || imagenFromArchive || '', creadoEn: serverTimestamp()
           });
-          window.showToast('Soundbite actualizado (ya existía uno igual)');
+          window.showToast('Soundbite updated (an identical one already existed)');
           setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
           return;
         }
@@ -811,12 +816,12 @@
           imagen: imagenFromRawg || imagenFromArchive || '',
           creadoEn: serverTimestamp()
         });
-        window.showToast('Soundbite publicado');
+        window.showToast('Soundbite published');
         setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
       } catch(e) {
         console.error(e);
-        window.showToast('Error al publicar: ' + e.message, 'error');
-        btn.disabled = false; btn.textContent = 'Publicar Soundbite';
+        window.showToast('Error publishing: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Publish Soundbite';
       }
     });
 
@@ -830,11 +835,11 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
