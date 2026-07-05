@@ -41,7 +41,7 @@
     .preview-info { font-size:.75rem;color:var(--text-dim);margin-top:.4rem; }
 
     /* ── CONSOLA BLOQUEADA ── */
-    select#consola:disabled { opacity:.45;cursor:not-allowed; }
+    select#consola:disabled, #categoria:disabled, #descripcion:disabled { opacity:.45;cursor:not-allowed; }
     .juego-lock-hint { font-size:.72rem;color:var(--text-dim);margin-top:.4rem;line-height:1.6; }
     .juego-lock-hint.ok { color:var(--neon); }
 
@@ -223,8 +223,8 @@
       </div>
 
       <div class="form-group">
-        <label>3. Category *</label>
-        <select id="categoria">
+        <label>3. Category * <span style="color:var(--text-dim);font-size:.72rem">(select a game first)</span></label>
+        <select id="categoria" disabled>
           <option value="">— Select —</option>
           <option value="orquestal">Orchestral & Instrumental</option>
           <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
@@ -279,8 +279,8 @@
       </div>
 
       <div class="form-group">
-        <label>5. Description (optional)</label>
-        <textarea id="descripcion" maxlength="300" placeholder="When does it play in the game? What makes it special?"></textarea>
+        <label>5. Description (optional) <span style="color:var(--text-dim);font-size:.72rem">(select a game first)</span></label>
+        <textarea id="descripcion" maxlength="300" placeholder="When does it play in the game? What makes it special?" disabled></textarea>
         <p class="char-counter" id="descripcionCounter">0/300</p>
       </div>
 
@@ -355,6 +355,8 @@
         juegoInput.value = nombreJuego;
         juegoConfirmado   = true;
         document.getElementById('consola').value = consolaParam;
+        document.getElementById('categoria').disabled = false;
+        document.getElementById('descripcion').disabled = false;
         juegoHint.className   = 'juego-lock-hint ok';
         juegoHint.textContent = `✓ ${nombreJuego} selected — console assigned automatically`;
 
@@ -668,6 +670,8 @@
       imagenFromRawg  = '';
       document.getElementById('juegoImgWrap').style.display = 'none';
       document.getElementById('consola').value = '';
+      document.getElementById('categoria').disabled = true;
+      document.getElementById('descripcion').disabled = true;
       juegoHint.className = 'juego-lock-hint';
       juegoHint.textContent = 'You must select a game from the list to publish. This automatically assigns the console.';
 
@@ -711,6 +715,8 @@
       juegoInput.value   = game.name;
       sugBox.style.display = 'none';
       juegoConfirmado    = true;
+      document.getElementById('categoria').disabled = false;
+      document.getElementById('descripcion').disabled = false;
       imagenFromRawg     = game.background_image || ''; // misma URL que se muestra — sin resize, prioridad garantizada
 
       const imgWrap = document.getElementById('juegoImgWrap');
