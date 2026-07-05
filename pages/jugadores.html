@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Jugadores — Omnibites</title>
+  <title>Players — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -120,46 +120,46 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>    
-      <a href="jugadores.html" class="active-jugadores">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>    
+      <a href="jugadores.html" class="active-jugadores">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>    
-    <a href="jugadores.html" class="active-jugadores">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>    
+    <a href="jugadores.html" class="active-jugadores">Players</a>
   </div>
 
   <main class="players-page">
-    <h1>Jugadores</h1>
+    <h1>Players</h1>
     <div class="players-search">
-  <input type="text" id="searchInput" placeholder="Buscar jugador por nombre..."/>
-  <button class="players-search-btn" id="searchBtn" title="Buscar">
-    <img src="../assets/icons/search.png" alt="Buscar"/>
+  <input type="text" id="searchInput" placeholder="Search player by name..."/>
+  <button class="players-search-btn" id="searchBtn" title="Search">
+    <img src="../assets/icons/search.png" alt="Search"/>
   </button>
     </div>
     <div id="playersGrid" class="players-grid">
       <div class="state-msg" style="grid-column:1/-1">
         <div class="spinner"></div>
-        <p>Cargando jugadores...</p>
+        <p>Loading players...</p>
       </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
@@ -168,87 +168,122 @@
   </footer>
 
   <script type="module">
-    import { db } from '../js/firebase-config.js';
-    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, getDocs, query, where, orderBy, limit }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-let allPlayers = [];
-let audioCountMap = {};
-let loveCountMap  = {};
-let followersCountMap = {};
-    async function loadPlayers() {
+    const DEFAULT_LIMIT = 30; // también el máximo que soporta el operador 'in' de Firestore
+
+    let currentUser = null;
+    onAuthStateChanged(auth, u => {
+      currentUser = u;
+      // Re-renderiza con los mismos datos ya cargados para actualizar el link "es mi perfil"
+      render(document.getElementById('searchInput').value);
+    });
+
+    // ── Nivel 1: unos pocos jugadores por defecto (sin escanear toda la colección) ──
+    let defaultPlayers = null;
+    async function loadDefaultPlayers() {
       try {
-        const [usersSnap, audiosSnap] = await Promise.all([
-          getDocs(collection(db, 'usuarios')),
-          getDocs(collection(db, 'audios'))
-        ]);
+        const usersQ = query(collection(db, 'usuarios'), orderBy('creadoEn', 'desc'), limit(DEFAULT_LIMIT));
+        const usersSnap = await getDocs(usersQ);
+        const baseUsers = usersSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
+        const uids = baseUsers.map(u => u.uid);
 
-        // Contar audios por usuario
-        audiosSnap.docs.forEach(d => {
-  const uid  = d.data().autorId;
-  const love = d.data().reactions?.love || 0;
-  if (uid) {
-    audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
-    loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
-  }
-});
+        let audioCountMap = {}, loveCountMap = {};
+        if (uids.length) {
+          const audiosQ = query(collection(db, 'audios'), where('autorId', 'in', uids));
+          const audiosSnap = await getDocs(audiosQ);
+          audiosSnap.docs.forEach(d => {
+            const uid = d.data().autorId;
+            const love = d.data().reactions?.love || 0;
+            audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+            loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
+          });
+        }
 
-usersSnap.docs.forEach(d => {
-  const sig = d.data().siguiendo || [];
-  sig.forEach(uidSeguido => {
-    followersCountMap[uidSeguido] = (followersCountMap[uidSeguido] || 0) + 1;
-  });
-});
+        // Seguidores: una consulta chiquita por cada jugador visible (acotado a DEFAULT_LIMIT)
+        const followerCounts = await Promise.all(baseUsers.map(async u => {
+          try {
+            const snap = await getDocs(query(collection(db, 'usuarios'), where('siguiendo', 'array-contains', u.uid)));
+            return snap.size;
+          } catch { return 0; }
+        }));
 
-// IDs de audios que realmente existen — para filtrar favoritos huérfanos sin lecturas extra
-const validAudioIds = new Set(audiosSnap.docs.map(d => d.id));
-
-allPlayers = usersSnap.docs.map(d => {
-  const data = d.data();
-  const favsReal = (data.favoritos || []).filter(id => validAudioIds.has(id)).length;
-  return {
-    uid: d.id,
-    ...data,
-    audios: audioCountMap[d.id] || 0,
-    love:   loveCountMap[d.id]  || 0,
-    seguidores: followersCountMap[d.id] || 0,
-    favs: favsReal
-  };
-});
-
-        render('');
+        defaultPlayers = baseUsers.map((u, i) => ({
+          ...u,
+          audios: audioCountMap[u.uid] || 0,
+          love: loveCountMap[u.uid] || 0,
+          seguidores: followerCounts[i] || 0,
+          // Conteo crudo de favoritos, sin filtrar huérfanos, para no tener que leer toda la colección de audios
+          favs: (u.favoritos || []).length
+        }));
       } catch(e) {
-        document.getElementById('playersGrid').innerHTML =
-          '<div class="state-msg" style="grid-column:1/-1"><p>Error al cargar jugadores.</p></div>';
+        console.error('Error loading default players:', e.message);
+        defaultPlayers = [];
       }
     }
 
-    function render(search) {
-      const grid = document.getElementById('playersGrid');
-      const q = search.toLowerCase().trim();
-      const filtered = q
-        ? allPlayers.filter(p => (p.nombre || '').toLowerCase().includes(q))
-        : allPlayers;
+    // ── Nivel 2: colección completa, solo se pide si el usuario busca (se cachea) ──
+    let fullPlayers = null;
+    async function ensureFullPlayers() {
+      if (fullPlayers) return fullPlayers;
+      const [usersSnap, audiosSnap] = await Promise.all([
+        getDocs(collection(db, 'usuarios')),
+        getDocs(collection(db, 'audios'))
+      ]);
 
-      if (!filtered.length) {
-        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No se encontró ningún jugador.</p></div>';
-        return;
-      }
+      const audioCountMap = {}, loveCountMap = {}, followersCountMap = {};
+      audiosSnap.docs.forEach(d => {
+        const uid  = d.data().autorId;
+        const love = d.data().reactions?.love || 0;
+        if (uid) {
+          audioCountMap[uid] = (audioCountMap[uid] || 0) + 1;
+          loveCountMap[uid]  = (loveCountMap[uid]  || 0) + love;
+        }
+      });
+      usersSnap.docs.forEach(d => {
+        const sig = d.data().siguiendo || [];
+        sig.forEach(uidSeguido => {
+          followersCountMap[uidSeguido] = (followersCountMap[uidSeguido] || 0) + 1;
+        });
+      });
 
-      grid.innerHTML = filtered.map(p => {
-        const name = p.nombre || 'Jugador';
-        const initial = name.charAt(0).toUpperCase();
-        const favs = p.favs;
-        const avatarHTML = p.avatar
-          ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
-               onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
-             <div class="player-avatar-fallback" style="display:none">${initial}</div>`
-          : `<div class="player-avatar-fallback">${initial}</div>`;
+      const validAudioIds = new Set(audiosSnap.docs.map(d => d.id));
 
-        return `
-          <a class="player-card" href="jugador.html?uid=${p.uid}">
-            ${avatarHTML}
-            <div class="player-name">${name}</div>
+      fullPlayers = usersSnap.docs.map(d => {
+        const data = d.data();
+        const favsReal = (data.favoritos || []).filter(id => validAudioIds.has(id)).length;
+        return {
+          uid: d.id,
+          ...data,
+          audios: audioCountMap[d.id] || 0,
+          love:   loveCountMap[d.id]  || 0,
+          seguidores: followersCountMap[d.id] || 0,
+          favs: favsReal
+        };
+      });
+      return fullPlayers;
+    }
+
+    function cardHTML(p) {
+      const name = p.nombre || 'Player';
+      const initial = name.charAt(0).toUpperCase();
+      const avatarHTML = p.avatar
+        ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
+             onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
+           <div class="player-avatar-fallback" style="display:none">${initial}</div>`
+        : `<div class="player-avatar-fallback">${initial}</div>`;
+
+      const isMe = currentUser && currentUser.uid === p.uid;
+      const href = isMe ? 'perfil.html' : `jugador.html?uid=${p.uid}`;
+
+      return `
+        <a class="player-card" href="${href}">
+          ${avatarHTML}
+          <div class="player-name">${name}</div>
 <div class="player-stats">
   <div class="player-stat-item">
     <img src="../assets/icons/soundbite.png" alt="Soundbites"/>
@@ -256,22 +291,47 @@ allPlayers = usersSnap.docs.map(d => {
   </div>
   <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/reactions/love.png" alt="Me encanta"/>
+    <img src="../assets/reactions/love.png" alt="Love it"/>
     <strong>${p.love}</strong>
   </div>
 <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/reactions/fav.png" alt="Favoritos"/>
-    <strong>${favs}</strong>
+    <img src="../assets/reactions/fav.png" alt="Favorites"/>
+    <strong>${p.favs}</strong>
   </div>
   <div class="pstat-divider"></div>
   <div class="player-stat-item">
-    <img src="../assets/icons/followers.png" alt="Seguidores"/>
+    <img src="../assets/icons/followers.png" alt="Followers"/>
     <strong>${p.seguidores}</strong>
   </div>
 </div>
-          </a>`;
-      }).join('');
+        </a>`;
+    }
+
+    async function render(search) {
+      const grid = document.getElementById('playersGrid');
+      const q = (search || '').toLowerCase().trim();
+
+      let source;
+      if (q) {
+        if (!fullPlayers) {
+          grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><div class="spinner"></div><p>Searching all players...</p></div>';
+        }
+        source = await ensureFullPlayers();
+      } else {
+        source = defaultPlayers || [];
+      }
+
+      const filtered = q
+        ? source.filter(p => (p.nombre || '').toLowerCase().includes(q))
+        : source;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="state-msg" style="grid-column:1/-1"><p>No player found.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(cardHTML).join('');
     }
 
     document.getElementById('searchBtn').addEventListener('click', () => {
@@ -284,7 +344,10 @@ allPlayers = usersSnap.docs.map(d => {
       if (e.key === 'Enter') render(e.target.value);
     });
 
-    loadPlayers();
+    (async function init() {
+      await loadDefaultPlayers();
+      render('');
+    })();
   </script>
   <script type="module" src="../js/auth.js"></script>
   <script src="../js/ui.js"></script>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <meta property="og:title" content="Omnibites — Soundbites de Videojuegos"/>
-<meta property="og:description" content="Escucha, descarga y comenta soundbites de tus juegos favoritos."/>
+  <meta property="og:title" content="Omnibites — Video Game Soundbites"/>
+<meta property="og:description" content="Listen, download, and comment on soundbites from your favorite games."/>
 <meta property="og:image" content="https://jhondydario.github.io/Omnibites/assets/og-banner.png"/>
 <meta property="og:url" content="https://jhondydario.github.io/Omnibites/pages/soundbite.html"/>
 <meta property="og:type" content="website"/>
@@ -75,34 +75,34 @@
       <span class="logo-text">OMNI<span>BITES</span></span>
     </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
   </div>
 
   <main class="sb-detail-page">
-    <a href="#" class="btn-back" id="backBtn">← Volver</a>
+    <a href="#" class="btn-back" id="backBtn">← Back</a>
 
     <div id="loadingState" class="state-msg">
       <div class="spinner"></div>
-      <p>Cargando soundbite...</p>
+      <p>Loading soundbite...</p>
     </div>
 
     <div id="notFound" style="display:none" class="state-msg">
-      <p>No se encontró este soundbite.</p>
-      <a href="comunidad.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Volver a Comunidad</a>
+      <p>This soundbite wasn't found.</p>
+      <a href="comunidad.html" class="btn-primary" style="margin-top:1rem;display:inline-block">Back to Community</a>
     </div>
 
     <div id="sbMain" style="display:none">
@@ -119,10 +119,10 @@
         <img id="sbImage" class="sb-detail-img" src="" alt=""/>
         <div class="edit-btns-col">
           <button class="edit-title-btn" id="editTitleBtn" style="display:none">
-            <img src="../assets/icons/camera.png" alt=""/> Editar soundtrack
+            <img src="../assets/icons/camera.png" alt=""/> Edit soundtrack
           </button>
           <button class="edit-title-btn" id="editCategoriaBtn" style="display:none">
-            <img src="../assets/icons/camera.png" alt=""/> Editar categoría
+            <img src="../assets/icons/camera.png" alt=""/> Edit category
           </button>
         </div>
       </div>
@@ -136,24 +136,24 @@
         <input type="text" id="editTitleInput" maxlength="60"/>
         <div class="edit-char-count" id="editCharCount">0/60</div>
         <div class="edit-title-actions">
-          <button class="btn-primary" id="saveTitleBtn">Guardar</button>
-          <button class="btn-outline" id="cancelTitleBtn">Cancelar</button>
+          <button class="btn-primary" id="saveTitleBtn">Save</button>
+          <button class="btn-outline" id="cancelTitleBtn">Cancel</button>
         </div>
       </div>
 
 <div class="edit-title-form" id="editCategoriaForm">
         <select id="editCategoriaSelect">
-          <option value="orquestal">Orquestal e Instrumental</option>
+          <option value="orquestal">Orchestral & Instrumental</option>
           <option value="chiptune">Chiptune (8-Bit / 16-Bit)</option>
-          <option value="electronica">Electrónica (EDM, Synthwave, Lo-Fi)</option>
-          <option value="rock-metal">Rock, Metal e Industrial</option>
-          <option value="jazz">Jazz y Dark Jazz / Noir</option>
-          <option value="hibrido">Soundtracks Híbridos</option>
-          <option value="licenciada">Música Licenciada</option>
+          <option value="electronica">Electronic (EDM, Synthwave, Lo-Fi)</option>
+          <option value="rock-metal">Rock, Metal & Industrial</option>
+          <option value="jazz">Jazz & Dark Jazz / Noir</option>
+          <option value="hibrido">Hybrid Soundtracks</option>
+          <option value="licenciada">Licensed Music</option>
         </select>
         <div class="edit-title-actions">
-          <button class="btn-primary" id="saveCategoriaBtn">Guardar</button>
-          <button class="btn-outline" id="cancelCategoriaBtn">Cancelar</button>
+          <button class="btn-primary" id="saveCategoriaBtn">Save</button>
+          <button class="btn-outline" id="cancelCategoriaBtn">Cancel</button>
         </div>
       </div>
 
@@ -166,43 +166,43 @@
       </div>
 
       <div class="sb-detail-actions">
-        <button class="icon-btn icon-btn-love" id="rLove" title="Me encanta">
-          <img src="../assets/reactions/love.png" alt="Me encanta"/><span class="icon-count" id="loveCount">0</span>
+        <button class="icon-btn icon-btn-love" id="rLove" title="Love it">
+          <img src="../assets/reactions/love.png" alt="Love it"/><span class="icon-count" id="loveCount">0</span>
         </button>
-        <button class="icon-btn icon-btn-meh" id="rMeh" title="Regular">
-          <img src="../assets/reactions/meh.png" alt="Regular"/><span class="icon-count" id="mehCount">0</span>
+        <button class="icon-btn icon-btn-meh" id="rMeh" title="Meh">
+          <img src="../assets/reactions/meh.png" alt="Meh"/><span class="icon-count" id="mehCount">0</span>
         </button>
-        <button class="icon-btn icon-btn-fav" id="favBtn" title="Favorito">
-          <img src="../assets/reactions/fav.png" alt="Favorito"/>
+        <button class="icon-btn icon-btn-fav" id="favBtn" title="Favorite">
+          <img src="../assets/reactions/fav.png" alt="Favorite"/>
         </button>
-        <button class="icon-btn icon-btn-dl" id="dlBtn" title="Descargar">
-          <img src="../assets/reactions/download.png" alt="Descargar"/>
+        <button class="icon-btn icon-btn-dl" id="dlBtn" title="Download">
+          <img src="../assets/reactions/download.png" alt="Download"/>
         </button>
-        <button class="icon-btn" id="shareBtn" title="Compartir">
-          <img src="../assets/icons/share.png" alt="Compartir"/>
+        <button class="icon-btn" id="shareBtn" title="Share">
+          <img src="../assets/icons/share.png" alt="Share"/>
         </button>
-<button class="icon-btn icon-btn-report" id="reportBtn" title="Reportar">
-          <img src="../assets/icons/report.png" alt="Reportar"/>
+<button class="icon-btn icon-btn-report" id="reportBtn" title="Report">
+          <img src="../assets/icons/report.png" alt="Report"/>
         </button>
-        <button class="icon-btn icon-btn-report" id="deleteSBBtn" title="Eliminar" style="display:none">
-          <img src="../assets/reactions/delete.png" alt="Eliminar"/>
+        <button class="icon-btn icon-btn-report" id="deleteSBBtn" title="Delete" style="display:none">
+          <img src="../assets/reactions/delete.png" alt="Delete"/>
         </button>
       </div>
 
       <div class="sbox" id="descBox" style="display:none">
-        <h2>Descripción</h2>
+        <h2>Description</h2>
         <p id="sbDescripcion"></p>
       </div>
 
 <div class="sbox">
-        <h2>Comentarios <span id="commentCount" style="color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
+        <h2>Comments <span id="commentCount" style="color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
         <div class="comment-box" id="commentForm" style="display:none">
-          <textarea id="commentInput" placeholder="Escribe un comentario..." maxlength="300"></textarea>
+          <textarea id="commentInput" placeholder="Write a comment..." maxlength="300"></textarea>
           <div class="comment-char-count" id="charCount">0/500</div>
-          <button class="btn-primary" id="submitComment">Comentar</button>
+          <button class="btn-primary" id="submitComment">Comment</button>
         </div>
         <div class="note" id="loginPrompt" style="display:none">
-          Inicia sesión para comentar. <a href="login.html" style="color:var(--neon)">Entrar</a>
+          Sign in to comment. <a href="login.html" style="color:var(--neon)">Sign in</a>
         </div>
         <div id="commentsList" style="margin-top:1.25rem"></div>
       </div>
@@ -211,11 +211,11 @@
 
   <div class="popup-overlay" id="deleteSBPopup" style="display:none">
     <div class="popup-box">
-      <h3>Eliminar soundbite</h3>
-      <p>Esta acción no se puede deshacer. El soundbite se eliminará permanentemente para todos.</p>
+      <h3>Delete soundbite</h3>
+      <p>This action cannot be undone. The soundbite will be permanently deleted for everyone.</p>
       <div class="popup-actions">
-        <button class="btn-outline" id="cancelDeleteSB">Cancelar</button>
-        <button class="btn-danger" id="confirmDeleteSB">Sí, eliminar</button>
+        <button class="btn-outline" id="cancelDeleteSB">Cancel</button>
+        <button class="btn-danger" id="confirmDeleteSB">Yes, delete</button>
       </div>
     </div>
   </div>
@@ -240,13 +240,13 @@
 function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
     const CATEGORIA_LABELS = {
-      orquestal: 'Orquestal e Instrumental',
+      orquestal: 'Orchestral & Instrumental',
       chiptune: 'Chiptune (8-Bit / 16-Bit)',
-      electronica: 'Electrónica (EDM, Synthwave, Lo-Fi)',
-      'rock-metal': 'Rock, Metal e Industrial',
-      jazz: 'Jazz y Dark Jazz / Noir',
-      hibrido: 'Soundtracks Híbridos',
-      licenciada: 'Música Licenciada'
+      electronica: 'Electronic (EDM, Synthwave, Lo-Fi)',
+      'rock-metal': 'Rock, Metal & Industrial',
+      jazz: 'Jazz & Dark Jazz / Noir',
+      hibrido: 'Hybrid Soundtracks',
+      licenciada: 'Licensed Music'
     };
     
     function categoriaLabel(slug) { return CATEGORIA_LABELS[slug] || slug || 'soundbite'; }
@@ -256,14 +256,14 @@ function escapeHtml(str) { const d = document.createElement('div'); d.textConten
       if (existing) existing.remove();
       const el = document.createElement('div');
       el.className = 'auth-prompt';
-      el.innerHTML = `Debes iniciar sesión para esto.<a href="${ROOT}/pages/login.html">Entrar</a>`;
+      el.innerHTML = `Sign in to do this.<a href="${ROOT}/pages/login.html">Sign in</a>`;
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 4000);
     }
 
     async function getNombreUsuario(uid) {
-      try { const snap = await getDoc(doc(db,'usuarios',uid)); return snap.exists() ? (snap.data().nombre || 'Jugador') : 'Jugador'; }
-      catch { return 'Jugador'; }
+      try { const snap = await getDoc(doc(db,'usuarios',uid)); return snap.exists() ? (snap.data().nombre || 'Player') : 'Player'; }
+      catch { return 'Player'; }
     }
 
     onAuthStateChanged(auth, async user => {
@@ -297,18 +297,18 @@ function escapeHtml(str) { const d = document.createElement('div'); d.textConten
       document.getElementById('sbMain').style.display = 'block';
       document.title = `${sbData.titulo || 'Soundbite'} — Omnibites`;
       document.querySelector('meta[property="og:title"]')?.setAttribute('content', sbData.titulo || 'Soundbite');
-document.querySelector('meta[property="og:description"]')?.setAttribute('content', `${sbData.juego || ''} · Subido por ${sbData.autorNombre || 'Anónimo'}`);
+document.querySelector('meta[property="og:description"]')?.setAttribute('content', `${sbData.juego || ''} · Uploaded by ${sbData.autorNombre || 'Anonymous'}`);
 if (sbData.imagen) document.querySelector('meta[property="og:image"]')?.setAttribute('content', sbData.imagen);
       
       const img = document.getElementById('sbImage');
       img.src = sbData.imagen || `${ROOT}/assets/avatars/avatar0.png`;
       img.onerror = function() { this.onerror = null; this.src = `${ROOT}/assets/avatars/avatar0.png`; };
 
-      document.getElementById('sbTitulo').textContent = sbData.titulo || 'Sin título';
+      document.getElementById('sbTitulo').textContent = sbData.titulo || 'Untitled';
       document.getElementById('sbJuego').textContent = sbData.juego || '';
 
       const autorLink = document.getElementById('sbAutorLink');
-      autorLink.textContent = sbData.autorNombre || 'Anónimo';
+      autorLink.textContent = sbData.autorNombre || 'Anonymous';
       autorLink.href = `jugador.html?uid=${sbData.autorId || ''}`;
 
 document.getElementById('sbClasificacion').textContent = categoriaLabel(sbData.categoria);
@@ -367,7 +367,7 @@ function updateEditButtonVisibility() {
     function marcarReportButtonComoEnviado() {
       const btn = document.getElementById('reportBtn');
       btn.classList.add('active-report');
-      btn.title = 'Ya reportaste este soundbite';
+      btn.title = 'You already reported this soundbite';
     }
 
     // ── EDITAR TÍTULO ──
@@ -395,19 +395,19 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
     document.getElementById('saveCategoriaBtn').addEventListener('click', async () => {
       if (!currentUser || currentUser.uid !== sbData.autorId) return;
       const nueva = document.getElementById('editCategoriaSelect').value;
-      if (!nueva) { window.showToast && window.showToast('Selecciona una categoría.', 'error'); return; }
+      if (!nueva) { window.showToast && window.showToast('Select a category.', 'error'); return; }
       const btn = document.getElementById('saveCategoriaBtn');
-      btn.disabled = true; btn.textContent = 'Guardando...';
+      btn.disabled = true; btn.textContent = 'Saving...';
       try {
         await updateDoc(doc(db,'audios',sbId), { categoria: nueva });
         sbData.categoria = nueva;
         document.getElementById('sbClasificacion').textContent = categoriaLabel(nueva);
         document.getElementById('editCategoriaForm').style.display = 'none';
-        window.showToast && window.showToast('Categoría actualizada');
+        window.showToast && window.showToast('Category updated');
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       } finally {
-        btn.disabled = false; btn.textContent = 'Guardar';
+        btn.disabled = false; btn.textContent = 'Save';
       }
     });
 
@@ -423,10 +423,10 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
     document.getElementById('saveTitleBtn').addEventListener('click', async () => {
       if (!currentUser || currentUser.uid !== sbData.autorId) return;
       const nuevo = document.getElementById('editTitleInput').value.trim();
-      if (!nuevo) { window.showToast && window.showToast('El título no puede quedar vacío.', 'error'); return; }
-      if (nuevo.length > 60) { window.showToast && window.showToast('Máximo 60 caracteres.', 'error'); return; }
+      if (!nuevo) { window.showToast && window.showToast('Title can\'t be empty.', 'error'); return; }
+      if (nuevo.length > 60) { window.showToast && window.showToast('Maximum 60 characters.', 'error'); return; }
       const btn = document.getElementById('saveTitleBtn');
-      btn.disabled = true; btn.textContent = 'Guardando...';
+      btn.disabled = true; btn.textContent = 'Saving...';
       try {
         await updateDoc(doc(db,'audios',sbId), { titulo: nuevo });
         sbData.titulo = nuevo;
@@ -434,11 +434,11 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
         document.title = `${nuevo} — Omnibites`;
         document.getElementById('editTitleForm').style.display = 'none';
         document.getElementById('titleDisplay').style.display = 'block';
-        window.showToast && window.showToast('Título actualizado');
+        window.showToast && window.showToast('Title updated');
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       } finally {
-        btn.disabled = false; btn.textContent = 'Guardar';
+        btn.disabled = false; btn.textContent = 'Save';
       }
     });
 
@@ -493,11 +493,11 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
         if (isActive) {
           await updateDoc(ref, { favoritos: arrayRemove(sbId) });
           btn.classList.remove('active-fav');
-          window.showToast && window.showToast('Eliminado de favoritos');
+          window.showToast && window.showToast('Removed from favorites');
         } else {
           await updateDoc(ref, { favoritos: arrayUnion(sbId) });
           btn.classList.add('active-fav');
-          window.showToast && window.showToast('Guardado en favoritos');
+          window.showToast && window.showToast('Saved to favorites');
         }
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message, 'error'); }
     }
@@ -510,26 +510,26 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
       if (!currentUser) { showAuthPrompt(); return; }
       const btn = document.getElementById('reportBtn');
       if (btn.classList.contains('active-report')) {
-        window.showToast && window.showToast('Ya reportaste este soundbite.');
+        window.showToast && window.showToast('You already reported this soundbite.');
         return;
       }
-      if (!confirm('¿Reportar este soundbite? Un moderador lo revisará.')) return;
+      if (!confirm('Report this soundbite? A moderator will review it.')) return;
 
       btn.disabled = true;
       try {
         const reportadoPorNombre = await getNombreUsuario(currentUser.uid);
         await addDoc(collection(db, 'reportes'), {
           audioId: sbId,
-          audioTitulo: sbData.titulo || 'Sin título',
+          audioTitulo: sbData.titulo || 'Untitled',
           audioJuego: sbData.juego || '—',
           audioAutorId: sbData.autorId || '',
-          audioAutorNombre: sbData.autorNombre || 'Anónimo',
+          audioAutorNombre: sbData.autorNombre || 'Anonymous',
           reportadoPor: currentUser.uid,
           reportadoPorNombre,
           creadoEn: serverTimestamp()
         });
         marcarReportButtonComoEnviado();
-        window.showToast && window.showToast('Reporte registrado. Gracias por avisar.');
+        window.showToast && window.showToast('Report submitted. Thanks for letting us know.');
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       } finally {
@@ -568,7 +568,7 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
       stopPlayback();
       const myToken = ++playToken;
       const btn = document.getElementById('sbPlayBtn');
-      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Cargando" class="loading-icon"/>';
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
       btn.disabled = true;
       try {
         const ctx = getCtx();
@@ -662,13 +662,13 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
         const blob = await buildMp3Blob(mp3, sbData.imagen || '');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${sbData.juego || 'Juego'} · ${(sbData.titulo || 'soundbite').slice(0, 50)} · Omnibites.mp3`.replace(/[<>:"/\\|?*]/g, '');
+        a.download = `${sbData.juego || 'Game'} · ${(sbData.titulo || 'soundbite').slice(0, 50)} · Omnibites.mp3`.replace(/[<>:"/\\|?*]/g, '');
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-        window.showToast && window.showToast('Descargando MP3');
+        window.showToast && window.showToast('Downloading MP3');
       } catch(e) {
         console.error('download error:', e);
-        window.showToast && window.showToast('Error al descargar.', 'error');
+        window.showToast && window.showToast('Download error.', 'error');
       } finally {
         if (img) img.style.opacity = '';
         btn.disabled = false;
@@ -678,21 +678,21 @@ document.getElementById('editTitleBtn').addEventListener('click', () => {
     // ── COMENTARIOS ──
 async function loadComments() {
       const list = document.getElementById('commentsList');
-      list.innerHTML = '<div class="empty-mini">Cargando comentarios...</div>';
+      list.innerHTML = '<div class="empty-mini">Loading comments...</div>';
       try {
         const q = query(collection(db,'audios',sbId,'comentarios'), orderBy('creadoEn','desc'));
         const snap = await getDocs(q);
         document.getElementById('commentCount').textContent = snap.size ? `(${snap.size})` : '';
-        if (snap.empty) { list.innerHTML = '<div class="empty-mini">Sé el primero en comentar.</div>'; return; }
+        if (snap.empty) { list.innerHTML = '<div class="empty-mini">Be the first to comment.</div>'; return; }
         list.innerHTML = snap.docs.map(d => {
           const c = d.data();
           const fecha = c.creadoEn?.toDate
-            ? c.creadoEn.toDate().toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+            ? c.creadoEn.toDate().toLocaleDateString('en-US', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
             : '';
           return `
             <div class="comment-item">
               <div class="comment-head">
-                <a class="comment-user" href="jugador.html?uid=${c.autorId || ''}">${escapeHtml(c.autorNombre || 'Jugador')}</a>
+                <a class="comment-user" href="jugador.html?uid=${c.autorId || ''}">${escapeHtml(c.autorNombre || 'Player')}</a>
                 <span class="comment-date">${fecha}</span>
               </div>
               <div class="comment-text">${escapeHtml(c.texto || '')}</div>
@@ -700,7 +700,7 @@ async function loadComments() {
         }).join('');
       } catch(e) {
         console.error('comments error:', e);
-        list.innerHTML = '<div class="empty-mini">Error al cargar comentarios.</div>';
+        list.innerHTML = '<div class="empty-mini">Error loading comments.</div>';
       }
     }
 
@@ -712,9 +712,9 @@ async function loadComments() {
       if (!currentUser) { showAuthPrompt(); return; }
       const input = document.getElementById('commentInput');
       const texto = input.value.trim();
-      if (!texto) { window.showToast && window.showToast('Escribe algo primero.', 'error'); return; }
+      if (!texto) { window.showToast && window.showToast('Write something first.', 'error'); return; }
       const btn = document.getElementById('submitComment');
-      btn.disabled = true; btn.textContent = 'Enviando...';
+      btn.disabled = true; btn.textContent = 'Sending...';
       try {
         const autorNombre = await getNombreUsuario(currentUser.uid);
         await addDoc(collection(db,'audios',sbId,'comentarios'), {
@@ -726,7 +726,7 @@ async function loadComments() {
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       } finally {
-        btn.disabled = false; btn.textContent = 'Comentar';
+        btn.disabled = false; btn.textContent = 'Comment';
       }
     });
 
@@ -740,9 +740,9 @@ async function loadComments() {
     document.getElementById('shareBtn').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(location.href);
-        window.showToast && window.showToast('Enlace copiado');
+        window.showToast && window.showToast('Link copied');
       } catch {
-        window.showToast && window.showToast('No se pudo copiar el enlace', 'error');
+        window.showToast && window.showToast('Could not copy the link', 'error');
       }
     });
 document.getElementById('deleteSBBtn').addEventListener('click', () => {
@@ -756,12 +756,12 @@ document.getElementById('deleteSBBtn').addEventListener('click', () => {
 
     document.getElementById('confirmDeleteSB').addEventListener('click', async () => {
       const btn = document.getElementById('confirmDeleteSB');
-      btn.disabled = true; btn.textContent = 'Eliminando...';
+      btn.disabled = true; btn.textContent = 'Deleting...';
       try {
         await deleteDoc(doc(db, 'audios', sbId));
         window.location.href = ROOT + '/pages/comunidad.html?deleted_sb=1';
       } catch(e) {
-        btn.disabled = false; btn.textContent = 'Sí, eliminar';
+        btn.disabled = false; btn.textContent = 'Yes, delete';
         document.getElementById('deleteSBPopup').style.display = 'none';
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       }
@@ -779,11 +779,11 @@ document.getElementById('deleteSBBtn').addEventListener('click', () => {
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>

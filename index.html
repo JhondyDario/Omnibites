@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Omnibites — Soundbites de Videojuegos</title>
-  <meta name="description" content="La comunidad para encontrar, calificar, descargar y compartir soundbites de tus juegos favoritos."/>
+  <title>Omnibites — Video Game Soundbites</title>
+  <meta name="description" content="The community to find, rate, download, and share soundbites from your favorite games."/>
+  <meta property="og:title" content="Omnibites — Video Game Soundbites"/>
+  <meta property="og:description" content="The community to find, rate, download, and share soundbites from your favorite games."/>
+  <meta property="og:image" content="https://jhondydario.github.io/Omnibites/assets/og-banner.png"/>
+  <meta property="og:url" content="https://jhondydario.github.io/Omnibites/"/>
+  <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Omnibites — Video Game Soundbites"/>
+  <meta name="twitter:description" content="The community to find, rate, download, and share soundbites from your favorite games."/>
+  <meta name="twitter:image" content="https://jhondydario.github.io/Omnibites/assets/og-banner.png"/>
   <link rel="icon" type="image/png" href="assets/logo.png"/>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,36 +26,36 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
 </a>
     <div class="nav-links">
-      <a href="pages/comunidad.html">Comunidad</a>
-      <a href="pages/explorar.html">Explorar</a>
-      <a href="pages/subir.html">Añadir</a>
-      <a href="pages/jugadores.html">Jugadores</a>
+      <a href="pages/comunidad.html">Community</a>
+      <a href="pages/explorar.html">Explore</a>
+      <a href="pages/subir.html">Add</a>
+      <a href="pages/jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="pages/comunidad.html">Comunidad</a>
-    <a href="pages/explorar.html">Explorar</a>
-    <a href="pages/subir.html">Añadir</a>
-    <a href="pages/jugadores.html">Jugadores</a>
+    <a href="pages/comunidad.html">Community</a>
+    <a href="pages/explorar.html">Explore</a>
+    <a href="pages/subir.html">Add</a>
+    <a href="pages/jugadores.html">Players</a>
   </div>
 
   <!-- HERO -->
   <section class="hero">
     <div class="hero-bg-grid"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">El mejor sitio para escuchar los</p>
-      <h1 class="hero-title">Sonidos que <br/><span class="glitch" data-text="RECUERDAS">RECUERDAS</span></h1>
-      <p class="hero-sub">La comunidad donde puedes encontrar, calificar, descargar y compartir los soundbites de tus juegos favoritos. Todo en un solo lugar.</p>
+      <p class="hero-eyebrow">The best place to hear the</p>
+      <h1 class="hero-title">Sounds you <br/><span class="glitch" data-text="REMEMBER">REMEMBER</span></h1>
+      <p class="hero-sub">The community where you can find, rate, download, and share soundbites from your favorite games. All in one place.</p>
     </div>
     <div class="hero-visual">
       <div class="pixel-art-screen">
         <div class="screen-scanlines"></div>
         <div class="waveform-demo">
-          <canvas id="demoWave" width="280" height="70"></canvas>
+          <canvas id="demoWave" width="420" height="60"></canvas>
         </div>
         <div class="screen-stats">
           <div class="screen-stat">
@@ -56,12 +65,12 @@
           <div class="screen-stat-divider"></div>
           <div class="screen-stat">
             <span class="screen-stat-val" id="stat-juegos">—</span>
-            <span class="screen-stat-label">Videojuegos</span>
+            <span class="screen-stat-label">Games</span>
           </div>
           <div class="screen-stat-divider"></div>
           <div class="screen-stat">
             <span class="screen-stat-val" id="stat-usuarios">—</span>
-            <span class="screen-stat-label">Usuarios</span>
+            <span class="screen-stat-label">Players</span>
           </div>
         </div>
       </div>
@@ -71,7 +80,7 @@
   <!-- COMMUNITY SECTION -->
   <section class="section community-section">
     <div class="community-header">
-      <h2>¿Qué quieres hacer hoy?</h2>
+      <h2>What do you want to do today?</h2>
     </div>
 
     <div class="action-cards">
@@ -79,77 +88,77 @@
       <!-- CARD 1: Comunidad -->
       <div class="action-card">
         <div class="action-card-img">
-          <img src="assets/card-comunidad.png" alt="Comunidad" onerror="this.style.display='none'"/>
+          <img src="assets/card-comunidad.png" alt="Community" onerror="this.style.display='none'"/>
         </div>
         <div class="action-card-body">
-          <h3>Soundbites de la Comunidad</h3>
-          <p>Explora los soundbites subidos por la comunidad, escucha el preview de 15 segundos con efecto fade y dales tu puntuación.</p>
+          <h3>Community Soundbites</h3>
+          <p>Explore the soundbites uploaded by the community, listen to the 15-second preview with fade effect, and give them your rating.</p>
         </div>
         <a href="pages/comunidad.html" class="action-card-btn btn-card-green">
-          Ver Soundbites <span class="action-arrow">→</span>
+          View Soundbites <span class="action-arrow">→</span>
         </a>
       </div>
 
       <!-- CARD 2: Explorar -->
       <div class="action-card">
         <div class="action-card-img">
-          <img src="assets/card-explorar.png" alt="Explorar" onerror="this.style.display='none'"/>
+          <img src="assets/card-explorar.png" alt="Explore" onerror="this.style.display='none'"/>
         </div>
         <div class="action-card-body">
-          <h3>Buscar en la Web</h3>
-          <p>Usa la herramienta de buscar pistas de audio, define el soundbite y publícalo para que todos lo escuchen.</p>
+          <h3>Search the Web</h3>
+          <p>Use the audio track search tool, define the soundbite, and publish it for everyone to hear.</p>
         </div>
         <a href="pages/explorar.html" class="action-card-btn btn-card-purple">
-          Explorar Música <span class="action-arrow">→</span>
+          Explore Music <span class="action-arrow">→</span>
         </a>
       </div>
 
       <!-- CARD 3: Crear -->
       <div class="action-card">
         <div class="action-card-img">
-          <img src="assets/card-crear.png" alt="Crear" onerror="this.style.display='none'"/>
+          <img src="assets/card-crear.png" alt="Create" onerror="this.style.display='none'"/>
         </div>
         <div class="action-card-body">
-          <h3>Crea y Comparte</h3>
-          <p>Crea tu propio soundbite de 15 segundos y compártelo con la comunidad retro.</p>
+          <h3>Create and Share</h3>
+          <p>Create your own 15-second soundbite and share it with the retro community.</p>
         </div>
         <a href="pages/subir.html" class="action-card-btn btn-card-gold">
-          Crear Soundbite <span class="action-arrow">→</span>
+          Create Soundbite <span class="action-arrow">→</span>
         </a>
       </div>
 
             <!-- CARD 4: Jugadores -->
       <div class="action-card">
   <div class="action-card-img">
-    <img src="assets/card-jugadores.png" alt="Jugadores" onerror="this.style.display='none'"/>
+    <img src="assets/card-jugadores.png" alt="Players" onerror="this.style.display='none'"/>
   </div>
   <div class="action-card-body">
-    <h3>Buscar Jugadores</h3>
-    <p>Encuentra otros miembros de la comunidad, mira sus soundbites y sus favoritos.</p>
+    <h3>Find Players</h3>
+    <p>Find other community members, check out their soundbites and favorites.</p>
   </div>
 <a href="pages/jugadores.html" class="action-card-btn btn-card-cyan"> 
-  Ver Jugadores <span class="action-arrow">→</span>
+  View Players <span class="action-arrow">→</span>
   </a>
 </div>
 
     </div>
 
 <div class="community-banner">
-      <div class="cb-pixel">INSERTA UN DISCO</div>
-      <p>Ayuda a otros jugadores a encontrar sus sonidos favoritos — añade tracks a la biblioteca de soundbites que todos compartimos. <strong>Cada disco que insertas hace la colección más grande.</strong></p>
+      <div class="cb-pixel">INSERT A DISC</div>
+      <p>Help other players find their favorite sounds — add tracks to the shared soundbite library. <strong>Every disc you insert makes the collection bigger.</strong></p>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="pages/legal.html">Licencia</a>
+        <a href="pages/legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
-      <a href="../index.html" class="logo">
+      <a href="index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
       </a>
     </div>
@@ -158,7 +167,7 @@
   <script>
     if (new URLSearchParams(location.search).get('deleted')) {
       window.addEventListener('load', () => {
-        setTimeout(() => window.showToast && window.showToast('Tu cuenta ha sido eliminada. ¡Hasta luego!'), 500);
+        setTimeout(() => window.showToast && window.showToast('Your account has been deleted. See you soon!'), 500);
         history.replaceState({}, '', location.pathname);
       });
     }

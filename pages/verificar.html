@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
-  <title>Verifica tu correo — Omnibites</title>
+  <title>Verify your email — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -25,46 +25,46 @@
   <span class="logo-text">OMNI<span>BITES</span></span>
 </a>
     <div class="nav-links">
-      <a href="comunidad.html">Comunidad</a>
-      <a href="explorar.html">Explorar</a>
-      <a href="subir.html">Añadir</a>   
-      <a href="jugadores.html">Jugadores</a>
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>   
+      <a href="jugadores.html">Players</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="comunidad.html">Comunidad</a>
-    <a href="explorar.html">Explorar</a>
-    <a href="subir.html">Añadir</a>   
-    <a href="jugadores.html">Jugadores</a>
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>   
+    <a href="jugadores.html">Players</a>
   </div>
 
   <main class="verify-page">
     <div class="verify-card">
       <div class="verify-icon">✉️</div>
-      <h1>Verifica tu correo</h1>
-      <p>Para usar Omnibites necesitas verificar tu cuenta. Te enviamos un enlace a <span class="verify-email" id="userEmail">tu correo</span>.<br/><br/>Revisa tu bandeja de entrada (y el spam, por si acaso).</p>
+      <h1>Verify your email</h1>
+      <p>To use Omnibites you need to verify your account. We sent a link to <span class="verify-email" id="userEmail">your email</span>.<br/><br/>Check your inbox (and spam folder, just in case).</p>
       <div class="btn-row">
-        <button class="btn-primary" id="checkBtn">Ya lo verifiqué</button>
-        <button class="btn-outline" id="resendBtn">Reenviar correo</button>
+        <button class="btn-primary" id="checkBtn">I already verified it</button>
+        <button class="btn-outline" id="resendBtn">Resend email</button>
         <p class="resend-cool" id="cooldown"></p>
       </div>
       <p style="margin-top:1.5rem;font-size:.75rem;color:var(--text-dim)">
-        ¿Correo incorrecto? <a href="#" id="logoutLink" style="color:var(--neon)">Cerrar sesión</a> y regístrate de nuevo.
+        Wrong email? <a href="#" id="logoutLink" style="color:var(--neon)">Sign out</a> and register again.
       </p>
     </div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <p>Hecho con amor para la comunidad</p>
+      <p>Made with love for the community</p>
       <div class="footer-links">
-        <a href="legal.html">Licencia</a>
+        <a href="legal.html">License</a>
         <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donar</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
       </div>
       <a href="../index.html" class="logo">
         <span class="logo-text">OMNI<span>BITES</span></span>
@@ -91,18 +91,18 @@
     document.getElementById('checkBtn').addEventListener('click', async () => {
       if (!currentUser) return;
       const btn = document.getElementById('checkBtn');
-      btn.textContent = 'Verificando...'; btn.disabled = true;
+      btn.textContent = 'Verifying...'; btn.disabled = true;
       try {
         await reload(currentUser);
         if (currentUser.emailVerified) {
-          window.showToast && window.showToast('Correo verificado. ¡Bienvenido!');
+          window.showToast && window.showToast('Email verified. Welcome!');
           setTimeout(() => window.location.href = ROOT + '/index.html', 1000);
         } else {
-          window.showToast && window.showToast('Aún no verificado. Revisa tu correo.', 'error');
-          btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
+          window.showToast && window.showToast('Not verified yet. Check your email.', 'error');
+          btn.textContent = 'I already verified it'; btn.disabled = false;
         }
       } catch(e) {
-        btn.textContent = 'Ya lo verifiqué'; btn.disabled = false;
+        btn.textContent = 'I already verified it'; btn.disabled = false;
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       }
     });
@@ -111,7 +111,7 @@
       if (!currentUser || cooldownTimer) return;
       try {
         await sendEmailVerification(currentUser);
-        window.showToast && window.showToast('Correo reenviado');
+        window.showToast && window.showToast('Email resent');
         startCooldown(60);
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
@@ -125,7 +125,7 @@
       let remaining = secs;
       cooldownTimer = setInterval(() => {
         remaining--;
-        cool.textContent = `Puedes reenviar en ${remaining}s`;
+        cool.textContent = `You can resend in ${remaining}s`;
         if (remaining <= 0) {
           clearInterval(cooldownTimer); cooldownTimer = null;
           btn.disabled = false; cool.textContent = '';
