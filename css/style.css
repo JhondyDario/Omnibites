@@ -548,6 +548,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
     align-items:stretch;
     gap:.3rem;
     width:100%;
+    flex:none;              /* ← AGREGAR ESTA LÍNEA */
     margin-left:0 !important;
   }
   .filter-group label{
@@ -555,6 +556,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   }
   .filters select{
     width:100%;
+    flex:none;              /* ← AGREGAR ESTA LÍNEA */
   }
 }
 @media(max-width:480px){
