@@ -228,12 +228,12 @@
               <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anonymous'}</a></div>
             </div>
           </div>
-          <div class="sb-player">
+<div class="sb-player">
     <button class="sb-play" id="sbplay-${a.id}" onclick="playSB('${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})">
       <img src="../assets/icons/play.png" alt="Play"/>
     </button>
     <div class="sb-prog-wrap">
-                  <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
+                  <div class="sb-prog-bar" id="sbbar-${a.id}" style="cursor:pointer" onclick="seekSB(event,'${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
                   <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
                 </div>
               </div>
@@ -351,124 +351,149 @@
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
 
-    let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
-    const CLIP=15,FADE=2;
-    function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-    function stopSB(isPause=false){
-      playToken++;
-      if(activeSource){
-        try{
-          if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
-          activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
-          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-          const elAudio = activeSource;
-          setTimeout(() => { try{ elAudio.pause(); }catch{} }, 150);
-        }catch{}
-        activeSource = activeGain = null;
-      }
-      clearInterval(progIv);
-      if(activeSBId){
-        const b = document.getElementById(`sbplay-${activeSBId}`);
-        if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.classList.remove('playing'); b.disabled=false; }
-        if(!isPause){
-          const p = document.getElementById(`sbprog-${activeSBId}`);
-          if(p) p.style.width='0%';
-          const c = document.getElementById(`sbcur-${activeSBId}`);
-          if(c) c.textContent='0:00';
-          pausedAt = 0;
-        }
-      }
-      activeSBId = null;
+let audioCtx=null,activeSource=null,activeGain=null,activeSBId=null,progIv=null,playToken=0,pausedAt=0,lastElapsed=0,pausedSBId=null;
+const CLIP=15,FADE=2;
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+
+function stopSB(isPause=false){
+  playToken++;
+  if(activeSource){
+    try{
+      if(activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
+      activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      const elAudio = activeSource;
+      setTimeout(() => { try{ elAudio.pause(); }catch{} }, 150);
+    }catch{}
+    activeSource = activeGain = null;
+  }
+  clearInterval(progIv);
+  if(activeSBId){
+    const b = document.getElementById(`sbplay-${activeSBId}`);
+    if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.classList.remove('playing'); b.disabled=false; }
+    if(!isPause){
+      const p = document.getElementById(`sbprog-${activeSBId}`);
+      if(p) p.style.width='0%';
+      const c = document.getElementById(`sbcur-${activeSBId}`);
+      if(c) c.textContent='0:00';
+      pausedAt = 0;
+    }
+  }
+  activeSBId = null;
+}
+
+async function startSB(id, url, ts, te, resumeOffset){
+  stopSB(true); // no resetea la barra, ya la pintamos antes de llamar esto
+  const myToken = ++playToken;
+  const btn = document.getElementById(`sbplay-${id}`);
+  if(!btn) return;
+
+  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
+  btn.disabled  = true;
+
+  try{
+    const ctx = getCtx();
+    if(ctx.state === 'suspended') await ctx.resume();
+
+    const audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.preload     = 'auto';
+    audioEl.src         = url;
+
+    await new Promise((resolve, reject) => {
+      audioEl.addEventListener('loadedmetadata', resolve, { once:true });
+      audioEl.addEventListener('error',          reject,  { once:true });
+    });
+
+    if(myToken !== playToken){
+      btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
+      return;
     }
 
-    window.playSB = async function(id, url, ts, te){
-      if(activeSBId === id){
-        pausedAt    = lastElapsed;
-        pausedSBId  = id;
-        stopSB(true);
-        return;
-      }
-      const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
-      pausedSBId = null;
-      stopSB();
+    const baseStart     = Math.min(ts || 0, audioEl.duration - 1);
+    const dur           = Math.min((te || 15) - (ts || 0), CLIP, audioEl.duration - baseStart);
+    const safeResume    = Math.min(Math.max(resumeOffset,0), dur - 0.1);
+    audioEl.currentTime = baseStart + safeResume;
 
-      const myToken = ++playToken;
-      const btn = document.getElementById(`sbplay-${id}`);
-      if(!btn) return;
+    const source    = ctx.createMediaElementSource(audioEl);
+    const gain      = ctx.createGain();
+    const remaining = dur - safeResume;
 
-      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
-      btn.disabled  = true;
+    gain.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
+    if(safeResume < FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
+    gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
 
-      try{
-        const ctx = getCtx();
-        if(ctx.state === 'suspended') await ctx.resume();
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    await audioEl.play();
 
-        const audioEl = new Audio();
-        audioEl.crossOrigin = 'anonymous';
-        audioEl.preload     = 'auto';
-        audioEl.src         = url;
+    activeSource = audioEl;
+    activeGain   = gain;
+    activeSBId   = id;
+    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+    btn.classList.add('playing'); btn.disabled = false;
 
-        await new Promise((resolve, reject) => {
-          audioEl.addEventListener('loadedmetadata', resolve, { once:true });
-          audioEl.addEventListener('error',          reject,  { once:true });
-        });
+    const endTimeout = setTimeout(() => {
+      if(activeSBId === id && myToken === playToken) stopSB();
+    }, remaining * 1000);
+    activeSource._endTimeout = endTimeout;
 
-        if(myToken !== playToken){
-          btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
-          return;
-        }
+    const t0 = ctx.currentTime;
+    progIv = setInterval(() => {
+      if(myToken !== playToken){ clearInterval(progIv); return; }
+      const el = safeResume + (ctx.currentTime - t0);
+      lastElapsed = el;
+      const p = document.getElementById(`sbprog-${id}`);
+      const c = document.getElementById(`sbcur-${id}`);
+      if(p) p.style.width = (Math.min(el, dur) / dur * 100) + '%';
+      if(c) c.textContent = fmt(el);
+      if(el >= dur) clearInterval(progIv);
+    }, 100);
 
-        const baseStart     = Math.min(ts || 0, audioEl.duration - 1);
-        const dur           = Math.min((te || 15) - (ts || 0), CLIP, audioEl.duration - baseStart);
-        const safeResume    = Math.min(resumeOffset, dur - 0.1);
-        audioEl.currentTime = baseStart + safeResume;
+  }catch(e){
+    if(myToken !== playToken) return;
+    const b = document.getElementById(`sbplay-${id}`);
+    if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
+    setTimeout(() => {
+      const b = document.getElementById(`sbplay-${id}`);
+      if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
+    }, 3000);
+  }
+}
 
-        const source    = ctx.createMediaElementSource(audioEl);
-        const gain      = ctx.createGain();
-        const remaining = dur - safeResume;
+window.playSB = async function(id, url, ts, te){
+  if(activeSBId === id){
+    pausedAt    = lastElapsed;
+    pausedSBId  = id;
+    stopSB(true);
+    return;
+  }
+  const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
+  pausedSBId = null;
+  await startSB(id, url, ts, te, resumeOffset);
+};
 
-        gain.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
-        if(safeResume < FADE) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
-        gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+window.seekSB = function(e, id, url, ts, te){
+  const dur = Math.min((te||15)-(ts||0), CLIP);
+  const bar = document.getElementById(`sbbar-${id}`);
+  const rect = bar.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+  const target = frac * dur;
 
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        await audioEl.play();
+  lastElapsed = target;
+  const p = document.getElementById(`sbprog-${id}`);
+  const c = document.getElementById(`sbcur-${id}`);
+  if(p) p.style.width = (target/dur*100)+'%';
+  if(c) c.textContent = fmt(target);
 
-        activeSource = audioEl;
-        activeGain   = gain;
-        activeSBId   = id;
-        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
-        btn.classList.add('playing'); btn.disabled = false;
-
-        const endTimeout = setTimeout(() => {
-          if(activeSBId === id && myToken === playToken) stopSB();
-        }, remaining * 1000);
-        activeSource._endTimeout = endTimeout;
-
-        const t0 = ctx.currentTime;
-        progIv = setInterval(() => {
-          if(myToken !== playToken){ clearInterval(progIv); return; }
-          const el = safeResume + (ctx.currentTime - t0);
-          lastElapsed = el;
-          const p = document.getElementById(`sbprog-${id}`);
-          const c = document.getElementById(`sbcur-${id}`);
-          if(p) p.style.width = (Math.min(el, dur) / dur * 100) + '%';
-          if(c) c.textContent = fmt(el);
-          if(el >= dur) clearInterval(progIv);
-        }, 100);
-
-      }catch(e){
-        if(myToken !== playToken) return;
-        const b = document.getElementById(`sbplay-${id}`);
-        if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
-        setTimeout(() => {
-          const b = document.getElementById(`sbplay-${id}`);
-          if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
-        }, 3000);
-      }
-    };
+  if(activeSBId === id){
+    startSB(id, url, ts, te, target);
+  } else {
+    pausedSBId = id;
+    pausedAt = target;
+  }
+};
 
     function showAuthPrompt() {
       const existing = document.querySelector('.auth-prompt');
