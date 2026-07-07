@@ -524,22 +524,6 @@
     });
 
     // ══════════════════════════════════════════════
-    // AUDIO — player y estado
-    // ══════════════════════════════════════════════
-    let audioCtx = null;
-    let activeSource = null;
-    let activeGain   = null;
-    let activeCard   = null;
-    let progressInterval = null;
-    let pausedProgress   = {};
-    let playbackStarts   = {};
-
-    function getAudioCtx() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      return audioCtx;
-    }
-
-    // ══════════════════════════════════════════════
     // BÚSQUEDA EN ARCHIVE.ORG
     // ══════════════════════════════════════════════
     const STOPWORDS = new Set(['the','de','la','el','los','las','un','una','and','of','for','en','a','con','por','del']);
@@ -761,30 +745,143 @@
       }
     };
 
-    function stopActive(isPause = false) {
-      if (activeSource) {
-        try {
-          activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
-          activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-          activeSource.stop(audioCtx.currentTime + 0.15);
-        } catch {}
-        activeSource = null;
-        activeGain   = null;
-      }
-      clearInterval(progressInterval);
-      if (activeCard !== null) {
-        const btn  = document.getElementById(`playBtn-${activeCard}`);
-        const prog = document.getElementById(`prog-${activeCard}`);
-        const cur  = document.getElementById(`cur-${activeCard}`);
-        if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
-        if (!isPause) {
-          if (prog) prog.style.width = '0%';
-          if (cur)  cur.textContent  = '0:00';
-          delete pausedProgress[activeCard];
-        }
-      }
-      activeCard = null;
+let audioCtx = null;
+let activeSource = null;
+let activeGain   = null;
+let activeCard   = null;
+let progressInterval = null;
+let pausedElapsed = {};
+const audioBuffers = {}; // cache de buffers decodificados, evita re-descargar en cada seek
+const clipStarts   = {}; // punto de inicio del clip dentro de la pista completa, fijo una vez elegido
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+async function getBuffer(idx, url) {
+  if (audioBuffers[idx]) return audioBuffers[idx];
+  const ctx = getAudioCtx();
+  const res    = await fetch(url);
+  const arrBuf = await res.arrayBuffer();
+  const buf    = await ctx.decodeAudioData(arrBuf);
+  audioBuffers[idx] = buf;
+  return buf;
+}
+
+function stopActive(isPause = false) {
+  if (activeSource) {
+    try {
+      activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      activeSource.stop(audioCtx.currentTime + 0.15);
+    } catch {}
+    activeSource = null;
+    activeGain   = null;
+  }
+  clearInterval(progressInterval);
+  if (activeCard !== null) {
+    const btn  = document.getElementById(`playBtn-${activeCard}`);
+    const prog = document.getElementById(`prog-${activeCard}`);
+    const cur  = document.getElementById(`cur-${activeCard}`);
+    if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+    if (!isPause) {
+      if (prog) prog.style.width = '0%';
+      if (cur)  cur.textContent  = '0:00';
+      delete pausedElapsed[activeCard];
     }
+  }
+  activeCard = null;
+}
+
+async function playClipFrom(idx, url, totalSecs, offsetSec) {
+  stopActive(true); // no resetea la barra, ya la pintamos nosotros antes de llamar esto
+  const btn = document.getElementById(`playBtn-${idx}`);
+  if (!btn) return;
+  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
+  btn.disabled  = true;
+  try {
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const buf = await getBuffer(idx, url);
+
+    if (clipStarts[idx] === undefined) {
+      const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 5);
+      clipStarts[idx] = totalSecs > 30
+        ? Math.random() * Math.min(maxStart, buf.duration * 0.3) + buf.duration * 0.1
+        : 0;
+    }
+    const clipStart  = clipStarts[idx];
+    const safeOffset = Math.min(Math.max(offsetSec, 0), CLIP_DURATION - 0.1);
+    const remaining  = CLIP_DURATION - safeOffset;
+
+    const source = ctx.createBufferSource();
+    source.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(safeOffset < FADE_DURATION ? 0 : 1, ctx.currentTime);
+    if (safeOffset < FADE_DURATION) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE_DURATION - safeOffset));
+    gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE_DURATION);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(0, clipStart + safeOffset, remaining);
+    source.onended = () => { if (activeCard === idx) stopActive(); };
+
+    activeSource = source;
+    activeGain   = gain;
+    activeCard   = idx;
+    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+    btn.classList.add('playing');
+    btn.disabled = false;
+
+    const t0 = ctx.currentTime;
+    progressInterval = setInterval(() => {
+      const elapsed = Math.min(safeOffset + (ctx.currentTime - t0), CLIP_DURATION);
+      const pct     = (elapsed / CLIP_DURATION) * 100;
+      const progEl  = document.getElementById(`prog-${idx}`);
+      const curEl   = document.getElementById(`cur-${idx}`);
+      if (progEl) progEl.style.width = pct + '%';
+      if (curEl)  curEl.textContent  = formatTime(elapsed);
+      pausedElapsed[idx] = elapsed;
+      if (elapsed >= CLIP_DURATION) {
+        clearInterval(progressInterval);
+        delete pausedElapsed[idx];
+      }
+    }, 100);
+  } catch (e) {
+    console.error(e);
+    if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+    alert('This audio could not be loaded. Try another result.');
+  }
+}
+
+window.togglePlay = async function(idx, url, totalSecs) {
+  if (activeCard === idx) {
+    const elapsed = pausedElapsed[idx] ?? 0;
+    stopActive(true);
+    pausedElapsed[idx] = elapsed;
+    return;
+  }
+  const resumeOffset = pausedElapsed[idx] ?? 0;
+  await playClipFrom(idx, url, totalSecs, resumeOffset);
+};
+
+window.seekTo = function(e, idx, totalSecs) {
+  const item = window._items?.[idx];
+  if (!item) return;
+  const bar = e.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+  const target = frac * CLIP_DURATION;
+
+  const progEl = document.getElementById(`prog-${idx}`);
+  const curEl  = document.getElementById(`cur-${idx}`);
+  if (progEl) progEl.style.width = (target / CLIP_DURATION * 100) + '%';
+  if (curEl)  curEl.textContent  = formatTime(target);
+  pausedElapsed[idx] = target;
+
+  playClipFrom(idx, item.url, totalSecs, target);
+};
 
     window.seekTo = function(e, idx, totalSecs) {};
 
