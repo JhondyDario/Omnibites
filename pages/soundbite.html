@@ -21,6 +21,11 @@
     .sb-meta-neon{color:var(--neon);font-weight:600;}
     .sb-meta-dot{color:var(--border);}
 
+    .sb-volume{display:flex;align-items:center;gap:.4rem;flex-shrink:0;}
+.sb-volume img{width:20px;height:20px;object-fit:contain;opacity:.7;}
+.sb-volume input[type="range"]{width:70px;accent-color:var(--neon);}
+.sb-prog-bar{cursor:pointer;}
+
     .edit-btns-col{display:flex;flex-direction:column;gap:.5rem;}
     .edit-title-form select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
     .edit-title-form select:focus{border-color:var(--neon);}
@@ -157,13 +162,17 @@
         </div>
       </div>
 
-      <div class="sb-player">
-        <button class="sb-play" id="sbPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
-        <div class="sb-prog-wrap">
-          <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
-          <div class="sb-time"><span id="sbCur">0:00</span><span id="sbTotal">0:15</span></div>
-        </div>
-      </div>
+<div class="sb-player">
+  <button class="sb-play" id="sbPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
+  <div class="sb-prog-wrap">
+    <div class="sb-prog-bar" id="sbProgBar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
+    <div class="sb-time"><span id="sbCur">0:00</span><span id="sbTotal">0:15</span></div>
+  </div>
+  <div class="sb-volume">
+    <img src="../assets/icons/volume.png" alt="Volume" onerror="this.style.display='none'"/>
+    <input type="range" id="sbVolume" min="0" max="100" value="100"/>
+  </div>
+</div>
 
       <div class="sb-detail-actions">
         <button class="icon-btn icon-btn-love" id="rLove" title="Love it">
@@ -231,9 +240,114 @@
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     const sbId = new URLSearchParams(location.search).get('id');
 
-    let currentUser = null, sbData = null, lastElapsed = 0;
-    let audioCtx = null, source = null, gain = null, isPlaying = false, progIv = null, playToken = 0, pausedAt = 0;
-    const CLIP = 15, FADE = 2;
+let currentUser = null, sbData = null, lastElapsed = 0;
+let audioCtx = null, source = null, gain = null, volGain = null, isPlaying = false, progIv = null, playToken = 0, pausedAt = 0, currentVolume = 1;
+const CLIP = 15, FADE = 2;
+
+function stopPlayback(isPause = false) {
+  playToken++;
+  if (source) {
+    try {
+      if (source._endTimeout) clearTimeout(source._endTimeout);
+      gain.gain.cancelScheduledValues(audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      const el = source;
+      setTimeout(() => { try { el.pause(); } catch {} }, 150);
+    } catch {}
+    source = gain = volGain = null;
+  }
+  clearInterval(progIv);
+  const btn = document.getElementById('sbPlayBtn');
+  if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+  if (!isPause) {
+    document.getElementById('sbProgFill').style.width = '0%';
+    document.getElementById('sbCur').textContent = '0:00';
+    pausedAt = 0;
+  }
+  isPlaying = false;
+}
+
+async function playFrom(resumeOffset) {
+  stopPlayback();
+  const myToken = ++playToken;
+  const btn = document.getElementById('sbPlayBtn');
+  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
+  btn.disabled = true;
+  try {
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.preload = 'auto';
+    audioEl.src = sbData.url;
+    await new Promise((resolve, reject) => {
+      audioEl.addEventListener('loadedmetadata', resolve, { once: true });
+      audioEl.addEventListener('error', reject, { once: true });
+    });
+    if (myToken !== playToken) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false; return; }
+
+    const baseStart = Math.min(sbData.trimStart || 0, audioEl.duration - 1);
+    const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP, audioEl.duration - baseStart);
+    const safeResume = Math.min(Math.max(resumeOffset, 0), dur - 0.1);
+    audioEl.currentTime = baseStart + safeResume;
+
+    const src = ctx.createMediaElementSource(audioEl);
+    const g = ctx.createGain();
+    const vg = ctx.createGain();
+    vg.gain.value = currentVolume;
+    const remaining = dur - safeResume;
+    g.gain.setValueAtTime(safeResume < FADE ? 0 : 1, ctx.currentTime);
+    if (safeResume < FADE) g.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE - safeResume));
+    g.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE);
+    g.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
+    src.connect(g); g.connect(vg); vg.connect(ctx.destination);
+    await audioEl.play();
+
+    source = audioEl; gain = g; volGain = vg; isPlaying = true;
+    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+    btn.classList.add('playing'); btn.disabled = false;
+
+    const endTimeout = setTimeout(() => { if (myToken === playToken) stopPlayback(); }, remaining * 1000);
+    source._endTimeout = endTimeout;
+
+    const t0 = ctx.currentTime;
+    progIv = setInterval(() => {
+      if (myToken !== playToken) { clearInterval(progIv); return; }
+      const el = safeResume + (ctx.currentTime - t0);
+      lastElapsed = el;
+      document.getElementById('sbProgFill').style.width = (Math.min(el, dur) / dur * 100) + '%';
+      document.getElementById('sbCur').textContent = fmt(el);
+      if (el >= dur) clearInterval(progIv);
+    }, 100);
+  } catch(e) {
+    if (myToken !== playToken) return;
+    btn.innerHTML = '<img src="../assets/icons/error.png" alt="Error"/>'; btn.disabled = false;
+    setTimeout(() => { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; }, 3000);
+  }
+}
+
+async function togglePlaySB() {
+  if (!sbData) return;
+  if (isPlaying) { pausedAt = lastElapsed; stopPlayback(true); return; }
+  await playFrom(pausedAt);
+}
+
+function seekSB(e) {
+  if (!sbData) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+  const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP);
+  const target = frac * dur;
+  if (isPlaying) {
+    stopPlayback(true);
+    playFrom(target);
+  } else {
+    pausedAt = target;
+    lastElapsed = target;
+    document.getElementById('sbProgFill').style.width = (target / dur * 100) + '%';
+    document.getElementById('sbCur').textContent = fmt(target);
+  }
+}
 
     function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
     function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
@@ -753,6 +867,12 @@ document.getElementById('deleteSBBtn').addEventListener('click', () => {
     document.getElementById('cancelDeleteSB').addEventListener('click', () => {
       document.getElementById('deleteSBPopup').style.display = 'none';
     });
+
+    document.getElementById('sbVolume').addEventListener('input', e => {
+  currentVolume = e.target.value / 100;
+  if (volGain) volGain.gain.value = currentVolume;
+});
+document.getElementById('sbProgBar').addEventListener('click', seekSB);
 
     document.getElementById('confirmDeleteSB').addEventListener('click', async () => {
       const btn = document.getElementById('confirmDeleteSB');
