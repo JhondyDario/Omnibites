@@ -21,10 +21,10 @@
     .sb-meta-neon{color:var(--neon);font-weight:600;}
     .sb-meta-dot{color:var(--border);}
 
-    .sb-volume{display:flex;align-items:center;gap:.4rem;flex-shrink:0;}
-.sb-volume img{width:20px;height:20px;object-fit:contain;opacity:.7;}
-.sb-volume input[type="range"]{width:70px;accent-color:var(--neon);}
-.sb-prog-bar{cursor:pointer;}
+    .sb-volume-row{display:flex;align-items:center;gap:.6rem;margin-top:.6rem;margin-bottom:.25rem;}
+    .sb-volume-row img{width:18px;height:18px;object-fit:contain;opacity:.7;flex-shrink:0;}
+    .sb-volume-row input[type="range"]{flex:1;max-width:160px;accent-color:var(--neon);}
+    .sb-prog-bar{cursor:pointer;}
 
     .edit-btns-col{display:flex;flex-direction:column;gap:.5rem;}
     .edit-title-form select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
@@ -168,10 +168,11 @@
     <div class="sb-prog-bar" id="sbProgBar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
     <div class="sb-time"><span id="sbCur">0:00</span><span id="sbTotal">0:15</span></div>
   </div>
-  <div class="sb-volume">
-    <img src="../assets/icons/volume.png" alt="Volume" onerror="this.style.display='none'"/>
-    <input type="range" id="sbVolume" min="0" max="100" value="100"/>
-  </div>
+</div>
+<div class="sb-volume-row">
+  <img src="../assets/icons/volume.png" alt="Volume" onerror="this.style.display='none'"/>
+  <input type="range" id="sbVolume" min="0" max="100" value="100"/>
+</div>
 </div>
 
       <div class="sb-detail-actions">
@@ -268,7 +269,7 @@ function stopPlayback(isPause = false) {
 }
 
 async function playFrom(resumeOffset) {
-  stopPlayback();
+  stopPlayback(true); // true = no resetea la barra a 0, ya la vamos a poner nosotros
   const myToken = ++playToken;
   const btn = document.getElementById('sbPlayBtn');
   btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
@@ -326,26 +327,22 @@ async function playFrom(resumeOffset) {
   }
 }
 
-async function togglePlaySB() {
-  if (!sbData) return;
-  if (isPlaying) { pausedAt = lastElapsed; stopPlayback(true); return; }
-  await playFrom(pausedAt);
-}
-
 function seekSB(e) {
   if (!sbData) return;
   const rect = e.currentTarget.getBoundingClientRect();
   const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
   const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP);
   const target = frac * dur;
+
+  // refleja el punto clickeado de una vez, antes de que cargue nada
+  lastElapsed = target;
+  document.getElementById('sbProgFill').style.width = (target / dur * 100) + '%';
+  document.getElementById('sbCur').textContent = fmt(target);
+
   if (isPlaying) {
-    stopPlayback(true);
     playFrom(target);
   } else {
     pausedAt = target;
-    lastElapsed = target;
-    document.getElementById('sbProgFill').style.width = (target / dur * 100) + '%';
-    document.getElementById('sbCur').textContent = fmt(target);
   }
 }
 
