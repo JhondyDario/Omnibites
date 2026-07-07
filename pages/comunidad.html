@@ -383,7 +383,7 @@ function stopSB(isPause=false){
 }
 
 async function startSB(id, url, ts, te, resumeOffset){
-  stopSB(true); // no resetea la barra, ya la pintamos antes de llamar esto
+  stopSB(true); // no resetea la barra
   const myToken = ++playToken;
   const btn = document.getElementById(`sbplay-${id}`);
   if(!btn) return;
@@ -461,18 +461,6 @@ async function startSB(id, url, ts, te, resumeOffset){
     }, 3000);
   }
 }
-
-window.playSB = async function(id, url, ts, te){
-  if(activeSBId === id){
-    pausedAt    = lastElapsed;
-    pausedSBId  = id;
-    stopSB(true);
-    return;
-  }
-  const resumeOffset = (pausedSBId === id) ? pausedAt : 0;
-  pausedSBId = null;
-  await startSB(id, url, ts, te, resumeOffset);
-};
 
 window.seekSB = function(e, id, url, ts, te){
   const dur = Math.min((te||15)-(ts||0), CLIP);
