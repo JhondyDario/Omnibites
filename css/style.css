@@ -154,7 +154,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .action-card:has(.btn-card-green):hover  {border-color:var(--neon);}
 .action-card:has(.btn-card-purple):hover {border-color:var(--purple);}
 .action-card:has(.btn-card-gold):hover   {border-color:var(--gold);}
-
+.btn-card-red{background:var(--danger);color:#fff;}
+.action-card:has(.btn-card-red):hover{border-color:var(--danger);}
 .action-card-img{
   flex-shrink:0;
   width:68px;
