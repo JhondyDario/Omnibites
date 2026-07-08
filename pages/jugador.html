@@ -183,6 +183,11 @@
     <img src="../assets/icons/following.png" alt="Following"/>
     <strong id="pubStatSiguiendo">0</strong>
   </div>
+  <div class="pstat-divider"></div>
+<div class="pstat-item">
+  <img src="../assets/icons/trophy.png" alt="Trivia Points"/>
+  <strong id="pubStatTrivia">0</strong>
+</div>
 </div>
       <div class="collapse-section">
         <div class="collapse-header" onclick="toggleSec('mios')">
@@ -326,6 +331,7 @@ window.toggleFollow = async function() {
   document.getElementById('pubStatSeguidores').textContent = followersSnap.size;
 } catch { document.getElementById('pubStatSeguidores').textContent = '0'; }
 document.getElementById('pubStatSiguiendo').textContent = (data.siguiendo || []).length;
+      document.getElementById('pubStatTrivia').textContent = data.triviaPuntosTotal || 0;
 
 profileReady = true;
 maybeRenderFollow();
