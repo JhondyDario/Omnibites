@@ -125,6 +125,10 @@
     <a href="trivia.html">Trivia</a>
   </div>
 
+  <div id="profileLoading" class="state-msg">
+  <div class="spinner"></div>
+  <p>Loading profile...</p>
+</div>
   <main class="profile-page" id="profileMain" style="display:none">
     <h1>My Profile</h1>
 
@@ -237,7 +241,6 @@
   onAuthStateChanged(auth, async user => {
     if (!user) { window.location.href = ROOT + '/pages/login.html'; return; }
     currentUser = user;
-    document.getElementById('profileMain').style.display = 'block';
 
     const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
     if (!isGoogle && !user.emailVerified)
@@ -277,8 +280,11 @@ animCount(document.getElementById('statTrivia'), d.triviaPuntosTotal || 0);
         await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
       }
 
-      document.getElementById('userName').textContent = nombre;
-      applyAvatar(selectedAvatar);
+document.getElementById('userName').textContent = nombre;
+applyAvatar(selectedAvatar);
+
+document.getElementById('profileLoading').style.display = 'none';
+document.getElementById('profileMain').style.display = 'block';
 
       try {
   const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', user.uid)));
@@ -303,10 +309,12 @@ animCount(document.getElementById('statFavs'), favAudios.length);
         document.getElementById('statFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No favorites yet.</div>';
       }
-    } catch(e) {
-      console.error('Perfil error:',e.message);
-      window.showToast&&window.showToast('Error: '+e.message,'error');
-    }
+} catch(e) {
+  console.error('Perfil error:',e.message);
+  document.getElementById('profileLoading').style.display = 'none';
+  document.getElementById('profileMain').style.display = 'block';
+  window.showToast&&window.showToast('Error: '+e.message,'error');
+}
   });
 
   function renderMios(items) {
