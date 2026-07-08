@@ -32,7 +32,7 @@ onAuthStateChanged(auth, async user => {
         avatar = snap.data().avatar || null;
       } else {
         const n = user.displayName || user.email?.split('@')[0] || 'Player';
-        await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn: serverTimestamp(), audiosSubidos:0 });
+await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn: serverTimestamp(), audiosSubidos:0, triviaPuntosTotal:0 });
         nombre = n; avatar = 'avatar1';
       }
     } catch(e) { console.warn('auth.js Firestore:', e.message); }
