@@ -752,19 +752,23 @@
             ? Math.random() * Math.min(maxStart, buf.duration * 0.3) + buf.duration * 0.1
             : 0;
         }
-        const clipStart  = clipStarts[idx];
-        const safeOffset = Math.min(Math.max(offsetSec, 0), CLIP_DURATION - 0.1);
-        const remaining  = CLIP_DURATION - safeOffset;
+const clipStart  = clipStarts[idx];
+    const safeOffset = Math.min(Math.max(offsetSec, 0), CLIP_DURATION - 0.1);
+    const remaining  = CLIP_DURATION - safeOffset;
 
-        const source = ctx.createBufferSource();
-        source.buffer = buf;
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(safeOffset < FADE_DURATION ? 0 : 1, ctx.currentTime);
-        if (safeOffset < FADE_DURATION) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + (FADE_DURATION - safeOffset));
-        gain.gain.setValueAtTime(1, ctx.currentTime + remaining - FADE_DURATION);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
-        source.connect(gain);
-        gain.connect(ctx.destination);
+    const source = ctx.createBufferSource();
+    source.buffer = buf;
+    const gain = ctx.createGain();
+
+    // El fade-in y fade-out no pueden generar tiempos negativos ni desordenados,
+    // por eso se recortan al tiempo que realmente queda disponible en el clip.
+    const fadeIn       = Math.min(FADE_DURATION, safeOffset < FADE_DURATION ? FADE_DURATION - safeOffset : 0);
+    const fadeOutStart = Math.max(fadeIn, remaining - FADE_DURATION);
+
+    gain.gain.setValueAtTime(safeOffset < FADE_DURATION ? 0 : 1, ctx.currentTime);
+    if (fadeIn > 0) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeIn);
+    gain.gain.setValueAtTime(1, ctx.currentTime + fadeOutStart);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
         source.start(0, clipStart + safeOffset, remaining);
         source.onended = () => { if (activeCard === idx) stopActive(); };
 
