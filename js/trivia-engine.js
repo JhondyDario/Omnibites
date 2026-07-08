@@ -148,7 +148,7 @@ async function buildDailyQuiz(fecha) {
     const opciones = shuffleSeeded([juego.nombre, ...otros], rng);
     preguntas.push({
       tipo: 'juego', audioUrl: track.url,
-      pregunta: '¿A qué juego pertenece este soundbite?',
+      pregunta: 'Which game does this soundbite belong to?',
       opciones, correcta: opciones.indexOf(juego.nombre)
     });
   }
@@ -165,7 +165,7 @@ async function buildDailyQuiz(fecha) {
     const nombres = opcionesTracks.map(t => t.nombreTrack || 'Untitled track');
     preguntas.push({
       tipo: 'soundtrack', audioUrl: correctoObj.url,
-      pregunta: `Este soundbite es de ${juego.nombre}. ¿Cuál track es?`,
+      pregunta: `This soundbite is from ${juego.nombre}. Which track is it?`,
       opciones: nombres, correcta: 0 // ya viene shuffled abajo si hace falta
     });
   }
@@ -181,8 +181,8 @@ async function buildDailyQuiz(fecha) {
       : shuffleSeeded(juegos.filter(j => j !== juegoReal), rng)[0];
     preguntas.push({
       tipo: 'sino', audioUrl: track.url,
-      pregunta: `¿Este soundbite pertenece a "${juegoMostrado.nombre}"?`,
-      opciones: ['Sí', 'No'],
+      pregunta: `Does this soundbite belong to "${juegoMostrado.nombre}"?`,
+      opciones: ['Yes', 'No'],
       correcta: esSi ? 0 : 1
     });
   }
