@@ -385,7 +385,6 @@
       $('qProgFill').style.width = `${(currentIndex / 6) * 100}%`;
       $('qScoreSoFar').textContent = `${puntosAcum} pts`;
       $('qText').textContent = q.pregunta;
-      $('qNextBtn').style.display = 'none';
 
       const opts = $('qOptions');
       opts.innerHTML = q.opciones.map((op, i) =>
