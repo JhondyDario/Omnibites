@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <title>Daily Trivia — Omnibites</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .trivia-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;}
+    .trivia-page h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;text-align:center;}
+    .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);animation:opt-pulse .4s ease;}
+@keyframes opt-pulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
+
+    /* ── LEYENDA INICIAL ── */
+    .trivia-intro{background:var(--bg2);border:1px solid var(--danger);border-radius:12px;padding:2rem 1.75rem;text-align:center;}
+    .trivia-intro h2{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--danger);margin-bottom:1rem;}
+    .trivia-intro-rules{text-align:left;background:var(--bg3);border-radius:8px;padding:1.1rem 1.4rem;margin-bottom:1.5rem;}
+    .trivia-intro-rules p{font-size:.85rem;color:var(--text-dim);line-height:1.8;margin-bottom:.4rem;}
+    .trivia-intro-rules p strong{color:var(--text);}
+    .trivia-points-hint{display:flex;justify-content:center;gap:1.5rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--text-dim);}
+    .trivia-points-hint span strong{color:var(--neon);}
+
+    /* ── LOADING (generando trivia del día) ── */
+    .trivia-loading{text-align:center;padding:3rem 1rem;}
+    .trivia-loading .disc{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,var(--bg3) 30%,var(--danger) 31%,var(--danger) 34%,var(--bg3) 35%);margin:0 auto 1.5rem;animation:spin-disc 1.2s linear infinite;}
+    @keyframes spin-disc{to{transform:rotate(360deg);}}
+    .trivia-loading p{color:var(--text-dim);font-size:.88rem;margin-bottom:.4rem;}
+    .trivia-loading small{color:var(--text-dim);font-size:.72rem;}
+
+    /* ── PREGUNTA ── */
+    .trivia-progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;font-size:.78rem;color:var(--text-dim);}
+    .trivia-progress-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin:0 1rem;}
+    .trivia-progress-fill{height:100%;background:var(--danger);transition:width .3s ease;}
+
+    .trivia-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.75rem;}
+    .trivia-question{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:1.25rem;text-align:center;}
+
+    .trivia-player{background:var(--bg3);border-radius:8px;padding:.9rem;display:flex;align-items:center;gap:.85rem;margin-bottom:1.5rem;}
+    .trivia-play{display:flex;align-items:center;justify-content:center;width:42px;height:42px;background:var(--danger);border:none;border-radius:50%;cursor:pointer;flex-shrink:0;}
+    .trivia-play img{width:38px;height:38px;object-fit:contain;}
+    .trivia-play img.loading-icon{animation:spin 0.8s linear infinite;}
+    .trivia-play.playing{background:var(--purple);}
+    .trivia-prog-wrap{flex:1;}
+    .trivia-prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:.3rem;}
+    .trivia-prog-fill{height:100%;background:var(--danger);width:0%;transition:width .1s linear;}
+    .trivia-time{font-size:.68rem;color:var(--text-dim);display:flex;justify-content:space-between;}
+
+    .trivia-options{display:flex;flex-direction:column;gap:.65rem;}
+    .trivia-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;font-size:.88rem;font-family:var(--font-body);color:var(--text);cursor:pointer;text-align:left;transition:border-color .2s,background .2s;}
+    .trivia-opt:hover{border-color:var(--danger);}
+    .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);}
+    .trivia-opt:disabled{opacity:.5;cursor:not-allowed;}
+
+    .trivia-next-btn{width:100%;margin-top:1.5rem;padding:.8rem;font-size:.95rem;}
+
+    /* ── RESULTADOS ── */
+    .trivia-results{text-align:center;}
+    .trivia-results .big-score{font-family:var(--font-head);font-size:2.5rem;font-weight:700;color:var(--danger);margin-bottom:.3rem;}
+    .trivia-results p{color:var(--text-dim);font-size:.9rem;margin-bottom:1.5rem;}
+
+    .trivia-share-card{background:linear-gradient(135deg,rgba(248,113,113,.12),rgba(74,222,128,.06));border:1px solid var(--danger);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;}
+    .trivia-share-card h3{font-family:var(--font-head);font-size:.95rem;font-weight:700;margin-bottom:.5rem;color:var(--text);}
+    .trivia-share-card p{font-size:.8rem;color:var(--text-dim);margin-bottom:1rem;}
+    .trivia-share-btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--danger);color:#fff;border:none;border-radius:20px;padding:.6rem 1.4rem;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+    .trivia-share-btn img{width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);}
+
+    .trivia-review-item{background:var(--bg3);border-radius:8px;padding:1rem;margin-bottom:.75rem;text-align:left;}
+    .trivia-review-q{font-size:.85rem;font-weight:600;margin-bottom:.5rem;}
+    .trivia-review-a{font-size:.8rem;color:var(--text-dim);}
+    .trivia-review-a.ok{color:var(--neon);}
+    .trivia-review-a.bad{color:var(--danger);}
+
+    .trivia-actions-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;}
+
+    /* ── RANKING ── */
+    .trivia-rank-item{display:flex;align-items:center;gap:.85rem;background:var(--bg3);border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;}
+    .trivia-rank-pos{font-family:var(--font-head);font-weight:700;color:var(--danger);width:1.5rem;text-align:center;flex-shrink:0;}
+    .trivia-rank-name{flex:1;font-size:.85rem;font-weight:600;}
+    .trivia-rank-pts{font-size:.85rem;color:var(--neon);font-weight:700;}
+
+    .trivia-already{text-align:center;padding:2rem 0;}
+    .trivia-already .big-score{font-family:var(--font-head);font-size:2rem;font-weight:700;color:var(--neon);margin-bottom:.5rem;}
+
+    .state-msg{text-align:center;padding:3rem 1rem;color:var(--text-dim);}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">
+      <img src="../assets/logo.png" alt="Omnibites" class="nav-logo-img"/>
+      <span class="logo-text">OMNI<span>BITES</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="comunidad.html">Community</a>
+      <a href="explorar.html">Explore</a>
+      <a href="subir.html">Add</a>
+      <a href="jugadores.html">Players</a>
+      <a href="trivia.html" style="color:var(--danger)">Trivia</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth"></div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="comunidad.html">Community</a>
+    <a href="explorar.html">Explore</a>
+    <a href="subir.html">Add</a>
+    <a href="jugadores.html">Players</a>
+    <a href="trivia.html" style="color:var(--danger)">Trivia</a>
+  </div>
+
+  <div id="authWall" style="display:none;padding:2rem 1.5rem;">
+    <div class="auth-wall" style="border-color:var(--danger)">
+      <h2 style="color:var(--danger)">You need an account</h2>
+      <p>Sign in to play the daily trivia and show up on the ranking. It's free.</p>
+      <div class="aw-btns">
+        <a href="registro.html" class="btn-primary">Sign up</a>
+        <a href="login.html" class="btn-outline">I already have an account</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="trivia-page" id="triviaMain" style="display:none">
+    <h1>🎮 Daily Trivia</h1>
+
+    <!-- LEYENDA INICIAL -->
+    <div class="trivia-intro" id="introScreen">
+      <h2>How it works</h2>
+      <div class="trivia-intro-rules">
+        <p><strong>6 random questions</strong> a day, using real soundbites from Archive.org.</p>
+        <p>Some ask <strong>which game</strong> a soundbite is from, some ask <strong>which soundtrack</strong> within a game, and some just ask <strong>yes or no</strong> if it matches a game.</p>
+        <p>Everyone gets the <strong>same questions</strong> today, in a random order.</p>
+        <p>Only <strong>one attempt per day</strong> — come back tomorrow for new ones.</p>
+      </div>
+      <div class="trivia-points-hint">
+        <span>Correct answer: <strong>+3 pts</strong></span>
+        <span>Wrong answer: <strong>+1 pt</strong></span>
+      </div>
+      <button class="btn-primary" id="startBtn" style="padding:.8rem 2rem;font-size:1rem;background:var(--danger)">Start</button>
+      <div style="margin-top:1rem">
+        <button class="btn-outline" id="viewRankBtnIntro" style="border-color:var(--danger);color:var(--danger);font-size:.8rem;padding:.5rem 1.1rem">View today's ranking</button>
+      </div>
+    </div>
+
+    <!-- YA JUGÓ HOY -->
+    <div class="trivia-already" id="alreadyScreen" style="display:none">
+      <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:.5rem">You already played today. Come back tomorrow!</p>
+      <div class="big-score" id="alreadyScore">0 pts</div>
+      <div class="trivia-actions-row">
+        <button class="btn-outline" id="viewRankBtnAlready" style="border-color:var(--danger);color:var(--danger)">View today's ranking</button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="trivia-loading" id="loadingScreen" style="display:none">
+      <div class="disc"></div>
+      <p id="loadingMsg">Digging up today's soundbites...</p>
+      <small>This only takes a bit longer for the first player today</small>
+    </div>
+
+    <!-- PREGUNTA -->
+    <div id="questionScreen" style="display:none">
+      <div class="trivia-progress">
+        <span id="qCounter">1/6</span>
+        <div class="trivia-progress-bar"><div class="trivia-progress-fill" id="qProgFill"></div></div>
+        <span id="qScoreSoFar">0 pts</span>
+      </div>
+      <div class="trivia-card">
+        <div class="trivia-question" id="qText"></div>
+        <div class="trivia-player">
+          <button class="trivia-play" id="qPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
+          <div class="trivia-prog-wrap">
+            <div class="trivia-prog-bar"><div class="trivia-prog-fill" id="qProgAudio"></div></div>
+            <div class="trivia-time"><span id="qCur">0:00</span><span>0:15</span></div>
+          </div>
+        </div>
+        <div class="trivia-options" id="qOptions"></div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS (solo puntaje) -->
+    <div class="trivia-results" id="scoreScreen" style="display:none">
+      <p style="font-size:.85rem;color:var(--text-dim)">You scored</p>
+      <div class="big-score" id="finalScore">0 pts</div>
+      <p id="finalMsg"></p>
+      <div class="trivia-actions-row">
+        <button class="btn-primary" id="viewAnswersBtn" style="background:var(--danger)">View my answers</button>
+        <button class="btn-outline" id="viewRankBtnScore" style="border-color:var(--danger);color:var(--danger)">View ranking</button>
+      </div>
+    </div>
+
+    <!-- REVISIÓN DE RESPUESTAS + COMPARTIR -->
+    <div id="reviewScreen" style="display:none">
+      <div class="trivia-share-card">
+        <h3>Share your score</h3>
+        <p id="shareText"></p>
+        <button class="trivia-share-btn" id="shareBtn">
+          <img src="../assets/icons/share.png" alt=""/> Share result
+        </button>
+      </div>
+      <div id="reviewList"></div>
+    </div>
+
+    <!-- RANKING -->
+    <div id="rankScreen" style="display:none">
+      <h2 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:1rem;text-align:center">🏆 Today's Top 10</h2>
+      <div id="rankList"><div class="state-msg">Loading ranking...</div></div>
+      <div class="trivia-actions-row">
+        <button class="btn-outline" id="backFromRank" style="border-color:var(--danger);color:var(--danger)">← Back</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getDailyQuiz, guardarResultadoDelDia, getRankingDeHoy, fechaDeHoy } from '../js/trivia-engine.js';
+
+    const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
+    const STORAGE_KEY = 'omnibites_trivia_progress';
+
+    let currentUser = null, nombreUsuario = 'Player';
+    let quiz = null, quizPreguntas = [], currentIndex = 0, respuestas = [], puntosAcum = 0;
+    let answered = false;
+
+    const $ = id => document.getElementById(id);
+    function show(id) { ['introScreen','alreadyScreen','loadingScreen','questionScreen','scoreScreen','reviewScreen','rankScreen']
+      .forEach(s => $(s).style.display = s === id ? 'block' : 'none'); }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { $('authWall').style.display = 'block'; $('triviaMain').style.display = 'none'; return; }
+      currentUser = user;
+      $('authWall').style.display = 'none';
+      $('triviaMain').style.display = 'block';
+      try {
+        const snap = await getDoc(doc(db, 'usuarios', user.uid));
+        if (snap.exists()) nombreUsuario = snap.data().nombre || 'Player';
+      } catch {}
+      await checkIfPlayedToday();
+    });
+
+    async function checkIfPlayedToday() {
+      try {
+        const fecha = fechaDeHoy();
+        const snap = await getDoc(doc(db, 'triviaResultados', `${fecha}_${currentUser.uid}`));
+        if (snap.exists()) {
+          $('alreadyScore').textContent = `${snap.data().puntos} pts`;
+          show('alreadyScreen');
+          return;
+        }
+      } catch {}
+
+      // ── Recuperar progreso si recargó a mitad del quiz ──
+      const saved = tryLoadProgress();
+      if (saved) {
+        quiz = saved.quiz; quizPreguntas = quiz.preguntas;
+        currentIndex = saved.currentIndex; respuestas = saved.respuestas; puntosAcum = saved.puntosAcum;
+        show('questionScreen');
+        renderQuestion();
+        return;
+      }
+      show('introScreen');
+    }
+
+    function tryLoadProgress() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (data.fecha !== fechaDeHoy()) { sessionStorage.removeItem(STORAGE_KEY); return null; }
+        return data;
+      } catch { return null; }
+    }
+
+    function saveProgress() {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+          fecha: fechaDeHoy(), quiz, currentIndex, respuestas, puntosAcum
+        }));
+      } catch {}
+    }
+
+    function clearProgress() { try { sessionStorage.removeItem(STORAGE_KEY); } catch {} }
+
+    $('startBtn').addEventListener('click', async () => {
+      show('loadingScreen');
+      const mensajes = ['Digging up today\'s soundbites...', 'Dusting off old cartridges...', 'Tuning the retro frequencies...'];
+      $('loadingMsg').textContent = mensajes[Math.floor(Math.random()*mensajes.length)];
+      try {
+        quiz = await getDailyQuiz();
+        quizPreguntas = quiz.preguntas;
+        currentIndex = 0; respuestas = []; puntosAcum = 0;
+        saveProgress();
+        show('questionScreen');
+        renderQuestion();
+      } catch (e) {
+        $('loadingScreen').innerHTML = `<p style="color:var(--danger)">Couldn't load today's trivia. Try again in a bit.</p>
+          <button class="btn-outline" onclick="location.reload()" style="margin-top:1rem">Reload</button>`;
+      }
+    });
+
+    // ── Reproductor (mismo patrón de fade que el resto del sitio) ──
+    let audioCtx = null, source = null, gain = null, isPlaying = false, progIv = null, playToken = 0;
+    const CLIP = 15, FADE = 2;
+    function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+    function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+
+    function stopAudio() {
+      playToken++;
+      if (source) {
+        try {
+          gain.gain.cancelScheduledValues(audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+          const el = source;
+          setTimeout(() => { try { el.pause(); } catch {} }, 150);
+        } catch {}
+        source = gain = null;
+      }
+      clearInterval(progIv);
+      const btn = $('qPlayBtn');
+      if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+      $('qProgAudio').style.width = '0%';
+      $('qCur').textContent = '0:00';
+      isPlaying = false;
+    }
+
+    async function playAudio(url) {
+      if (isPlaying) { stopAudio(); return; }
+      stopAudio();
+      const myToken = ++playToken;
+      const btn = $('qPlayBtn');
+      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
+      btn.disabled = true;
+      try {
+        const ctx = getCtx();
+        if (ctx.state === 'suspended') await ctx.resume();
+        const audioEl = new Audio();
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.preload = 'auto';
+        audioEl.src = url;
+        await new Promise((resolve, reject) => {
+          audioEl.addEventListener('loadedmetadata', resolve, { once: true });
+          audioEl.addEventListener('error', reject, { once: true });
+        });
+        if (myToken !== playToken) return;
+
+        const dur = Math.min(CLIP, audioEl.duration);
+        const src = ctx.createMediaElementSource(audioEl);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(1, ctx.currentTime + Math.min(FADE, dur/2));
+        g.gain.setValueAtTime(1, ctx.currentTime + dur - FADE);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+        src.connect(g); g.connect(ctx.destination);
+        await audioEl.play();
+
+        source = audioEl; gain = g; isPlaying = true;
+        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
+        btn.classList.add('playing'); btn.disabled = false;
+
+        setTimeout(() => { if (myToken === playToken) stopAudio(); }, dur * 1000);
+
+        const t0 = ctx.currentTime;
+        progIv = setInterval(() => {
+          if (myToken !== playToken) { clearInterval(progIv); return; }
+          const el = ctx.currentTime - t0;
+          $('qProgAudio').style.width = (Math.min(el, dur) / dur * 100) + '%';
+          $('qCur').textContent = fmt(el);
+          if (el >= dur) clearInterval(progIv);
+        }, 100);
+      } catch(e) {
+        if (myToken !== playToken) return;
+        btn.innerHTML = '<img src="../assets/icons/error.png" alt="Error"/>'; btn.disabled = false;
+        setTimeout(() => { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; }, 2000);
+      }
+    }
+
+    function renderQuestion() {
+      stopAudio();
+      answered = false;
+      const q = quizPreguntas[currentIndex];
+      $('qCounter').textContent = `${currentIndex + 1}/6`;
+      $('qProgFill').style.width = `${(currentIndex / 6) * 100}%`;
+      $('qScoreSoFar').textContent = `${puntosAcum} pts`;
+      $('qText').textContent = q.pregunta;
+      $('qNextBtn').style.display = 'none';
+
+      const opts = $('qOptions');
+      opts.innerHTML = q.opciones.map((op, i) =>
+        `<button class="trivia-opt" data-i="${i}">${op}</button>`).join('');
+
+      opts.querySelectorAll('.trivia-opt').forEach(btn => {
+        btn.addEventListener('click', () => selectAnswer(parseInt(btn.dataset.i)));
+      });
+
+      $('qPlayBtn').onclick = () => playAudio(q.audioUrl);
+    }
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizPreguntas[currentIndex];
+  const esCorrecta = idx === q.correcta;
+  const pts = esCorrecta ? 3 : 1;
+  puntosAcum += pts;
+  respuestas.push({ pregunta: q.pregunta, elegida: q.opciones[idx], correcta: q.opciones[q.correcta], ok: esCorrecta, pts });
+
+  document.querySelectorAll('.trivia-opt').forEach(b => b.disabled = true);
+  document.querySelector(`.trivia-opt[data-i="${idx}"]`).classList.add('selected');
+
+  $('qScoreSoFar').textContent = `${puntosAcum} pts`;
+  saveProgress();
+
+  setTimeout(() => {
+    currentIndex++;
+    if (currentIndex >= quizPreguntas.length) { finishQuiz(); return; }
+    renderQuestion();
+  }, 700);
+}
+
+    async function finishQuiz() {
+      stopAudio();
+      clearProgress();
+      $('finalScore').textContent = `${puntosAcum} pts`;
+      const correctas = respuestas.filter(r => r.ok).length;
+      $('finalMsg').textContent = `${correctas} out of 6 correct — come back tomorrow for more!`;
+      show('scoreScreen');
+
+      try {
+        await guardarResultadoDelDia(currentUser.uid, nombreUsuario, puntosAcum);
+        await updateDoc(doc(db, 'usuarios', currentUser.uid), { triviaPuntosTotal: increment(puntosAcum) });
+      } catch(e) { console.warn('No se pudo guardar el puntaje:', e.message); }
+    }
+
+    $('viewAnswersBtn').addEventListener('click', () => {
+      const shareMsg = `I scored ${puntosAcum}/18 pts on Omnibites Daily Trivia 🎮🔊 Think you know your game music better? Try it: ${location.origin}${ROOT}/pages/trivia.html`;
+      $('shareText').textContent = shareMsg;
+      $('reviewList').innerHTML = respuestas.map(r => `
+        <div class="trivia-review-item">
+          <div class="trivia-review-q">${r.pregunta}</div>
+          <div class="trivia-review-a ${r.ok ? 'ok' : 'bad'}">Your answer: ${r.elegida} ${r.ok ? '✓' : '✗'}</div>
+          ${!r.ok ? `<div class="trivia-review-a ok">Correct answer: ${r.correcta}</div>` : ''}
+        </div>`).join('');
+      show('reviewScreen');
+    });
+
+    $('shareBtn').addEventListener('click', async () => {
+      const text = $('shareText').textContent;
+      if (navigator.share) {
+        try { await navigator.share({ text, url: `${location.origin}${ROOT}/pages/trivia.html` }); return; } catch {}
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        window.showToast && window.showToast('Result copied — go paste it somewhere!');
+      } catch {
+        window.showToast && window.showToast('Could not copy the result', 'error');
+      }
+    });
+
+    async function mostrarRanking() {
+      show('rankScreen');
+      $('rankList').innerHTML = '<div class="state-msg">Loading ranking...</div>';
+      try {
+        const top = await getRankingDeHoy();
+        if (!top.length) { $('rankList').innerHTML = '<div class="state-msg">Nobody has played yet today. Be the first!</div>'; return; }
+        $('rankList').innerHTML = top.map((r, i) => `
+          <div class="trivia-rank-item">
+            <div class="trivia-rank-pos">${i + 1}</div>
+            <div class="trivia-rank-name">${r.nombre}</div>
+            <div class="trivia-rank-pts">${r.puntos} pts</div>
+          </div>`).join('');
+      } catch(e) {
+        $('rankList').innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
+      }
+    }
+
+    $('viewRankBtnIntro').addEventListener('click', mostrarRanking);
+    $('viewRankBtnAlready').addEventListener('click', mostrarRanking);
+    $('viewRankBtnScore').addEventListener('click', mostrarRanking);
+    $('backFromRank').addEventListener('click', () => {
+      if (respuestas.length === quizPreguntas.length && quizPreguntas.length > 0) show('scoreScreen');
+      else checkIfPlayedToday();
+    });
+  </script>
+  <script type="module" src="../js/auth.js"></script>
+  <script src="../js/ui.js"></script>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Made with love for the community</p>
+      <div class="footer-links">
+        <a href="legal.html">License</a>
+        <a href="https://github.com/jhondydario/Omnibites" target="_blank">GitHub</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=VTCEB23YUFYKJ" target="_blank">Donate</a>
+      </div>
+      <a href="../index.html" class="logo">
+        <span class="logo-text">OMNI<span>BITES</span></span>
+      </a>
+    </div>
+  </footer>
+</body>
+</html>
