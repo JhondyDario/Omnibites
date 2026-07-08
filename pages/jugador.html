@@ -162,18 +162,18 @@
       
 <div class="pstat-single">
   <div class="pstat-row">
-    <div class="pstat-item"><img src="../assets/icons/soundbite.png" alt="Soundbites"/><strong id="statAudios">0</strong></div>
+    <div class="pstat-item"><img src="../assets/icons/soundbite.png" alt="Soundbites"/><strong id="pubStatAudios">0</strong></div>
     <div class="pstat-divider"></div>
-    <div class="pstat-item"><img src="../assets/reactions/love.png" alt="Love it"/><strong id="statLove">0</strong></div>
+    <div class="pstat-item"><img src="../assets/reactions/love.png" alt="Love it"/><strong id="pubStatLove">0</strong></div>
     <div class="pstat-divider"></div>
-    <div class="pstat-item"><img src="../assets/reactions/fav.png" alt="Favorites"/><strong id="statFavs">0</strong></div>
+    <div class="pstat-item"><img src="../assets/reactions/fav.png" alt="Favorites"/><strong id="pubStatFavs">0</strong></div>
   </div>
   <div class="pstat-row">
-    <div class="pstat-item"><img src="../assets/icons/followers.png" alt="Followers"/><strong id="statSeguidores">0</strong></div>
+    <div class="pstat-item"><img src="../assets/icons/followers.png" alt="Followers"/><strong id="pubStatSeguidores">0</strong></div>
     <div class="pstat-divider"></div>
-    <div class="pstat-item"><img src="../assets/icons/following.png" alt="Following"/><strong id="statSiguiendo">0</strong></div>
+    <div class="pstat-item"><img src="../assets/icons/following.png" alt="Following"/><strong id="pubStatSiguiendo">0</strong></div>
     <div class="pstat-divider"></div>
-    <div class="pstat-item"><img src="../assets/icons/trophy.png" alt="Trivia Points"/><strong id="statTrivia">0</strong></div>
+    <div class="pstat-item"><img src="../assets/icons/trophy.png" alt="Trivia Points"/><strong id="pubStatTrivia">0</strong></div>
   </div>
 </div>
       
@@ -329,10 +329,10 @@ window.toggleFollow = async function() {
 
       try {
   const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', uid)));
-  document.getElementById('pubStatSeguidores').textContent = followersSnap.size;
-} catch { document.getElementById('pubStatSeguidores').textContent = '0'; }
-document.getElementById('pubStatSiguiendo').textContent = (data.siguiendo || []).length;
-      document.getElementById('pubStatTrivia').textContent = data.triviaPuntosTotal || 0;
+animCount(document.getElementById('pubStatSeguidores'), followersSnap.size);
+      } catch { document.getElementById('pubStatSeguidores').textContent = '0'; }
+animCount(document.getElementById('pubStatSiguiendo'), (data.siguiendo || []).length);
+animCount(document.getElementById('pubStatTrivia'), data.triviaPuntosTotal || 0);
 
 profileReady = true;
 maybeRenderFollow();
@@ -341,10 +341,10 @@ maybeRenderFollow();
         query(collection(db, 'audios'), where('autorId', '==', uid))
       );
       const audios = audiosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      document.getElementById('pubStatAudios').textContent = audios.length;
-
+animCount(document.getElementById('pubStatAudios'), audios.length);
+      
       const totalLove = audios.reduce((s, a) => s + (a.reactions?.love || 0), 0);
-      document.getElementById('pubStatLove').textContent = totalLove;
+animCount(document.getElementById('pubStatLove'), totalLove);
 
       const PAGE_SIZE = 5;
       let pageMios = 0, pageFavs = 0;
@@ -405,7 +405,7 @@ if (favIds.length > 0) {
   ));
   const favAudios = results.filter(fs => fs && fs.exists()).map(fs => ({ id: fs.id, ...fs.data() }));
   dataFavs = favAudios;
-  document.getElementById('pubStatFavs').textContent = favAudios.length;
+animCount(document.getElementById('pubStatFavs'), favAudios.length);
   renderFavsPage();
 } else {
         document.getElementById('pubStatFavs').textContent = 0;
