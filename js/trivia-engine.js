@@ -214,10 +214,10 @@ export async function getDailyQuiz() {
   return final.exists() ? final.data() : quiz;
 }
 
-export async function guardarResultadoDelDia(uid, nombre, puntos) {
+export async function guardarResultadoDelDia(uid, nombre, avatar, puntos) {
   const fecha = hoyStr();
   await setDoc(doc(db, 'triviaResultados', `${fecha}_${uid}`), {
-    uid, nombre, puntos, fecha, creadoEn: serverTimestamp()
+    uid, nombre, avatar: avatar || 'avatar1', puntos, fecha, creadoEn: serverTimestamp()
   });
 }
 
