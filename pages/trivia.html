@@ -86,6 +86,12 @@
     .trivia-rank-name{flex:1;font-size:.85rem;font-weight:600;}
     .trivia-rank-pts{font-size:.85rem;color:var(--neon);font-weight:700;}
 
+    .trivia-rank-item.gold{background:rgba(251,191,36,.12);border-color:#fbbf24;}
+.trivia-rank-item.silver{background:rgba(192,192,200,.12);border-color:#c0c0c8;}
+.trivia-rank-item.bronze{background:rgba(205,127,50,.12);border-color:#cd7f32;}
+.trivia-rank-item.me{border:2px solid var(--danger);}
+.trivia-rank-sep{text-align:center;color:var(--text-dim);font-size:.85rem;margin:.3rem 0;letter-spacing:2px;}
+
     .trivia-already{text-align:center;padding:2rem 0;}
     .trivia-already .big-score{font-family:var(--font-head);font-size:2rem;font-weight:700;color:var(--neon);margin-bottom:.5rem;}
 
@@ -135,9 +141,7 @@
 <!-- LEYENDA INICIAL -->
 <div class="trivia-intro" id="introScreen">
   <button class="btn-primary" id="startBtn" style="padding:.8rem 2rem;font-size:1rem;background:var(--danger);margin-bottom:.75rem">Start</button>
-  <div style="margin-bottom:2rem">
-    <button class="btn-outline" id="viewRankBtnIntro" style="border-color:var(--danger);color:var(--danger);font-size:.8rem;padding:.5rem 1.1rem">View today's ranking</button>
-  </div>
+
   <h2>How it works</h2>
   <div class="trivia-intro-rules">
     <p><strong>6 random questions</strong> a day.</p>
@@ -149,14 +153,12 @@
       </div>
     </div>
 
-    <!-- YA JUGÓ HOY -->
-    <div class="trivia-already" id="alreadyScreen" style="display:none">
-      <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:.5rem">You already played today. Come back tomorrow!</p>
-      <div class="big-score" id="alreadyScore">0 pts</div>
-      <div class="trivia-actions-row">
-        <button class="btn-outline" id="viewRankBtnAlready" style="border-color:var(--danger);color:var(--danger)">View today's ranking</button>
-      </div>
-    </div>
+<!-- YA JUGÓ HOY -->
+<div class="trivia-already" id="alreadyScreen" style="display:none">
+  <p id="alreadyIntro" style="text-align:center;color:var(--text-dim);font-size:.88rem;margin-bottom:1.25rem"></p>
+  <div id="alreadyRankList"></div>
+  <p style="text-align:center;color:var(--text-dim);font-size:.85rem;margin-top:1.25rem">Come back tomorrow!</p>
+</div>
 
     <!-- LOADING -->
     <div class="trivia-loading" id="loadingScreen" style="display:none">
@@ -223,8 +225,8 @@
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getDailyQuiz, guardarResultadoDelDia, getRankingDeHoy, fechaDeHoy } from '../js/trivia-engine.js';
-
+import { getDailyQuiz, guardarResultadoDelDia, getRankingDeHoyCompleto, fechaDeHoy } from '../js/trivia-engine.js';
+    
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     const STORAGE_KEY = 'omnibites_trivia_progress';
 
@@ -251,28 +253,33 @@ try {
       await checkIfPlayedToday();
     });
 
-    async function checkIfPlayedToday() {
-      try {
-        const fecha = fechaDeHoy();
-        const snap = await getDoc(doc(db, 'triviaResultados', `${fecha}_${currentUser.uid}`));
-        if (snap.exists()) {
-          $('alreadyScore').textContent = `${snap.data().puntos} pts`;
-          show('alreadyScreen');
-          return;
-        }
-      } catch {}
-
-      // ── Recuperar progreso si recargó a mitad del quiz ──
-      const saved = tryLoadProgress();
-      if (saved) {
-        quiz = saved.quiz; quizPreguntas = quiz.preguntas;
-        currentIndex = saved.currentIndex; respuestas = saved.respuestas; puntosAcum = saved.puntosAcum;
-        show('questionScreen');
-        renderQuestion();
-        return;
-      }
-      show('introScreen');
+async function checkIfPlayedToday() {
+  try {
+    const fecha = fechaDeHoy();
+    const snap = await getDoc(doc(db, 'triviaResultados', `${fecha}_${currentUser.uid}`));
+    if (snap.exists()) {
+      const fullList = await getRankingDeHoyCompleto();
+      const myIndex = fullList.findIndex(r => r.uid === currentUser.uid);
+      const myPos = myIndex >= 0 ? myIndex + 1 : '—';
+      $('alreadyIntro').textContent =
+        `You already played today. You're in ${ordinal(myPos)} place out of ${fullList.length} player${fullList.length === 1 ? '' : 's'} who've played so far.`;
+      $('alreadyRankList').innerHTML = renderRankingList(fullList, currentUser.uid);
+      show('alreadyScreen');
+      return;
     }
+  } catch(e) { console.error('Already played check error:', e); }
+
+  // ── Recuperar progreso si recargó a mitad del quiz ──
+  const saved = tryLoadProgress();
+  if (saved) {
+    quiz = saved.quiz; quizPreguntas = quiz.preguntas;
+    currentIndex = saved.currentIndex; respuestas = saved.respuestas; puntosAcum = saved.puntosAcum;
+    show('questionScreen');
+    renderQuestion();
+    return;
+  }
+  show('introScreen');
+}
 
     function tryLoadProgress() {
       try {
@@ -526,28 +533,54 @@ await guardarResultadoDelDia(currentUser.uid, nombreUsuario, avatarUsuario, punt
       }
     });
 
-    async function mostrarRanking() {
-      show('rankScreen');
-      $('rankList').innerHTML = '<div class="state-msg">Loading ranking...</div>';
-      try {
-        const top = await getRankingDeHoy();
-        if (!top.length) { $('rankList').innerHTML = '<div class="state-msg">Nobody has played yet today. Be the first!</div>'; return; }
-$('rankList').innerHTML = top.map((r, i) => `
-  <a class="trivia-rank-item" href="jugador.html?uid=${r.uid}">
-    <div class="trivia-rank-pos">${i + 1}</div>
+    function ordinal(n) {
+  const s = ['th','st','nd','rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function medalClass(pos) {
+  if (pos === 1) return 'gold';
+  if (pos === 2) return 'silver';
+  if (pos === 3) return 'bronze';
+  return '';
+}
+
+function rankItemHTML(r, pos, isMe) {
+  const cls = ['trivia-rank-item', medalClass(pos), isMe ? 'me' : ''].filter(Boolean).join(' ');
+  return `<a class="${cls}" href="jugador.html?uid=${r.uid}">
+    <div class="trivia-rank-pos">${pos}</div>
     <img class="trivia-rank-avatar" src="../assets/avatars/${r.avatar || 'avatar1'}.png" alt=""
       onerror="this.src='../assets/avatars/avatar1.png'"/>
     <div class="trivia-rank-name">${r.nombre}</div>
     <div class="trivia-rank-pts">${r.puntos} pts</div>
-  </a>`).join('');
-      } catch(e) {
-          console.error('Ranking error:', e); // ← agrega esta línea
-        $('rankList').innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
-      }
-    }
+  </a>`;
+}
+
+function renderRankingList(fullList, currentUid) {
+  if (!fullList.length) return '<div class="state-msg">Nobody has played yet today. Be the first!</div>';
+  const top10 = fullList.slice(0, 10);
+  let html = top10.map((r, i) => rankItemHTML(r, i + 1, r.uid === currentUid)).join('');
+  const myIndex = fullList.findIndex(r => r.uid === currentUid);
+  if (myIndex >= 10) {
+    html += `<div class="trivia-rank-sep">•••</div>`;
+    html += rankItemHTML(fullList[myIndex], myIndex + 1, true);
+  }
+  return html;
+}
+
+async function mostrarRanking() {
+  show('rankScreen');
+  $('rankList').innerHTML = '<div class="state-msg">Loading ranking...</div>';
+  try {
+    const fullList = await getRankingDeHoyCompleto();
+    $('rankList').innerHTML = renderRankingList(fullList, currentUser?.uid);
+  } catch(e) {
+    console.error('Ranking error:', e);
+    $('rankList').innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
+  }
+}
 
     $('viewRankBtnIntro').addEventListener('click', mostrarRanking);
-    $('viewRankBtnAlready').addEventListener('click', mostrarRanking);
     $('viewRankBtnScore').addEventListener('click', mostrarRanking);
     $('backFromRank').addEventListener('click', () => {
       if (respuestas.length === quizPreguntas.length && quizPreguntas.length > 0) show('scoreScreen');
