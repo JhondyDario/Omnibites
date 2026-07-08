@@ -19,6 +19,7 @@
       <a href="explorar.html">Explore</a>
       <a href="subir.html">Add</a>    
       <a href="jugadores.html">Players</a>
+      <a href="trivia.html">Trivia</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
@@ -30,6 +31,7 @@
     <a href="explorar.html">Explore</a>
     <a href="subir.html">Add</a>     
     <a href="jugadores.html">Players</a>
+    <a href="trivia.html">Trivia</a>
   </div>
 
   <main class="form-page">
@@ -92,15 +94,16 @@
       return null;
     }
 
-    async function saveUser(user, nombre) {
-      await setDoc(doc(db,'usuarios',user.uid), {
-        nombre: nombre || user.displayName || 'Player',
-        email: user.email,
-        avatar: 'avatar1',
-        creadoEn: serverTimestamp(),
-        audiosSubidos: 0
-      }, { merge: true });
-    }
+async function saveUser(user, nombre) {
+  await setDoc(doc(db,'usuarios',user.uid), {
+    nombre: nombre || user.displayName || 'Player',
+    email: user.email,
+    avatar: 'avatar1',
+    creadoEn: serverTimestamp(),
+    audiosSubidos: 0,
+    triviaPuntosTotal: 0
+  }, { merge: true });
+}
 
     document.getElementById('registerBtn').addEventListener('click', async () => {
       const nombre = document.getElementById('nombre').value.trim();
