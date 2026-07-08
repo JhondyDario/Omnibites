@@ -19,6 +19,7 @@
       <a href="explorar.html">Explore</a>
       <a href="subir.html">Add</a>     
       <a href="jugadores.html">Players</a>
+      <a href="trivia.html">Trivia</a>
     </div>
     <div class="nav-right">
       <div id="nav-auth"></div>
@@ -30,6 +31,7 @@
     <a href="explorar.html">Explore</a>
     <a href="subir.html">Add</a>    
     <a href="jugadores.html">Players</a>
+    <a href="trivia.html">Trivia</a>
   </div>
 
   <main class="form-page">
@@ -54,8 +56,11 @@
         </div>
       </div>
 
-      <button class="btn-primary form-submit" id="loginBtn">Sign In</button>
-      <p class="form-alt">Don't have an account? <a href="registro.html">Sign up here</a></p>
+<button class="btn-primary form-submit" id="loginBtn">Sign In</button>
+<p style="text-align:center;font-size:.7rem;color:var(--text-dim);margin-top:.75rem;line-height:1.5">
+  No subscriptions, no ads, no third-party access. Your data stays yours.
+</p>
+<p class="form-alt">Don't have an account? <a href="registro.html">Sign up here</a></p>
     </div>
   </main>
 
@@ -65,8 +70,14 @@
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
-    const showErr = msg => { const e=document.getElementById('errMsg'); e.textContent=msg; e.style.display='block'; };
-
+const showErr = msg => {
+  const e = document.getElementById('errMsg');
+  e.textContent = msg;
+  e.style.display = 'block';
+  e.style.color = '';
+  e.style.background = '';
+  e.style.borderColor = '';
+};
     document.getElementById('loginBtn').addEventListener('click', async () => {
       const email = document.getElementById('email').value.trim();
       const pass  = document.getElementById('password').value;
