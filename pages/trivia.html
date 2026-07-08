@@ -79,7 +79,9 @@
     .trivia-actions-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;}
 
     /* ── RANKING ── */
-    .trivia-rank-item{display:flex;align-items:center;gap:.85rem;background:var(--bg3);border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;}
+.trivia-rank-item{display:flex;align-items:center;gap:.85rem;background:var(--bg3);border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;text-decoration:none;color:var(--text);transition:border-color .2s;border:1px solid transparent;}
+.trivia-rank-item:hover{border-color:var(--danger);}
+.trivia-rank-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--bg2);border:1px solid var(--border);flex-shrink:0;}
     .trivia-rank-pos{font-family:var(--font-head);font-weight:700;color:var(--danger);width:1.5rem;text-align:center;flex-shrink:0;}
     .trivia-rank-name{flex:1;font-size:.85rem;font-weight:600;}
     .trivia-rank-pts{font-size:.85rem;color:var(--neon);font-weight:700;}
@@ -226,7 +228,7 @@
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     const STORAGE_KEY = 'omnibites_trivia_progress';
 
-    let currentUser = null, nombreUsuario = 'Player';
+let currentUser = null, nombreUsuario = 'Player', avatarUsuario = 'avatar1';
     let quiz = null, quizPreguntas = [], currentIndex = 0, respuestas = [], puntosAcum = 0;
     let answered = false;
 
@@ -239,10 +241,13 @@
       currentUser = user;
       $('authWall').style.display = 'none';
       $('triviaMain').style.display = 'block';
-      try {
-        const snap = await getDoc(doc(db, 'usuarios', user.uid));
-        if (snap.exists()) nombreUsuario = snap.data().nombre || 'Player';
-      } catch {}
+try {
+  const snap = await getDoc(doc(db, 'usuarios', user.uid));
+  if (snap.exists()) {
+    nombreUsuario = snap.data().nombre || 'Player';
+    avatarUsuario = snap.data().avatar || 'avatar1';
+  }
+} catch {}
       await checkIfPlayedToday();
     });
 
@@ -491,7 +496,7 @@ function selectAnswer(idx) {
       show('scoreScreen');
 
       try {
-        await guardarResultadoDelDia(currentUser.uid, nombreUsuario, puntosAcum);
+await guardarResultadoDelDia(currentUser.uid, nombreUsuario, avatarUsuario, puntosAcum);
         await updateDoc(doc(db, 'usuarios', currentUser.uid), { triviaPuntosTotal: increment(puntosAcum) });
       } catch(e) { console.warn('No se pudo guardar el puntaje:', e.message); }
     }
@@ -527,12 +532,14 @@ function selectAnswer(idx) {
       try {
         const top = await getRankingDeHoy();
         if (!top.length) { $('rankList').innerHTML = '<div class="state-msg">Nobody has played yet today. Be the first!</div>'; return; }
-        $('rankList').innerHTML = top.map((r, i) => `
-          <div class="trivia-rank-item">
-            <div class="trivia-rank-pos">${i + 1}</div>
-            <div class="trivia-rank-name">${r.nombre}</div>
-            <div class="trivia-rank-pts">${r.puntos} pts</div>
-          </div>`).join('');
+$('rankList').innerHTML = top.map((r, i) => `
+  <a class="trivia-rank-item" href="jugador.html?uid=${r.uid}">
+    <div class="trivia-rank-pos">${i + 1}</div>
+    <img class="trivia-rank-avatar" src="../assets/avatars/${r.avatar || 'avatar1'}.png" alt=""
+      onerror="this.src='../assets/avatars/avatar1.png'"/>
+    <div class="trivia-rank-name">${r.nombre}</div>
+    <div class="trivia-rank-pts">${r.puntos} pts</div>
+  </a>`).join('');
       } catch(e) {
           console.error('Ranking error:', e); // ← agrega esta línea
         $('rankList').innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
