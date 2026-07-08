@@ -233,4 +233,15 @@ export async function getRankingDeHoy() {
   return snap.docs.map(d => d.data());
 }
 
+export async function getRankingDeHoyCompleto() {
+  const fecha = hoyStr();
+  const q = query(
+    collection(db, 'triviaResultados'),
+    where('fecha', '==', fecha),
+    orderBy('puntos', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
+}
+
 export function fechaDeHoy() { return hoyStr(); }
