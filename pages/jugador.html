@@ -322,7 +322,14 @@ window.toggleFollow = async function() {
       const avatar = data.avatar || 'avatar1';
       const favIds = data.favoritos || [];
 
-      document.getElementById('pubAvatar').src = `${ROOT}/assets/avatars/${avatar}.png`;
+const avatarUrl = `${ROOT}/assets/avatars/${avatar}.png`;
+await new Promise(resolve => {
+  const preload = new Image();
+  preload.onload = resolve;
+  preload.onerror = resolve;
+  preload.src = avatarUrl;
+});
+document.getElementById('pubAvatar').src = avatarUrl;
       document.getElementById('pubAvatarFallback').textContent = nombre.charAt(0).toUpperCase();
       document.getElementById('pubName').textContent = nombre;
       document.title = `${nombre} — Omnibites`;
