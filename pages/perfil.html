@@ -169,6 +169,11 @@
     <img src="../assets/icons/following.png" alt="Following"/>
     <strong id="statSiguiendo">0</strong>
   </div>
+  <div class="pstat-divider"></div>
+<div class="pstat-item">
+  <img src="../assets/icons/trophy.png" alt="Trivia Points"/>
+  <strong id="statTrivia">0</strong>
+</div>
 </div>
 
     <div class="collapse-section" id="sec-mios">
@@ -267,6 +272,7 @@ if (snap.exists()) {
   selectedAvatar = d.avatar || 'avatar1';
   favIds         = d.favoritos || [];
   document.getElementById('statSiguiendo').textContent = (d.siguiendo || []).length;
+  document.getElementById('statTrivia').textContent = d.triviaPuntosTotal || 0;
 } else {
         await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
       }
