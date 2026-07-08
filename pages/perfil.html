@@ -280,16 +280,13 @@ if (snap.exists()) {
       renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
 
 if (favIds.length > 0) {
-        const favAudios = [];
-        for (const fid of favIds) {
-          try {
-            const fs = await getDoc(doc(db,'audios',fid));
-            if (fs.exists()) favAudios.push({id:fs.id,...fs.data()});
-          } catch {}
-        }
-        document.getElementById('statFavs').textContent = favAudios.length;
-        renderFavs(favAudios);
-      } else {
+  const results = await Promise.all(favIds.map(fid =>
+    getDoc(doc(db,'audios',fid)).catch(() => null)
+  ));
+  const favAudios = results.filter(fs => fs && fs.exists()).map(fs => ({id:fs.id,...fs.data()}));
+  document.getElementById('statFavs').textContent = favAudios.length;
+  renderFavs(favAudios);
+} else {
         document.getElementById('statFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML = '<div class="empty-mini">No favorites yet.</div>';
       }
