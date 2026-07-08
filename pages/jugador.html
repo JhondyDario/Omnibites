@@ -245,6 +245,19 @@ function showAuthPrompt() {
   setTimeout(() => el.remove(), 4000);
 }
 
+    function animCount(el, target) {
+  if (!el) return;
+  target = Number(target) || 0;
+  if (target === 0) { el.textContent = '0'; return; }
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(target / 30));
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur >= 1000 ? (cur/1000).toFixed(1)+'k' : cur;
+    if (cur >= target) clearInterval(iv);
+  }, 25);
+}
+
 async function maybeRenderFollow() {
   if (!authReady || !profileReady) return;
   const btn = document.getElementById('followBtn');
@@ -387,17 +400,14 @@ maybeRenderFollow();
 
       // Cargar favoritos
 if (favIds.length > 0) {
-        const favAudios = [];
-        for (const fid of favIds) {
-          try {
-            const fs = await getDoc(doc(db, 'audios', fid));
-            if (fs.exists()) favAudios.push({ id: fs.id, ...fs.data() });
-          } catch {}
-        }
-        dataFavs = favAudios;
-        document.getElementById('pubStatFavs').textContent = favAudios.length;
-        renderFavsPage();
-      } else {
+  const results = await Promise.all(favIds.map(fid =>
+    getDoc(doc(db, 'audios', fid)).catch(() => null)
+  ));
+  const favAudios = results.filter(fs => fs && fs.exists()).map(fs => ({ id: fs.id, ...fs.data() }));
+  dataFavs = favAudios;
+  document.getElementById('pubStatFavs').textContent = favAudios.length;
+  renderFavsPage();
+} else {
         document.getElementById('pubStatFavs').textContent = 0;
         document.getElementById('list-favs').innerHTML =
           '<div class="empty-mini">This player has no favorites yet.</div>';
