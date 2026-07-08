@@ -247,7 +247,7 @@
       (user.displayName||'J').charAt(0).toUpperCase();
     document.getElementById('userEmail').textContent = user.email||'';
 
-    function animCount(el, target) {
+function animCount(el, target) {
   if (!el) return;
   target = Number(target) || 0;
   if (target === 0) { el.textContent = '0'; return; }
@@ -271,8 +271,8 @@ if (snap.exists()) {
   nombre         = d.nombre || nombre;
   selectedAvatar = d.avatar || 'avatar1';
   favIds         = d.favoritos || [];
-  document.getElementById('statSiguiendo').textContent = (d.siguiendo || []).length;
-  document.getElementById('statTrivia').textContent = d.triviaPuntosTotal || 0;
+animCount(document.getElementById('statSiguiendo'), (d.siguiendo || []).length);
+animCount(document.getElementById('statTrivia'), d.triviaPuntosTotal || 0);
 } else {
         await setDoc(ref,{nombre,email:user.email||'',avatar:'avatar1',creadoEn:serverTimestamp(),audiosSubidos:0});
       }
@@ -282,14 +282,14 @@ if (snap.exists()) {
 
       try {
   const followersSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains', user.uid)));
-  document.getElementById('statSeguidores').textContent = followersSnap.size;
-} catch { document.getElementById('statSeguidores').textContent = '0'; }
+animCount(document.getElementById('statSeguidores'), followersSnap.size);
+      } catch { document.getElementById('statSeguidores').textContent = '0'; }
 
       const q = query(collection(db,'audios'), where('autorId','==',user.uid));
       const aSnap = await getDocs(q);
 animCount(document.getElementById('statAudios'), aSnap.size);
-      const totalLove = aSnap.docs.reduce((s,d)=>s+(d.data().reactions?.love||0),0);
-      document.getElementById('statLove').textContent = totalLove;
+const totalLove = aSnap.docs.reduce((s,d)=>s+(d.data().reactions?.love||0),0);
+animCount(document.getElementById('statLove'), totalLove);
       renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
 
 if (favIds.length > 0) {
@@ -297,7 +297,7 @@ if (favIds.length > 0) {
     getDoc(doc(db,'audios',fid)).catch(() => null)
   ));
   const favAudios = results.filter(fs => fs && fs.exists()).map(fs => ({id:fs.id,...fs.data()}));
-  document.getElementById('statFavs').textContent = favAudios.length;
+animCount(document.getElementById('statFavs'), favAudios.length);
   renderFavs(favAudios);
 } else {
         document.getElementById('statFavs').textContent = 0;
