@@ -48,6 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .nav-links{display:flex;align-items:center;gap:1.5rem;}
 .nav-links a{color:var(--text-dim);text-decoration:none;font-size:.875rem;font-weight:500;transition:color var(--transition);}
 .nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a.active-trivia, .mobile-menu a.active-trivia { color: var(--danger) !important; }
 .nav-links a.active-comunidad, .mobile-menu a.active-comunidad { color: var(--neon)   !important; }
 .nav-links a.active-explorar,  .mobile-menu a.active-explorar  { color: var(--purple) !important; }
 .nav-links a.active-subir,     .mobile-menu a.active-subir     { color: var(--gold)   !important; }
