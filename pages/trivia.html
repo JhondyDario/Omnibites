@@ -13,6 +13,10 @@
     .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);animation:opt-pulse .4s ease;}
 @keyframes opt-pulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
 
+    .trivia-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;overflow-x:hidden;}
+.trivia-share-card #shareText{overflow-wrap:anywhere;}
+.trivia-review-q,.trivia-review-a{word-break:break-word;overflow-wrap:break-word;}
+
     /* ── LEYENDA INICIAL ── */
     .trivia-intro{background:var(--bg2);border:1px solid var(--danger);border-radius:12px;padding:2rem 1.75rem;text-align:center;}
     .trivia-intro h2{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--danger);margin-bottom:1rem;}
@@ -124,8 +128,8 @@
   </div>
 
   <main class="trivia-page" id="triviaMain" style="display:none">
-<h1><img src="../assets/icons/trivia.png" alt="" style="width:28px;height:28px;object-fit:contain;vertical-align:-6px;margin-right:.4rem"/> Daily Trivia <img src="../assets/icons/trivia.png" alt="" style="width:28px;height:28px;object-fit:contain;vertical-align:-6px;margin-right:.4rem"/></h1>
-
+<h1><img src="../assets/icons/trivia.png" alt="" style="width:28px;height:28px;object-fit:contain;vertical-align:-6px;margin-right:.4rem"/>Daily Trivia</h1>
+    
 <!-- LEYENDA INICIAL -->
 <div class="trivia-intro" id="introScreen">
   <button class="btn-primary" id="startBtn" style="padding:.8rem 2rem;font-size:1rem;background:var(--danger);margin-bottom:.75rem">Start</button>
@@ -168,13 +172,14 @@
       </div>
       <div class="trivia-card">
         <div class="trivia-question" id="qText"></div>
-        <div class="trivia-player">
-          <button class="trivia-play" id="qPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
-          <div class="trivia-prog-wrap">
-            <div class="trivia-prog-bar"><div class="trivia-prog-fill" id="qProgAudio"></div></div>
-            <div class="trivia-time"><span id="qCur">0:00</span><span>0:15</span></div>
-          </div>
-        </div>
+<div class="trivia-player">
+  <button class="trivia-play" id="qPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
+  <div class="trivia-prog-wrap">
+    <div class="trivia-prog-bar"><div class="trivia-prog-fill" id="qProgAudio"></div></div>
+    <div class="trivia-time"><span id="qCur">0:00</span><span>0:15</span></div>
+  </div>
+</div>
+<div id="qLives" style="text-align:center;font-size:.72rem;color:var(--text-dim);margin:-1rem 0 1.25rem"></div>
         <div class="trivia-options" id="qOptions"></div>
       </div>
     </div>
@@ -301,104 +306,163 @@
       }
     });
 
-    // ── Reproductor (mismo patrón de fade que el resto del sitio) ──
-    let audioCtx = null, source = null, gain = null, isPlaying = false, progIv = null, playToken = 0;
-    const CLIP = 15, FADE = 2;
-    function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
-    function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
+// ── Reproductor + countdown + vidas ──
+let audioCtx = null, source = null, gain = null, isPlaying = false, progIv = null, playToken = 0;
+let hasPlayedOnce = false, livesRemaining = 3, countdownActive = false;
+const CLIP = 15, FADE = 2;
+function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
 
-    function stopAudio() {
-      playToken++;
-      if (source) {
-        try {
-          gain.gain.cancelScheduledValues(audioCtx.currentTime);
-          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-          const el = source;
-          setTimeout(() => { try { el.pause(); } catch {} }, 150);
-        } catch {}
-        source = gain = null;
-      }
-      clearInterval(progIv);
-      const btn = $('qPlayBtn');
-      if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
-      $('qProgAudio').style.width = '0%';
-      $('qCur').textContent = '0:00';
-      isPlaying = false;
+function stopAudio() {
+  playToken++;
+  if (source) {
+    try {
+      gain.gain.cancelScheduledValues(audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      const el = source;
+      setTimeout(() => { try { el.pause(); } catch {} }, 150);
+    } catch {}
+    source = gain = null;
+  }
+  clearInterval(progIv);
+  if (!countdownActive) {
+    const btn = $('qPlayBtn');
+    if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); }
+  }
+  $('qProgAudio').style.width = '0%';
+  $('qCur').textContent = '0:00';
+  isPlaying = false;
+}
+
+function updateLivesDisplay() {
+  const el = $('qLives');
+  if (el) el.textContent = `🔁 ${livesRemaining} repeat${livesRemaining === 1 ? '' : 's'} left`;
+}
+
+function startCountdownThenPlay(url) {
+  countdownActive = true;
+  const btn = $('qPlayBtn');
+  btn.disabled = true;
+  const livesEl = $('qLives');
+  let n = 3;
+  livesEl.textContent = `Get ready... ${n}`;
+  btn.innerHTML = `<span style="font-family:var(--font-head);font-size:1.1rem;color:#fff">${n}</span>`;
+  const iv = setInterval(() => {
+    n--;
+    if (n > 0) {
+      livesEl.textContent = `Get ready... ${n}`;
+      btn.innerHTML = `<span style="font-family:var(--font-head);font-size:1.1rem;color:#fff">${n}</span>`;
+    } else {
+      clearInterval(iv);
+      countdownActive = false;
+      updateLivesDisplay();
+      playAudio(url);
     }
+  }, 1000);
+}
 
-    async function playAudio(url) {
-      if (isPlaying) { stopAudio(); return; }
-      stopAudio();
-      const myToken = ++playToken;
-      const btn = $('qPlayBtn');
-      btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
-      btn.disabled = true;
-      try {
-        const ctx = getCtx();
-        if (ctx.state === 'suspended') await ctx.resume();
-        const audioEl = new Audio();
-        audioEl.crossOrigin = 'anonymous';
-        audioEl.preload = 'auto';
-        audioEl.src = url;
-        await new Promise((resolve, reject) => {
-          audioEl.addEventListener('loadedmetadata', resolve, { once: true });
-          audioEl.addEventListener('error', reject, { once: true });
-        });
-        if (myToken !== playToken) return;
+function manualReplay(url) {
+  if (countdownActive || isPlaying || !hasPlayedOnce) return;
+  if (livesRemaining <= 0) {
+    window.showToast && window.showToast('No repeats left for this question');
+    return;
+  }
+  livesRemaining--;
+  updateLivesDisplay();
+  playAudio(url);
+}
 
-        const dur = Math.min(CLIP, audioEl.duration);
-        const src = ctx.createMediaElementSource(audioEl);
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(0, ctx.currentTime);
-        g.gain.linearRampToValueAtTime(1, ctx.currentTime + Math.min(FADE, dur/2));
-        g.gain.setValueAtTime(1, ctx.currentTime + dur - FADE);
-        g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
-        src.connect(g); g.connect(ctx.destination);
-        await audioEl.play();
+function onPlaybackFinished() {
+  hasPlayedOnce = true;
+  document.querySelectorAll('.trivia-opt').forEach(b => b.disabled = false);
+  const btn = $('qPlayBtn');
+  if (btn) {
+    btn.innerHTML = '<img src="../assets/icons/play.png" alt="Repeat"/>';
+    btn.disabled = livesRemaining <= 0;
+  }
+}
 
-        source = audioEl; gain = g; isPlaying = true;
-        btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
-        btn.classList.add('playing'); btn.disabled = false;
+async function playAudio(url) {
+  stopAudio();
+  const myToken = ++playToken;
+  const btn = $('qPlayBtn');
+  btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
+  btn.disabled = true;
+  try {
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.preload = 'auto';
+    audioEl.src = url;
+    await new Promise((resolve, reject) => {
+      audioEl.addEventListener('loadedmetadata', resolve, { once: true });
+      audioEl.addEventListener('error', reject, { once: true });
+    });
+    if (myToken !== playToken) return;
 
-        setTimeout(() => { if (myToken === playToken) stopAudio(); }, dur * 1000);
+    const dur = Math.min(CLIP, audioEl.duration);
+    const src = ctx.createMediaElementSource(audioEl);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(1, ctx.currentTime + Math.min(FADE, dur/2));
+    g.gain.setValueAtTime(1, ctx.currentTime + dur - FADE);
+    g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+    src.connect(g); g.connect(ctx.destination);
+    await audioEl.play();
 
-        const t0 = ctx.currentTime;
-        progIv = setInterval(() => {
-          if (myToken !== playToken) { clearInterval(progIv); return; }
-          const el = ctx.currentTime - t0;
-          $('qProgAudio').style.width = (Math.min(el, dur) / dur * 100) + '%';
-          $('qCur').textContent = fmt(el);
-          if (el >= dur) clearInterval(progIv);
-        }, 100);
-      } catch(e) {
-        if (myToken !== playToken) return;
-        btn.innerHTML = '<img src="../assets/icons/error.png" alt="Error"/>'; btn.disabled = false;
-        setTimeout(() => { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; }, 2000);
-      }
-    }
+    source = audioEl; gain = g; isPlaying = true;
+    btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Playing"/>';
+    btn.classList.add('playing');
+    btn.disabled = true; // no se puede interrumpir mientras suena
 
-    function renderQuestion() {
-      stopAudio();
-      answered = false;
-      const q = quizPreguntas[currentIndex];
-      $('qCounter').textContent = `${currentIndex + 1}/6`;
-      $('qProgFill').style.width = `${(currentIndex / 6) * 100}%`;
-      $('qScoreSoFar').textContent = `${puntosAcum} pts`;
-      $('qText').textContent = q.pregunta;
+    setTimeout(() => {
+      if (myToken === playToken) { stopAudio(); onPlaybackFinished(); }
+    }, dur * 1000);
 
-      const opts = $('qOptions');
-      opts.innerHTML = q.opciones.map((op, i) =>
-        `<button class="trivia-opt" data-i="${i}">${op}</button>`).join('');
+    const t0 = ctx.currentTime;
+    progIv = setInterval(() => {
+      if (myToken !== playToken) { clearInterval(progIv); return; }
+      const el = ctx.currentTime - t0;
+      $('qProgAudio').style.width = (Math.min(el, dur) / dur * 100) + '%';
+      $('qCur').textContent = fmt(el);
+      if (el >= dur) clearInterval(progIv);
+    }, 100);
+  } catch(e) {
+    if (myToken !== playToken) return;
+    btn.innerHTML = '<img src="../assets/icons/error.png" alt="Error"/>';
+    setTimeout(() => { onPlaybackFinished(); }, 1500);
+  }
+}
 
-      opts.querySelectorAll('.trivia-opt').forEach(btn => {
-        btn.addEventListener('click', () => selectAnswer(parseInt(btn.dataset.i)));
-      });
+function renderQuestion() {
+  stopAudio();
+  answered = false;
+  hasPlayedOnce = false;
+  livesRemaining = 3;
+  countdownActive = false;
 
-      $('qPlayBtn').onclick = () => playAudio(q.audioUrl);
-    }
+  const q = quizPreguntas[currentIndex];
+  $('qCounter').textContent = `${currentIndex + 1}/6`;
+  $('qProgFill').style.width = `${(currentIndex / 6) * 100}%`;
+  $('qScoreSoFar').textContent = `${puntosAcum} pts`;
+  $('qText').textContent = q.pregunta;
+  $('qLives').textContent = '';
+
+  const opts = $('qOptions');
+  opts.innerHTML = q.opciones.map((op, i) =>
+    `<button class="trivia-opt" data-i="${i}" disabled>${op}</button>`).join('');
+
+  opts.querySelectorAll('.trivia-opt').forEach(btn => {
+    btn.addEventListener('click', () => selectAnswer(parseInt(btn.dataset.i)));
+  });
+
+  $('qPlayBtn').onclick = () => manualReplay(q.audioUrl);
+  startCountdownThenPlay(q.audioUrl);
+}
 
 function selectAnswer(idx) {
-  if (answered) return;
+  if (answered || !hasPlayedOnce) return;
   answered = true;
   const q = quizPreguntas[currentIndex];
   const esCorrecta = idx === q.correcta;
@@ -418,7 +482,6 @@ function selectAnswer(idx) {
     renderQuestion();
   }, 700);
 }
-
     async function finishQuiz() {
       stopAudio();
       clearProgress();
@@ -471,6 +534,7 @@ function selectAnswer(idx) {
             <div class="trivia-rank-pts">${r.puntos} pts</div>
           </div>`).join('');
       } catch(e) {
+          console.error('Ranking error:', e); // ← agrega esta línea
         $('rankList').innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
       }
     }
