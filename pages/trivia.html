@@ -136,10 +136,14 @@
   </div>
 
   <main class="trivia-page" id="triviaMain" style="display:none">
+    <div class="state-msg" id="checkingScreen">
+  <div class="spinner"></div>
+  <p>Loading...</p>
+</div>
 <h1><img src="../assets/icons/trivia.png" alt="" style="width:28px;height:28px;object-fit:contain;vertical-align:-6px;margin-right:.4rem"/>Daily Trivia</h1>
     
 <!-- LEYENDA INICIAL -->
-<div class="trivia-intro" id="introScreen">
+<div class="trivia-intro" id="introScreen" style="display:none">
   <button class="btn-primary" id="startBtn" style="padding:.8rem 2rem;font-size:1rem;background:var(--danger);margin-bottom:.75rem">Start</button>
 
   <h2>How it works</h2>
@@ -235,22 +239,20 @@ let currentUser = null, nombreUsuario = 'Player', avatarUsuario = 'avatar1';
     let answered = false;
 
     const $ = id => document.getElementById(id);
-    function show(id) { ['introScreen','alreadyScreen','loadingScreen','questionScreen','scoreScreen','reviewScreen','rankScreen']
-      .forEach(s => $(s).style.display = s === id ? 'block' : 'none'); }
+function show(id) { ['checkingScreen','introScreen','alreadyScreen','loadingScreen','questionScreen','scoreScreen','reviewScreen','rankScreen']
+  .forEach(s => $(s).style.display = s === id ? 'block' : 'none'); }
 
     onAuthStateChanged(auth, async user => {
       if (!user) { $('authWall').style.display = 'block'; $('triviaMain').style.display = 'none'; return; }
       currentUser = user;
-      $('authWall').style.display = 'none';
-      $('triviaMain').style.display = 'block';
+$('authWall').style.display = 'none';
+$('triviaMain').style.display = 'block';
+show('checkingScreen');
 try {
   const snap = await getDoc(doc(db, 'usuarios', user.uid));
-  if (snap.exists()) {
-    nombreUsuario = snap.data().nombre || 'Player';
-    avatarUsuario = snap.data().avatar || 'avatar1';
-  }
+  if (snap.exists()) nombreUsuario = snap.data().nombre || 'Player';
 } catch {}
-      await checkIfPlayedToday();
+await checkIfPlayedToday();
     });
 
 async function checkIfPlayedToday() {
