@@ -247,6 +247,19 @@
       (user.displayName||'J').charAt(0).toUpperCase();
     document.getElementById('userEmail').textContent = user.email||'';
 
+    function animCount(el, target) {
+  if (!el) return;
+  target = Number(target) || 0;
+  if (target === 0) { el.textContent = '0'; return; }
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(target / 30));
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur >= 1000 ? (cur/1000).toFixed(1)+'k' : cur;
+    if (cur >= target) clearInterval(iv);
+  }, 25);
+}
+
     try {
       const ref  = doc(db,'usuarios',user.uid);
       const snap = await getDoc(ref);
@@ -274,7 +287,7 @@ if (snap.exists()) {
 
       const q = query(collection(db,'audios'), where('autorId','==',user.uid));
       const aSnap = await getDocs(q);
-      document.getElementById('statAudios').textContent = aSnap.size;
+animCount(document.getElementById('statAudios'), aSnap.size);
       const totalLove = aSnap.docs.reduce((s,d)=>s+(d.data().reactions?.love||0),0);
       document.getElementById('statLove').textContent = totalLove;
       renderMios(aSnap.docs.map(d=>({id:d.id,...d.data()})));
