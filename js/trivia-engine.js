@@ -14,12 +14,24 @@ const RAWG_KEY = '3207549bccd14954b04fa8e64840ec00';
 // ── Lista evergreen de franquicias. Edítala cada cierto tiempo,
 // no pasa nada si repites algunas de una edición a otra. ──
 const FRANCHISES = [
-  'Mario','Zelda','Sonic the Hedgehog','Metroid','Mega Man','Kirby','Castlevania',
-  'Final Fantasy','Chrono Trigger','Street Fighter','Mortal Kombat','Pac-Man',
-  'Donkey Kong','Star Fox','Metal Gear','Resident Evil','Crash Bandicoot','Spyro',
-  'Tekken','Contra','Double Dragon','Streets of Rage','Golden Axe','EarthBound',
-  'Banjo-Kazooie','Diddy Kong Racing','F-Zero','Kid Icarus','Punch-Out',
-  'Bomberman','Pokemon','Silent Hill','Tomb Raider','Doom','Duke Nukem'
+  'Mario','Zelda','Pokemon','Sonic the Hedgehog','Minecraft','Fortnite',
+  'Call of Duty','Grand Theft Auto','Halo','God of War','The Last of Us',
+  'Assassin\'s Creed','Metal Gear','Resident Evil','Final Fantasy',
+  'Street Fighter','Mortal Kombat','Tekken','Pac-Man','Donkey Kong',
+  'Kirby','Metroid','Mega Man','Castlevania','Chrono Trigger',
+  'Crash Bandicoot','Spyro','Tomb Raider','Doom','Duke Nukem',
+  'Star Fox','Contra','Double Dragon','Streets of Rage','Golden Axe',
+  'EarthBound','Banjo-Kazooie','Diddy Kong Racing','F-Zero',
+  'Kid Icarus','Punch-Out','Bomberman','Silent Hill', 'Overwatch','Valorant',
+  'League of Legends','Dota 2','World of Warcraft','Diablo','StarCraft',
+  'Elder Scrolls','Fallout','Destiny', 'Battlefield','Far Cry','Need for Speed',
+  'Forza Horizon','Gran Turismo','Mass Effect','Dragon Age','Bioshock','Borderlands','Portal',
+  'Half-Life','Counter-Strike','Dead Space','Monster Hunter','Persona',
+  'Yakuza','Like a Dragon','Kingdom Hearts','Dark Souls','Elden Ring',
+  'Bloodborne','Sekiro','Devil May Cry','Bayonetta','Ratchet & Clank',
+  'Jak and Daxter','Sly Cooper','Animal Crossing','Splatoon','Fire Emblem',
+  'Dragon Quest','King of Fighters','Guilty Gear','Apex Legends',
+  'Rainbow Six','Warcraft','Gears of War','Left 4 Dead','Among Us',
 ];
 
 // ── RNG determinístico con semilla (mulberry32) ──
