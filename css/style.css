@@ -642,20 +642,3 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   background: var(--border);
   flex-shrink: 0;
 }
-
-/* ── LIGHT MODE: contraste en botones de fondo sólido ── */
-[data-theme="light"] .btn-primary,
-[data-theme="light"] .action-card-btn,
-[data-theme="light"] .btn-sm-green,
-[data-theme="light"] .follow-btn.following,
-[data-theme="light"] .follow-btn:hover,
-[data-theme="light"] .mini-play-btn,
-[data-theme="light"] .avatar-fallback,
-[data-theme="light"] .nav-avatar-fallback,
-[data-theme="light"] .pub-avatar-fallback,
-[data-theme="light"] .player-avatar-fallback {
-  color: #fff;
-}
-[data-theme="light"] .btn-outline:hover {
-  color: #fff;
-}
