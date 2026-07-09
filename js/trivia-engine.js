@@ -104,6 +104,7 @@ async function fetchTracksForGame(nombreJuego, cantidad = 2) {
   if (!docs.length) return [];
 
   const tracks = [];
+  const nombresVistos = new Set(); // evita tracks con el mismo nombre aunque vengan de items distintos
   for (const doc of docs) {
     if (tracks.length >= cantidad) break;
     try {
@@ -115,8 +116,12 @@ async function fetchTracksForGame(nombreJuego, cantidad = 2) {
         .filter(f => !/\b(sfx|effect|jingle|voice|vo_|fx_|podcast|interview)\b/i.test(f.name));
       for (const f of files) {
         if (tracks.length >= cantidad) break;
+        const nombreTrack = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/^\d+\s*/, '');
+        const clave = nombreTrack.trim().toLowerCase();
+        if (nombresVistos.has(clave)) continue; // mismo nombre ya agregado, se descarta
+        nombresVistos.add(clave);
         tracks.push({
-          nombreTrack: f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/^\d+\s*/, ''),
+          nombreTrack,
           url: `https://archive.org/download/${doc.identifier}/${encodeURIComponent(f.name)}`
         });
       }
