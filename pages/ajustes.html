@@ -12,6 +12,10 @@
     .settings-page h1{font-family:var(--font-pixel);font-size:.85rem;color:var(--neon);margin-bottom:2rem;}
     .sbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.25rem;}
     .sbox h2{font-family:var(--font-pixel);font-size:.58rem;color:var(--text-dim);margin-bottom:1.25rem;}
+    .theme-row{display:flex;gap:.5rem;}
+.theme-btn{flex:1;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-dim);font-size:.82rem;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:border-color .2s,color .2s;}
+.theme-btn:hover{border-color:var(--neon);}
+.theme-btn.active{border-color:var(--neon);color:var(--neon);}
     .note{background:var(--bg3);border-radius:6px;padding:.7rem 1rem;font-size:.78rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.6;}
     .field-ok{color:var(--neon);font-size:.78rem;margin-top:.5rem;}
     .field-err{color:var(--danger);font-size:.78rem;margin-top:.5rem;}
@@ -56,8 +60,18 @@
   </div>
 
   <main class="settings-page" id="settingsMain" style="display:none">
-    <a href="perfil.html" class="btn-back">← Back to profile</a>
+<a href="perfil.html" class="btn-back">← Back to profile</a>
     <h1>Settings</h1>
+
+    <div class="sbox">
+      <h2>Appearance</h2>
+      <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:1rem">Automatic switches between light and dark based on your local time (day 6am–7pm, night the rest).</p>
+      <div class="theme-row">
+        <button class="theme-btn" data-mode="auto">Automatic</button>
+        <button class="theme-btn" data-mode="day">Day</button>
+        <button class="theme-btn" data-mode="night">Night</button>
+      </div>
+    </div>
 
     <div class="sbox">
       <h2>Account Information</h2>
