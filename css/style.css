@@ -15,17 +15,14 @@
   --text:      #e2e2ea;
   --text-dim:  #6b6b80;
   --border:    #252532;
---danger:    #f87171;
+  --danger:    #f87171;
   --gold:      #fbbf24;
-  --neon-solid:   #4ade80;
-  --purple-solid: #a78bfa;
-  --cyan-solid:   #67e8f9;
-  --gold-solid:   #fbbf24;
-  --danger-solid: #f87171;
   --font-head: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
---radius:    8px;
+  --radius:    8px;
   --transition: 0.18s ease;
+  --navbar-bg: rgba(13,13,18,0.97);
+  --screen-bg: #08080d;
 }
 
 :root[data-theme="light"] {
@@ -41,6 +38,8 @@
   --border:    #e0e0e8;
   --danger:    #dc2626;
   --gold:      #b45309;
+  --navbar-bg: rgba(255,255,255,0.97);
+  --screen-bg: #e9e6f7;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
