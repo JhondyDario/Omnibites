@@ -179,11 +179,18 @@
     const DEFAULT_LIMIT = 30; // también el máximo que soporta el operador 'in' de Firestore
 
     let currentUser = null;
-    onAuthStateChanged(auth, u => {
-      currentUser = u;
-      // Re-renderiza con los mismos datos ya cargados para actualizar el link "es mi perfil"
-      render(document.getElementById('searchInput').value);
-    });
+let playersReady = false;
+
+onAuthStateChanged(auth, u => {
+  currentUser = u;
+  if (playersReady) render(document.getElementById('searchInput').value);
+});
+
+(async function init() {
+  await loadDefaultPlayers();
+  playersReady = true;
+  render('');
+})();
 
     // ── Nivel 1: unos pocos jugadores por defecto (sin escanear toda la colección) ──
     let defaultPlayers = null;
