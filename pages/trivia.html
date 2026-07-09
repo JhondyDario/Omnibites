@@ -52,8 +52,8 @@
     .trivia-time{font-size:.68rem;color:var(--text-dim);display:flex;justify-content:space-between;}
 
     .trivia-options{display:flex;flex-direction:column;gap:.65rem;}
-    .trivia-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;font-size:.88rem;font-family:var(--font-body);color:var(--text);cursor:pointer;text-align:left;transition:border-color .2s,background .2s;}
-    .trivia-opt:hover{border-color:var(--danger);}
+.trivia-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;font-size:.88rem;font-family:var(--font-body);color:var(--text);cursor:pointer;text-align:left;transition:border-color .2s,background .2s;}
+    .trivia-opt:hover{border-color:var(--text-dim);background:var(--bg2);}
     .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);}
     .trivia-opt:disabled{opacity:.5;cursor:not-allowed;}
 
@@ -93,8 +93,10 @@
 .trivia-rank-sep{text-align:center;color:var(--text-dim);font-size:.85rem;margin:.3rem 0;letter-spacing:2px;}
 
     .trivia-already{text-align:center;padding:2rem 0;}
-    .trivia-already .big-score{font-family:var(--font-head);font-size:2rem;font-weight:700;color:var(--neon);margin-bottom:.5rem;}
-
+.trivia-already .big-score{font-family:var(--font-head);font-size:2rem;font-weight:700;color:var(--neon);margin-bottom:.5rem;}
+/* Los botones outline de esta página usan borde rojo — el hover debe matchear, no el verde genérico */
+.trivia-page .btn-outline:hover{background:var(--danger);color:#fff;}
+    
     .state-msg{text-align:center;padding:3rem 1rem;color:var(--text-dim);}
   </style>
 </head>
@@ -578,8 +580,7 @@ async function mostrarRanking() {
   }
 }
 
-    $('viewRankBtnIntro').addEventListener('click', mostrarRanking);
-    $('viewRankBtnScore').addEventListener('click', mostrarRanking);
+$('viewRankBtnScore').addEventListener('click', mostrarRanking);
     $('backFromRank').addEventListener('click', () => {
       if (respuestas.length === quizPreguntas.length && quizPreguntas.length > 0) show('scoreScreen');
       else checkIfPlayedToday();
