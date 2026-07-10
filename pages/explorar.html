@@ -907,13 +907,17 @@ const tituloRecortado = item.title.length > 60
         <p>Searching Archive.org...</p>
         <small>This may take a few seconds</small>`;
     }
-    function showEmpty(q) {
-      document.getElementById('stateMsg').innerHTML = `
-        <div class="emoji">😔</div>
-        <p>We couldn't find any audio for "<strong>${q}</strong>"</p>
-        <small>Try the game's English/US title, or just its name</small>`;
-      document.getElementById('stateMsg').style.display = 'block';
-    }
+function showEmpty(q) {
+  const juegoParam = selectedGame ? `?juego=${encodeURIComponent(selectedGame.name)}` : '';
+  document.getElementById('stateMsg').innerHTML = `
+    <div class="emoji">😔</div>
+    <p>We couldn't find any audio for "<strong>${q}</strong>"</p>
+    <small>Try the game's English/US title, or just its name</small>
+    <p style="margin-top:1.25rem">
+      <a href="subir.html${juegoParam}" class="btn-outline" style="display:inline-block">Can't find it? Upload it yourself →</a>
+    </p>`;
+  document.getElementById('stateMsg').style.display = 'block';
+}
     function showError() {
       document.getElementById('stateMsg').innerHTML = `
         <div class="emoji">⚠️</div>
