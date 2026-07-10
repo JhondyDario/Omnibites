@@ -461,7 +461,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── COMUNIDAD ── */
 .com-header{max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem 1rem;}
-.com-header h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:1.25rem;}
+.com-header h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:.5rem;text-align:center;}
 .com-search{display:flex;gap:.75rem;margin-bottom:1rem;}
 .com-search input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.75rem 1rem;font-size:.95rem;font-family:var(--font-body);outline:none;}
 .com-search input:focus{border-color:var(--neon);}
