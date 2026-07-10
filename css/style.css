@@ -591,6 +591,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   .hero-title{font-size:1.75rem;}
   .profile-stats{grid-template-columns:1fr 1fr;}
   .card-actions{gap:.4rem;}
+  .profile-page{padding:2rem .85rem;}
 }
 
 /* ── NAV LOGO IMAGE ── */
