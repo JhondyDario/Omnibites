@@ -583,16 +583,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   .filter-group label{
     font-size:.72rem;
   }
-  .filters select{
-    width:100%;
-    flex:none;              /* ← AGREGAR ESTA LÍNEA */
-  }
+.filters select{width:100%;flex:none;padding:.75rem 2rem .75rem 1rem;font-size:.9rem;}
 }
 @media(max-width:480px){
   .hero-title{font-size:1.75rem;}
   .profile-stats{grid-template-columns:1fr 1fr;}
   .card-actions{gap:.4rem;}
-  .profile-page{padding:2rem .85rem;}
+.profile-page{padding:2.5rem 1.5rem;}
 }
 
 /* ── NAV LOGO IMAGE ── */
