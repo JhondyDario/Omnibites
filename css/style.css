@@ -392,7 +392,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 /* ── EDITOR ── */
 .editor-page{max-width:860px;margin:0 auto;padding:2rem 1.5rem;}
 .editor-page h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:.5rem;text-align:center;}
-.editor-page .editor-hint{font-size:.78rem;color:var(--text-dim);margin-bottom:2rem;text-align:left;}
+.editor-page .editor-hint{font-size:.78rem;color:var(--text-dim);margin-bottom:2rem;text-align:justify;}
 .editor-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem;}
 .step-label{font-size:.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1.25rem;display:block;}
 .tab-row{display:flex;gap:.5rem;margin-bottom:1.5rem;}
