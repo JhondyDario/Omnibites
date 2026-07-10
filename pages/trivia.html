@@ -14,6 +14,17 @@
     .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);animation:opt-pulse .4s ease;}
 @keyframes opt-pulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
 
+    .trivia-dice-icon{
+  width:112px;height:112px;object-fit:contain;display:block;margin:0 auto 1rem;
+  animation:dice-live 2.5s ease-in-out infinite;
+}
+@keyframes dice-live{
+  0%,100%{transform:scale(1) rotate(0deg);filter:hue-rotate(0deg);}
+  25%{transform:scale(1.08) rotate(-6deg);filter:hue-rotate(70deg);}
+  50%{transform:scale(1) rotate(0deg);filter:hue-rotate(180deg);}
+  75%{transform:scale(1.08) rotate(6deg);filter:hue-rotate(300deg);}
+}
+
     .trivia-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;overflow-x:hidden;}
 .trivia-share-card #shareText{overflow-wrap:anywhere;}
 .trivia-review-q,.trivia-review-a{word-break:break-word;overflow-wrap:break-word;}
@@ -148,7 +159,7 @@
     
 <!-- LEYENDA INICIAL -->
 <div class="trivia-intro" id="introScreen" style="display:none">
-  <img src="../assets/icons/trivia.png" alt="" style="width:56px;height:56px;object-fit:contain;display:block;margin:0 auto 1rem"/>
+<img src="../assets/icons/trivia.png" alt="" class="trivia-dice-icon"/>
   <button class="btn-primary" id="startBtn" style="padding:.8rem 2rem;font-size:1rem;background:var(--danger);margin-bottom:.75rem">Start</button>
 
   <h2>How it works</h2>
