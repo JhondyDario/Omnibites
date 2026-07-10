@@ -8,8 +8,8 @@
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    .pub-profile { max-width: 640px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-
+.pub-profile { max-width: 660px; margin: 0 auto; padding: 2.5rem 1.5rem; overflow-x: hidden; box-sizing: border-box; width: 100%; }
+    
     .pub-avatar-wrap {
   margin: 0 auto 1.25rem;
   position: relative;
@@ -44,7 +44,7 @@
     .pstat strong { display: block; font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--cyan); margin-bottom: .25rem; }
     .pstat span { font-size: .72rem; color: var(--text-dim); }
 
-    .collapse-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: .875rem; overflow: hidden; }
+.collapse-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: .875rem; overflow: hidden; width: 100%; box-sizing: border-box; }
     .collapse-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; cursor: pointer; user-select: none; transition: background .2s; }
     .collapse-header:hover { background: var(--bg3); }
     .collapse-header h3 { font-family: var(--font-head); font-size: .9rem; font-weight: 600; }
@@ -111,6 +111,10 @@
 }
 .page-btn:hover { border-color: var(--neon); color: var(--neon); }
 .page-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(74,222,128,.08); }
+
+    @media(max-width:480px){
+  .pub-profile{padding:2rem .85rem;}
+}
   </style>
 </head>
 <body>
