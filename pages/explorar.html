@@ -167,25 +167,24 @@
       align-items: center;
       gap: 0.75rem;
     }
-    .mini-play-btn {
+.mini-play-btn {
       background: var(--neon-solid);
       color: #000;
       border: none;
       border-radius: 50%;
-      width: 36px; height: 36px;
-      font-size: 0.75rem;
+      width: 34px; height: 34px;
+      padding: 0;
       cursor: pointer;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
       transition: opacity 0.2s;
     }
     .mini-play-btn:hover { opacity: 0.8; }
     .mini-play-btn.playing { background: var(--purple-solid); }
-.mini-play-btn img { width:21px; height:21px; object-fit:contain; display:block; }
-    .mini-play-btn img.loading-icon { animation:spin 2s linear infinite; }
+.mini-play-btn img { width:34px; height:34px; object-fit:contain; display:block; border-radius:50%; }
+    .mini-play-btn img.loading-icon { animation:spin 0.8s linear infinite; }
 
     .mini-progress-wrap {
       flex: 1;
@@ -530,28 +529,17 @@
     // ══════════════════════════════════════════════
     // AUDIO — player y estado
     // ══════════════════════════════════════════════
-    let audioCtx = null;
+let audioCtx = null;
     let activeSource = null;
     let activeGain   = null;
     let activeCard   = null;
     let progressInterval = null;
-    let pausedElapsed = {}; // idx -> segundos pausados dentro del clip de 15s
-    const audioBuffers = {}; // cache de buffers decodificados, evita re-descargar en cada seek
-    const clipStarts   = {}; // punto de inicio del clip dentro de la pista completa, fijo una vez elegido
+    let pausedElapsed = {};
+    const clipStarts   = {};
 
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       return audioCtx;
-    }
-
-    async function getBuffer(idx, url) {
-      if (audioBuffers[idx]) return audioBuffers[idx];
-      const ctx = getAudioCtx();
-      const res    = await fetch(url);
-      const arrBuf = await res.arrayBuffer();
-      const buf    = await ctx.decodeAudioData(arrBuf);
-      audioBuffers[idx] = buf;
-      return buf;
     }
 
     // ══════════════════════════════════════════════
@@ -711,15 +699,19 @@
       updateSearchHints(query);
     }
 
-    const CLIP_DURATION = 15;
+const CLIP_DURATION = 15;
     const FADE_DURATION  = 2;
 
     function stopActive(isPause = false) {
+      playToken = (playToken || 0) + 1;
+      const myToken = playToken;
       if (activeSource) {
         try {
+          if (activeSource._endTimeout) clearTimeout(activeSource._endTimeout);
           activeGain.gain.cancelScheduledValues(audioCtx.currentTime);
           activeGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
-          activeSource.stop(audioCtx.currentTime + 0.15);
+          const el = activeSource;
+          setTimeout(() => { try { el.pause(); } catch {} }, 150);
         } catch {}
         activeSource = null;
         activeGain   = null;
@@ -739,8 +731,11 @@
       activeCard = null;
     }
 
+    let playToken = 0;
+
     async function playClipFrom(idx, url, totalSecs, offsetSec) {
       stopActive(true); // no resetea la barra, ya la pintamos antes de llamar esto
+      const myToken = ++playToken;
       const btn = document.getElementById(`playBtn-${idx}`);
       if (!btn) return;
       btn.innerHTML = '<img src="../assets/icons/loading.png" alt="Loading" class="loading-icon"/>';
@@ -748,43 +743,63 @@
       try {
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') await ctx.resume();
-        const buf = await getBuffer(idx, url);
+
+        const audioEl = new Audio();
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.preload     = 'auto';
+        audioEl.src         = url;
+
+        await new Promise((resolve, reject) => {
+          audioEl.addEventListener('loadedmetadata', resolve, { once: true });
+          audioEl.addEventListener('error',          reject,  { once: true });
+        });
+
+        if (myToken !== playToken) {
+          btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false;
+          return;
+        }
 
         if (clipStarts[idx] === undefined) {
-          const maxStart = Math.max(0, buf.duration - CLIP_DURATION - 5);
-          clipStarts[idx] = totalSecs > 30
-            ? Math.random() * Math.min(maxStart, buf.duration * 0.3) + buf.duration * 0.1
+          const dur = audioEl.duration;
+          const maxStart = Math.max(0, dur - CLIP_DURATION - 5);
+          clipStarts[idx] = dur > 30
+            ? Math.random() * Math.min(maxStart, dur * 0.3) + dur * 0.1
             : 0;
         }
-const clipStart  = clipStarts[idx];
-    const safeOffset = Math.min(Math.max(offsetSec, 0), CLIP_DURATION - 0.1);
-    const remaining  = CLIP_DURATION - safeOffset;
+        const clipStart  = clipStarts[idx];
+        const safeOffset = Math.min(Math.max(offsetSec, 0), CLIP_DURATION - 0.1);
+        const remaining  = CLIP_DURATION - safeOffset;
+        audioEl.currentTime = clipStart + safeOffset;
 
-    const source = ctx.createBufferSource();
-    source.buffer = buf;
-    const gain = ctx.createGain();
+        const source = ctx.createMediaElementSource(audioEl);
+        const gain   = ctx.createGain();
 
-    // El fade-in y fade-out no pueden generar tiempos negativos ni desordenados,
-    // por eso se recortan al tiempo que realmente queda disponible en el clip.
-    const fadeIn       = Math.min(FADE_DURATION, safeOffset < FADE_DURATION ? FADE_DURATION - safeOffset : 0);
-    const fadeOutStart = Math.max(fadeIn, remaining - FADE_DURATION);
+        const fadeIn       = Math.min(FADE_DURATION, safeOffset < FADE_DURATION ? FADE_DURATION - safeOffset : 0);
+        const fadeOutStart = Math.max(fadeIn, remaining - FADE_DURATION);
 
-    gain.gain.setValueAtTime(safeOffset < FADE_DURATION ? 0 : 1, ctx.currentTime);
-    if (fadeIn > 0) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeIn);
-    gain.gain.setValueAtTime(1, ctx.currentTime + fadeOutStart);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
-        source.start(0, clipStart + safeOffset, remaining);
-        source.onended = () => { if (activeCard === idx) stopActive(); };
+        gain.gain.setValueAtTime(safeOffset < FADE_DURATION ? 0 : 1, ctx.currentTime);
+        if (fadeIn > 0) gain.gain.linearRampToValueAtTime(1, ctx.currentTime + fadeIn);
+        gain.gain.setValueAtTime(1, ctx.currentTime + fadeOutStart);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + remaining);
 
-        activeSource = source;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        await audioEl.play();
+
+        activeSource = audioEl;
         activeGain   = gain;
         activeCard   = idx;
         btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
-        btn.classList.add('playing');
-        btn.disabled = false;
+        btn.classList.add('playing'); btn.disabled = false;
+
+        const endTimeout = setTimeout(() => {
+          if (activeCard === idx && myToken === playToken) stopActive();
+        }, remaining * 1000);
+        activeSource._endTimeout = endTimeout;
 
         const t0 = ctx.currentTime;
         progressInterval = setInterval(() => {
+          if (myToken !== playToken) { clearInterval(progressInterval); return; }
           const elapsed = Math.min(safeOffset + (ctx.currentTime - t0), CLIP_DURATION);
           const pct     = (elapsed / CLIP_DURATION) * 100;
           const progEl  = document.getElementById(`prog-${idx}`);
@@ -798,6 +813,7 @@ const clipStart  = clipStarts[idx];
           }
         }, 100);
       } catch (e) {
+        if (myToken !== playToken) return;
         console.error(e);
         if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
         alert('This audio could not be loaded. Try another result.');
