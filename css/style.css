@@ -130,7 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .hero-visual{flex-shrink:0;z-index:1;}
 .pixel-art-screen{width:440px;background:var(--navbar-bg);border:2px solid var(--border);border-radius:12px;padding:1.5rem;box-shadow:0 0 40px rgba(74,222,128,.1);position:relative;overflow:hidden;}
 .pixel-art-screen canvas{width:100%;height:auto;display:block;}
-.waveform-demo{background:var(--screen-bg);border-radius:8px;padding:.6rem;}
+.waveform-demo{background:#14141c;border-radius:8px;padding:.6rem;}
 .screen-scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:2;}
 .screen-label{font-family:var(--font-head);font-size:.85rem;font-weight:700;color:var(--text);letter-spacing:.5px;text-align:center;margin-bottom:.75rem;}
 .screen-label span{color:var(--neon);}
