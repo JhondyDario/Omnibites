@@ -17,13 +17,7 @@ if (canvas) {
   const ctx = canvas.getContext('2d');
   let frame = 0;
 
-  // El color de la onda sigue al tema (--neon cambia claro/oscuro).
-  // Se cachea y solo se recalcula cuando cambia data-theme, para no
-  // pagar un getComputedStyle en cada frame de la animación.
-  let waveColor = getComputedStyle(document.documentElement).getPropertyValue('--neon').trim() || '#4ade80';
-  new MutationObserver(() => {
-    waveColor = getComputedStyle(document.documentElement).getPropertyValue('--neon').trim() || '#4ade80';
-  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+const waveColor = '#ffffff';
 
   (function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
