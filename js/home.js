@@ -17,9 +17,9 @@ if (canvas) {
   const ctx = canvas.getContext('2d');
   let frame = 0;
 
-const waveColor = '#ffffff';
-
-  (function draw() {
+(function draw() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const waveColor = isLight ? '#4ade80' : '#ffffff';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = waveColor; ctx.lineWidth = 2;
     ctx.shadowColor = waveColor; ctx.shadowBlur = 4;
