@@ -166,6 +166,10 @@
   <div class="trivia-intro-rules">
     <p>You get <strong>6 tries</strong>. When you finish you'll see your results — come back tomorrow for more!</p>
   </div>
+  <div id="introRankBox" style="margin-top:1.25rem">
+    <h2 style="font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:1rem;text-align:center;color:var(--text)">🏆 Today's Top 10</h2>
+    <div id="introRankList"><div class="state-msg">Loading ranking...</div></div>
+  </div>
 </div>
 
 <!-- YA JUGÓ HOY -->
@@ -282,7 +286,7 @@ async function checkIfPlayedToday() {
     }
   } catch(e) { console.error('Already played check error:', e); }
 
-  // ── Recuperar progreso si recargó a mitad del quiz ──
+// ── Recuperar progreso si recargó a mitad del quiz ──
   const saved = tryLoadProgress();
   if (saved) {
     quiz = saved.quiz; quizPreguntas = quiz.preguntas;
@@ -292,6 +296,19 @@ async function checkIfPlayedToday() {
     return;
   }
   show('introScreen');
+  loadIntroRanking();
+}
+
+async function loadIntroRanking() {
+  const el = $('introRankList');
+  el.innerHTML = '<div class="state-msg">Loading ranking...</div>';
+  try {
+    const fullList = await getRankingDeHoyCompleto();
+    el.innerHTML = renderRankingList(fullList, currentUser?.uid);
+  } catch(e) {
+    console.error('Intro ranking error:', e);
+    el.innerHTML = '<div class="state-msg">Error loading the ranking.</div>';
+  }
 }
 
     function tryLoadProgress() {
