@@ -35,7 +35,18 @@ Video game music is a core part of popular culture and deserves its own dedicate
 
 Omnibites was born to preserve that music and make it accessible in a way that no other platform offers today.
 
-![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)
+<div align="center">
+
+[![Watch the demo](https://jhondydario.github.io/Omnibites/assets/showcase/demo-poster.png)](https://jhondydario.github.io/Omnibites/assets/showcase/demo.mp4)
+
+**▶ See it in action** — add soundbites to your favorite games right inside your launcher. Hover over a title and let its theme play, the same trick iiSU and other front-ends use.
+
+<p>
+  <img src="https://jhondydario.github.io/Omnibites/assets/showcase/preview1.png" width="48%"/>
+  <img src="https://jhondydario.github.io/Omnibites/assets/showcase/preview2.png" width="48%"/>
+</p>
+
+</div>
 
 > [!NOTE]
 > Omnibites is an independent project in active development, every soundbite uploaded by the community helps the library grow. If you’ve arrived here early, you’re part of something that’s just getting started.
@@ -61,6 +72,8 @@ Omnibites integrates seamlessly with **iiSU** and other retro frontends that sup
 Because all soundbites are delivered in **MP3** format and limited to **10–15 seconds**, they are extremely lightweight — typically between **200 and 300 kbps**, rarely exceeding **400 kpbs per clip**. This ensures fast loading, smooth playback, and excellent audio quality across compatible platforms.  
   
 Using open formats and minimal metadata makes it easy to extend or embed soundbites into any frontend that supports custom audio hooks or media previews.
+
+![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)
 
 ---
 

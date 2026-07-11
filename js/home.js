@@ -19,12 +19,10 @@ if (canvas) {
 
 (function draw() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    const waveColor  = isLight ? '#3f3f52' : '#ffffff';
-    const shadowColor = isLight ? 'rgba(63,63,82,.55)' : '#ffffff';
-    const blur = isLight ? 10 : 4;
+    const waveColor = isLight ? '#4ade80' : '#ffffff';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = waveColor; ctx.lineWidth = 2;
-    ctx.shadowColor = shadowColor; ctx.shadowBlur = blur;
+    ctx.shadowColor = waveColor; ctx.shadowBlur = 4;
     ctx.beginPath();
     for (let x = 0; x < canvas.width; x++) {
       const t = x / canvas.width;
