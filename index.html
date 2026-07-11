@@ -224,5 +224,20 @@
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/home.js"></script>
   <script src="js/ui.js"></script>
+  <script>
+  (function () {
+    const video = document.getElementById('showcaseVideo');
+    const wrap  = document.getElementById('showcaseVideoWrap');
+    const hint  = document.getElementById('showcaseSoundHint');
+    if (!video || !wrap || !hint) return;
+
+    wrap.addEventListener('click', () => {
+      video.muted = !video.muted;
+      hint.classList.add('show');
+      clearTimeout(wrap._hintTimeout);
+      wrap._hintTimeout = setTimeout(() => hint.classList.remove('show'), 1200);
+    });
+  })();
+</script>
 </body>
 </html>
