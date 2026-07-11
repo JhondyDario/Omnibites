@@ -688,7 +688,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .showcase-video{
   width:100%;
   display:block;
-  aspect-ratio:9/16;
+  aspect-ratio:16/9;
   object-fit:cover;
 }
 .showcase-sound-hint{
@@ -727,5 +727,5 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   display:block;
 }
 @media(max-width:480px){
-  .showcase-video-wrap{max-width:300px;}
+  .showcase-video-wrap{max-width:100%;}
 }
