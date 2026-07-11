@@ -9,8 +9,27 @@ import { doc, getDoc, setDoc, serverTimestamp }
 
 const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
 const BASE = location.pathname.includes('/pages/') ? '..' : '.';
+const CACHE_KEY = 'omnibites_cached_user';
 
 function goto(path) { window.location.href = ROOT + path; }
+
+function getCachedUser() {
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch { return null; }
+}
+function setCachedUser(nombre, avatar) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ nombre, avatar })); } catch {}
+}
+function clearCachedUser() {
+  try { localStorage.removeItem(CACHE_KEY); } catch {}
+}
+
+// Pinta de una vez con lo último que sabíamos del usuario, mientras
+// Firebase confirma la sesión real por detrás. Evita el flash de "Sign in".
+const cachedUser = getCachedUser();
+if (cachedUser) {
+  renderNav({ uid: 'cached' }, cachedUser.nombre, cachedUser.avatar);
+  renderMobile({ uid: 'cached' }, cachedUser.nombre);
+}
 
 onAuthStateChanged(auth, async user => {
   let nombre = null, avatar = null;
@@ -35,7 +54,10 @@ onAuthStateChanged(auth, async user => {
 await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn: serverTimestamp(), audiosSubidos:0, triviaPuntosTotal:0 });
         nombre = n; avatar = 'avatar1';
       }
-    } catch(e) { console.warn('auth.js Firestore:', e.message); }
+} catch(e) { console.warn('auth.js Firestore:', e.message); }
+    setCachedUser(nombre, avatar);
+  } else {
+    clearCachedUser();
   }
   renderNav(user, nombre, avatar);
   renderMobile(user, nombre);
