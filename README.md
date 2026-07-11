@@ -73,6 +73,8 @@ Because all soundbites are delivered in **MP3** format and limited to **10–15 
   
 Using open formats and minimal metadata makes it easy to extend or embed soundbites into any frontend that supports custom audio hooks or media previews.
 
+![Omnibites](https://jhondydario.github.io/Omnibites/assets/second-banner.png)
+
 ---
 
 ### 💚 Contribution
