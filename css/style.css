@@ -676,7 +676,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .showcase-video-wrap{
   position:relative;
   width:100%;
-  max-width:420px;
+  max-width:640px;
   margin:0 auto 1.5rem;
   border-radius:12px;
   overflow:hidden;
@@ -688,7 +688,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .showcase-video{
   width:100%;
   display:block;
-  aspect-ratio:16/9;
+  aspect-ratio:2.35/1;
   object-fit:cover;
 }
 .showcase-sound-hint{
