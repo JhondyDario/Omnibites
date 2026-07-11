@@ -8,14 +8,15 @@
   <link rel="stylesheet" href="../css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    .tab-row { display:flex;gap:.5rem;margin-bottom:1.5rem; }
-    .tab-btn { flex:1;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-dim);font-size:.82rem;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:border-color .2s,color .2s; }
-    .tab-btn.active { border-color:var(--neon);color:var(--neon); }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
-    .url-wrap { display:flex;gap:.75rem;margin-bottom:.6rem; }
+.url-wrap { display:flex;gap:.75rem;margin-bottom:.6rem; }
     .url-wrap input { flex:1; }
     .auth-wall { background:var(--bg2);border:1px solid var(--neon);border-radius:10px;padding:2.5rem;text-align:center;max-width:460px;margin:4rem auto; }
+
+    .source-hero { background:linear-gradient(135deg,rgba(74,222,128,.08),rgba(167,139,250,.05)); border:1px solid var(--neon); border-radius:10px; padding:1.1rem 1.25rem; margin-bottom:1.25rem; }
+    .source-hero-title { font-family:var(--font-head); font-weight:700; font-size:.95rem; margin-bottom:.3rem; }
+    .source-hero-sub { font-size:.8rem; color:var(--text-dim); margin-bottom:.75rem; }
+    .source-chip-row { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .source-chip { background:var(--bg3); border:1px solid var(--border); color:var(--neon); border-radius:20px; padding:.3rem .8rem; font-size:.75rem; font-weight:600; }
     .auth-wall h2 { font-family:var(--font-pixel);font-size:.8rem;color:var(--neon);margin-bottom:.75rem; }
     .auth-wall p { color:var(--text-dim);font-size:.85rem;margin-bottom:1.5rem; }
     .auth-wall .aw-btns { display:flex;gap:.75rem;justify-content:center; }
@@ -30,13 +31,6 @@
     .trim-handle::after { content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:18px;background:#000;opacity:.4; }
 
     .time-disp { font-family:var(--font-pixel);font-size:.52rem;color:var(--neon);display:flex;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap; }
-    .drop-zone { border:2px dashed var(--border);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s; }
-    .drop-zone:hover,.drop-zone.over { border-color:var(--neon);background:rgba(57,255,20,.03); }
-    .drop-zone input { display:none; }
-    .drop-zone p { color:var(--text-dim);font-size:.82rem; }
-    .drop-zone small { font-size:.72rem;color:var(--text-dim); }
-    .file-ok { color:var(--neon);font-size:.82rem;margin-top:.75rem; }
-    .file-err { color:var(--danger);font-size:.82rem;margin-top:.5rem; }
     .preview-box { background:var(--bg3);border-radius:6px;padding:1rem;margin-bottom:1rem; }
     .preview-info { font-size:.75rem;color:var(--text-dim);margin-top:.4rem; }
 
@@ -136,34 +130,30 @@
     <p class="editor-hint">Tip: paste an Archive.org link, or use Explore to find music fast.</p>
 
     <!-- PASO 1 -->
+<!-- PASO 1 -->
     <div class="editor-box" style="margin-bottom:1.5rem">
       <p class="step-label">STEP 1 — Audio source</p>
-      <div class="tab-row">
-        <button class="tab-btn active" data-tab="url">Archive.org URL</button>
-        <button class="tab-btn" data-tab="file">Upload from my device</button>
+
+      <div class="source-hero">
+        <p class="source-hero-title">🎧 Paste a link and you're halfway there</p>
+        <p class="source-hero-sub">Any direct audio link works, not just one site — pick whichever you've got open:</p>
+        <div class="source-chip-row">
+          <span class="source-chip">Archive.org</span>
+          <span class="source-chip">Khinsider</span>
+          <span class="source-chip">Zophar's Domain</span>
+          <span class="source-chip">OverClocked ReMix</span>
+          <span class="source-chip">Any direct .mp3 / .ogg</span>
+        </div>
       </div>
 
-      <div class="tab-panel active" id="tab-url">
-        <div class="url-wrap">
-          <input type="url" id="audioUrl" placeholder="https://archive.org/download/..."/>
-          <button class="btn-primary" id="loadBtn">Load</button>
-        </div>
-        <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.8">
-          Compatible sources: <strong style="color:var(--text)">Archive.org</strong>, <strong style="color:var(--text)">Khinsider</strong>, <strong style="color:var(--text)">Zophar's Domain</strong>, or any direct link to .mp3 / .ogg.<br/>
-          Easiest way: use <a href="explorar.html" style="color:var(--neon);font-weight:600">Explore music</a> and click "Add Soundbite".
-        </p>
-        <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
+      <div class="url-wrap">
+        <input type="url" id="audioUrl" placeholder="https://archive.org/download/..."/>
+        <button class="btn-primary" id="loadBtn">Load</button>
       </div>
-
-      <div class="tab-panel" id="tab-file">
-        <div class="drop-zone" id="dropZone">
-          <p>Drag your file here or click</p>
-          <small>MP3 only · Between 10 and 15 seconds</small>
-          <input type="file" id="fileInput" accept=".mp3,audio/mpeg"/>
-        </div>
-        <div id="fileError" class="file-err" style="display:none"></div>
-        <div id="fileOk"    class="file-ok"  style="display:none"></div>
-      </div>
+      <p style="font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.8">
+        Easiest way: use <a href="explorar.html" style="color:var(--neon);font-weight:600">Explore music</a> and click "Add Soundbite" — it fills in the link, title, and cover for you.
+      </p>
+      <div id="urlError" style="display:none;color:var(--danger);font-size:.8rem;margin-top:.6rem"></div>
     </div>
 
     <!-- PASO 2 -->
@@ -292,19 +282,14 @@
   </main>
 
   <script type="module">
-import { auth, db, storage } from '../js/firebase-config.js';
+    import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { collection, addDoc, updateDoc, doc, getDoc, getDocs, query, where, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
     import { getCachedRawgResults, setCachedRawgResults } from '../js/rawg-cache.js';
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser  = null;
     let audioPlayer  = document.getElementById('audioPlayer');
-let localFileUrl = null;
-    let localFileObj = null;
-    let localFileDuration = 0;
-    let activeTab = 'url';
 
     // Controla si el juego fue seleccionado desde RAWG (no escrito a mano)
     let juegoConfirmado = false;
@@ -379,18 +364,7 @@ let localFileUrl = null;
       }
     }
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeTab = btn.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`tab-${activeTab}`).classList.add('active');
-        document.getElementById('previewSection').style.display = activeTab === 'url' ? '' : 'none';
-      });
-    });
-
-    document.getElementById('loadBtn').addEventListener('click', () =>
+      document.getElementById('loadBtn').addEventListener('click', () =>
       loadAudioUrl(document.getElementById('audioUrl').value.trim()));
 
     function loadAudioUrl(url, startHint = 0, endHint = 15) {
@@ -591,15 +565,7 @@ let localFileUrl = null;
     });
 
     // Drop zone
-    const dropZone  = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    dropZone.addEventListener('click',    () => fileInput.click());
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-    dropZone.addEventListener('dragleave',() => dropZone.classList.remove('over'));
-    dropZone.addEventListener('drop',     e => { e.preventDefault(); dropZone.classList.remove('over'); validateFile(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change',  e => validateFile(e.target.files[0]));
-
-    function setupCharCounter(inputId, counterId, max) {
+      function setupCharCounter(inputId, counterId, max) {
       const input   = document.getElementById(inputId);
       const counter = document.getElementById(counterId);
       input.addEventListener('input', () => {
@@ -776,35 +742,18 @@ localFileUrl      = URL.createObjectURL(file);
       if (!consola)   { window.showToast('Could not detect the console. Try a different game.','error'); return; }
       if (!categoria) { window.showToast('Select the category.','error'); return; }
 
-      let url = '', trimStart = 0, trimEnd = 15;
-      if (activeTab === 'url') {
-        url = document.getElementById('audioUrl').value.trim();
-        if (!url) { window.showToast('Paste an audio link.','error'); return; }
-        trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
-        trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || 15;
-        const clipDur = trimEnd - trimStart;
-        if (clipDur < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
-        if (clipDur > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
-} else {
-        if (!localFileObj)        { window.showToast('Select a valid MP3 file (10-15 sec).','error'); return; }
-        if (localFileDuration < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
-        if (localFileDuration > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
-        trimEnd = localFileDuration;
-      }
+      const url = document.getElementById('audioUrl').value.trim();
+      if (!url) { window.showToast('Paste an audio link.','error'); return; }
+      const trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
+      const trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || 15;
+      const clipDur = trimEnd - trimStart;
+      if (clipDur < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
+      if (clipDur > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true; btn.textContent = 'Publishing...';
 
-try {
-        if (activeTab === 'file') {
-          btn.textContent = 'Uploading audio...';
-          const path = `audios/${currentUser.uid}/${Date.now()}_${localFileObj.name}`;
-          const storageRef = ref(storage, path);
-          await uploadBytes(storageRef, localFileObj);
-          url = await getDownloadURL(storageRef);
-          btn.textContent = 'Publishing...';
-        }
-
+      try {
         const autorNombre = await getNombreUsuario(currentUser.uid);
 
         const dupeQ = query(collection(db,'audios'),
