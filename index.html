@@ -2,6 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <script>
+(function(){
+  try {
+    var mode = localStorage.getItem('omnibites_theme_mode') || 'auto';
+    var theme;
+    if (mode === 'auto') {
+      var h = new Date().getHours();
+      theme = (h >= 6 && h < 19) ? 'light' : 'dark';
+    } else {
+      theme = mode === 'day' ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch(e) {}
+})();
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="google-site-verification" content="Lqbvnby5zKZxHsq1hHEfH7v21WWEW6Eb1NruKlqziKI" />
   <title>Omnibites — Video Game Soundbites</title>
