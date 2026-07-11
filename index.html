@@ -102,8 +102,9 @@
     <div class="showcase-video-wrap" id="showcaseVideoWrap">
       <video id="showcaseVideo" class="showcase-video" src="assets/showcase/demo.mp4"
              poster="assets/showcase/demo-poster.png" muted loop playsinline autoplay></video>
-      <div class="showcase-sound-hint" id="showcaseSoundHint">
-        <img src="assets/icons/volume.png" alt=""/>
+<div class="showcase-sound-hint" id="showcaseSoundHint">
+        <img src="assets/icons/volume.png" alt="" id="iconVolumeOn"/>
+        <img src="assets/icons/volume-off.png" alt="" id="iconVolumeOff" style="display:none"/>
       </div>
     </div>
 
@@ -224,15 +225,24 @@
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/home.js"></script>
   <script src="js/ui.js"></script>
-  <script>
+<script>
   (function () {
-    const video = document.getElementById('showcaseVideo');
-    const wrap  = document.getElementById('showcaseVideoWrap');
-    const hint  = document.getElementById('showcaseSoundHint');
+    const video   = document.getElementById('showcaseVideo');
+    const wrap    = document.getElementById('showcaseVideoWrap');
+    const hint    = document.getElementById('showcaseSoundHint');
+    const iconOn  = document.getElementById('iconVolumeOn');
+    const iconOff = document.getElementById('iconVolumeOff');
     if (!video || !wrap || !hint) return;
+
+    function updateIcon() {
+      iconOn.style.display  = video.muted ? 'none' : 'block';
+      iconOff.style.display = video.muted ? 'block' : 'none';
+    }
+    updateIcon();
 
     wrap.addEventListener('click', () => {
       video.muted = !video.muted;
+      updateIcon();
       hint.classList.add('show');
       clearTimeout(wrap._hintTimeout);
       wrap._hintTimeout = setTimeout(() => hint.classList.remove('show'), 1200);
