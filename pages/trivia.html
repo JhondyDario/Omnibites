@@ -280,7 +280,10 @@ $('triviaMain').style.display = 'block';
 show('checkingScreen');
 try {
   const snap = await getDoc(doc(db, 'usuarios', user.uid));
-  if (snap.exists()) nombreUsuario = snap.data().nombre || 'Player';
+  if (snap.exists()) {
+    nombreUsuario = snap.data().nombre || 'Player';
+    avatarUsuario = snap.data().avatar || 'avatar1';
+  }
 } catch {}
 await checkIfPlayedToday();
     });
