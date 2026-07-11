@@ -26,8 +26,8 @@
     .trivia-page{max-width:640px;margin:0 auto;padding:2.5rem 1.5rem;}
 .trivia-page h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:.5rem;text-align:center;}
     .trivia-page .trivia-hint{font-size:.78rem;color:var(--text-dim);margin-bottom:1.5rem;text-align:justify;}
-    .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);animation:opt-pulse .4s ease;}
-@keyframes opt-pulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
+.trivia-opt.selected{border-color:var(--cyan);background:rgba(103,232,249,.14);animation:opt-pulse .4s ease;}
+@keyframes opt-pulse{0%{transform:scale(1);background:rgba(103,232,249,.4);}50%{transform:scale(1.03);}100%{transform:scale(1);background:rgba(103,232,249,.14);}}
 
     .trivia-dice-icon{
   width:112px;height:112px;object-fit:contain;display:block;margin:0 auto 1rem;
@@ -80,9 +80,9 @@
 
     .trivia-options{display:flex;flex-direction:column;gap:.65rem;}
 .trivia-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;font-size:.88rem;font-family:var(--font-body);color:var(--text);cursor:pointer;text-align:left;transition:border-color .2s,background .2s;}
-    .trivia-opt:hover{border-color:var(--text-dim);background:var(--bg2);}
-    .trivia-opt.selected{border-color:var(--danger);background:rgba(248,113,113,.08);}
-    .trivia-opt:disabled{opacity:.5;cursor:not-allowed;}
+.trivia-opt:not(:disabled):hover{border-color:var(--cyan);background:rgba(103,232,249,.06);}
+    .trivia-opt.selected{border-color:var(--cyan);background:rgba(103,232,249,.14);}
+    .trivia-opt:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
 
     .trivia-next-btn{width:100%;margin-top:1.5rem;padding:.8rem;font-size:.95rem;}
 
