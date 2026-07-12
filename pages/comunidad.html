@@ -141,7 +141,8 @@
     import {
       collection, getDocs, query, orderBy, limit, doc,
       updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { crearNotificacion, getMiPerfil } from '../js/notifications.js';
 
     const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
     let currentUser = null;
@@ -323,10 +324,17 @@
           await updateDoc(userRef,  { reacciones: reacts });
           await updateDoc(audioRef, updates);
         } else {
-          updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
+updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
           reacts[id] = type;
           await updateDoc(userRef,  { reacciones: reacts });
           await updateDoc(audioRef, updates);
+          if (audioSnap.exists() && audioSnap.data().autorId && audioSnap.data().autorId !== currentUser.uid) {
+            const yo = await getMiPerfil(currentUser.uid);
+            crearNotificacion(audioSnap.data().autorId, {
+              tipo: 'reaction', deUid: currentUser.uid, deNombre: yo.nombre,
+              audioId: id, audioTitulo: audioSnap.data().titulo || 'Untitled', reactionType: type
+            });
+          }
           const newBtn = document.getElementById(`r-${type}-${id}`);
           if (newBtn) {
             newBtn.classList.add(`active-${type}`);
@@ -349,10 +357,20 @@
           await updateDoc(ref, { favoritos: arrayRemove(id) });
           btn.classList.remove('active-fav');
           window.showToast && window.showToast('Removed from favorites');
-        } else {
+} else {
           await updateDoc(ref, { favoritos: arrayUnion(id) });
           btn.classList.add('active-fav');
           window.showToast && window.showToast('Saved to favorites');
+          try {
+            const aSnap = await getDoc(doc(db,'audios',id));
+            if (aSnap.exists() && aSnap.data().autorId && aSnap.data().autorId !== currentUser.uid) {
+              const yo = await getMiPerfil(currentUser.uid);
+              crearNotificacion(aSnap.data().autorId, {
+                tipo: 'favorite', deUid: currentUser.uid, deNombre: yo.nombre,
+                audioId: id, audioTitulo: aSnap.data().titulo || 'Untitled'
+              });
+            }
+          } catch {}
         }
       } catch(e) { window.showToast && window.showToast('Error: ' + e.message,'error'); }
     };
