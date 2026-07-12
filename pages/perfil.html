@@ -24,7 +24,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
 .profile-page{max-width:660px;margin:0 auto;padding:2.5rem 1.5rem;overflow-x:hidden;box-sizing:border-box;width:100%;}
-.profile-page h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;text-align:center;}
+.profile-header-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.5rem;position:relative;}
+.profile-page h1{font-family:var(--font-head);font-size:1.4rem;font-weight:700;margin:0;text-align:center;}
+.profile-header-actions{display:flex;gap:.6rem;position:absolute;right:0;}
+.icon-circle-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:transparent;border:1px solid var(--border);cursor:pointer;transition:border-color .2s,background .2s;text-decoration:none;flex-shrink:0;}
+.icon-circle-btn img{width:19px;height:19px;object-fit:contain;opacity:.85;}
+.icon-circle-btn:hover{border-color:var(--neon);}
+.icon-circle-btn.icon-circle-danger:hover{border-color:var(--danger);background:rgba(248,113,113,.07);}
+@media(max-width:480px){
+  .profile-header-row{flex-direction:column;gap:.75rem;}
+  .profile-header-actions{position:static;}
+}
     .verify-banner{background:rgba(255,215,0,.08);border:1px solid var(--gold);border-radius:8px;padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
     .verify-banner p{font-size:.8rem;color:var(--gold);margin:0;}
     .verify-banner button{background:var(--gold);color:#000;border:none;border-radius:var(--radius);padding:.38rem .9rem;font-size:.75rem;font-weight:700;cursor:pointer;}
@@ -144,8 +154,18 @@
   <div class="spinner"></div>
   <p>Loading profile...</p>
 </div>
-  <main class="profile-page" id="profileMain" style="display:none">
-    <h1>My Profile</h1>
+<main class="profile-page" id="profileMain" style="display:none">
+    <div class="profile-header-row">
+      <h1>My Profile</h1>
+      <div class="profile-header-actions">
+        <a href="ajustes.html" class="icon-circle-btn" title="Settings">
+          <img src="../assets/icons/settings.png" alt="Settings"/>
+        </a>
+        <button class="icon-circle-btn icon-circle-danger" id="signOutBtn" title="Sign out">
+          <img src="../assets/icons/logout.png" alt="Sign out"/>
+        </button>
+      </div>
+    </div>
 
     <div class="verify-banner" id="verifyBanner" style="display:none">
       <p>Your email hasn't been verified yet. Check your inbox.</p>
@@ -205,23 +225,6 @@
         </div>
       </div>
     </div>
-
-<div class="profile-actions">
-  <a href="ajustes.html" class="btn-outline" style="
-    display:flex; align-items:center; gap:.5rem;
-    padding:.6rem 1.4rem; border-radius:20px;
-    font-size:.85rem;
-  ">
-<img src="../assets/icons/settings.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Settings 
-  </a>
-  <button class="btn-signout" id="signOutBtn" style="
-    display:flex; align-items:center; gap:.5rem;
-    padding:.6rem 1.4rem; border-radius:20px;
-    font-size:.85rem;
-  ">
-<img src="../assets/icons/logout.png" alt="" style="width:24px;height:24px;object-fit:contain;"/> Sign out
-  </button>
-</div>
   </main>
 
   <div class="avatar-modal" id="avatarModal" style="display:none">
