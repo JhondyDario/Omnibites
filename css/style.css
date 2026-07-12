@@ -269,7 +269,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   animation:spin 0.8s linear infinite;
 }
 .sb-play.playing{
-  background:var(--purple-solid);
+  background:transparent;
 }
 .sb-play{
   display:flex;
@@ -278,7 +278,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
   width:34px;
   height:34px;
   padding:0;
-  background:var(--neon-solid);
+  background:transparent;
   border:none;
   border-radius:50%;
   cursor:pointer;
@@ -441,8 +441,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .result-card-meta{font-size:.75rem;color:var(--text-dim);margin-bottom:.75rem;}
 .fade-badge{display:inline-block;background:rgba(74,222,128,.1);border:1px solid var(--neon-dim);color:var(--neon);border-radius:20px;padding:.12rem .55rem;font-size:.68rem;font-weight:600;}
 .mini-player{background:var(--bg3);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;}
-.mini-play-btn{background:var(--neon-solid);color:#000;border:none;border-radius:50%;width:34px;height:34px;font-size:.72rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background .2s;}
-.mini-play-btn.playing{background: var(--purple-solid);}
+.mini-play-btn{background:transparent;color:#000;border:none;border-radius:50%;width:34px;height:34px;font-size:.72rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background .2s;}
+.mini-play-btn.playing{background: transparent;}
 .mini-progress-wrap{flex:1;display:flex;flex-direction:column;gap:.35rem;}
 .mini-progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
 .mini-progress-fill{height:100%;background:var(--neon);width:0%;transition:width .1s linear;}
