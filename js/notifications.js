@@ -13,9 +13,29 @@ let unsubscribeSnap = null;
 function esc(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
 
 // ── Crear notificación para OTRO usuario (nunca para uno mismo) ──
+export async function getNotifPrefs(uid) {
+  try {
+    const snap = await getDoc(doc(db, 'usuarios', uid));
+    const p = snap.exists() ? (snap.data().notifPrefs || {}) : {};
+    return {
+      enabled:  p.enabled  !== false,
+      reaction: p.reaction !== false,
+      comment:  p.comment  !== false,
+      favorite: p.favorite !== false,
+      follow:   p.follow   !== false
+    };
+  } catch { return { enabled: true, reaction: true, comment: true, favorite: true, follow: true }; }
+}
+
 export async function crearNotificacion(paraUid, data) {
   try {
     if (!paraUid || !data.deUid || paraUid === data.deUid) return;
+    const prefs = await getNotifPrefs(paraUid);
+    if (!prefs.enabled) return;
+    if (data.tipo === 'reaction' && !prefs.reaction) return;
+    if (data.tipo === 'comment'  && !prefs.comment)  return;
+    if (data.tipo === 'favorite' && !prefs.favorite) return;
+    if (data.tipo === 'follow'   && !prefs.follow)   return;
     await addDoc(collection(db, 'usuarios', paraUid, 'notificaciones'), {
       ...data, leido: false, creadoEn: serverTimestamp()
     });
