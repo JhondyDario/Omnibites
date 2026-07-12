@@ -72,7 +72,7 @@ function renderNav(user, nombre, avatar) {
   if (!el) return;
   const onPerfil = location.pathname.includes('/perfil.html');
   if (user && onPerfil) { el.innerHTML = ''; return; }
-  if (user) {
+if (user) {
     const name = nombre || user.email?.split('@')[0] || 'Player';
     const initial = name.charAt(0).toUpperCase();
     const avatarHTML = avatar
@@ -81,9 +81,8 @@ function renderNav(user, nombre, avatar) {
          <div class="nav-avatar-fallback" style="display:none">${initial}</div>`
       : `<div class="nav-avatar-fallback">${initial}</div>`;
     el.innerHTML = `
-      <a href="${ROOT}/pages/perfil.html" class="nav-user-btn" style="text-decoration:none">
+      <a href="${ROOT}/pages/perfil.html" class="nav-user-btn" title="${name}" style="text-decoration:none">
         ${avatarHTML}
-        <span class="nav-user-name">${name.split(' ')[0]}</span>
       </a>`;
   } else {
     el.innerHTML = `<a href="${ROOT}/pages/login.html" class="nav-login-btn">Sign in</a>`;
