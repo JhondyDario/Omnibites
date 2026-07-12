@@ -50,19 +50,6 @@ async function checkTriviaAyer(uid) {
   } catch { return null; }
 }
 
-async function checkTriviaSemana(uid) {
-  const key = `semana_${hoyStr()}`;
-  if (localStorage.getItem(dismissKey(uid, key))) return null;
-  try {
-    for (let i = 0; i < 7; i++) {
-      const snap = await getDoc(doc(db, 'triviaResultados', `${hoyStr(-i)}_${uid}`));
-      if (snap.exists()) return null; // jugó esta semana, no hace falta el recordatorio
-    }
-    return { id: `v-${key}`, virtual: true, dismissKey: key, tipo: 'trivia-semana',
-      texto: "You haven't played Daily Trivia in a week — go for it!" };
-  } catch { return null; }
-}
-
 const SVG_BELL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
 const ICONS = {
   reaction: `<svg viewBox="0 0 24 24" fill="var(--danger)"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4.5c2 0 3.4 1 4.4 2.5 1-1.5 2.4-2.5 4.4-2.5 3.6 0 5.2 3.6 3.6 7.2C19.5 16.4 12 21 12 21z"/></svg>`,
@@ -70,7 +57,6 @@ const ICONS = {
   favorite: `<svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 17.3l-6.2 3.7 1.6-7-5.4-4.7 7.1-.6L12 2l2.9 6.7 7.1.6-5.4 4.7 1.6 7z"/></svg>`,
   follow:   `<svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M17 8h5M19.5 5.5v5"/></svg>`,
   'trivia-ayer':   `<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
-  'trivia-semana': `<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`
 };
 
 function fmtTime(ts) {
@@ -111,8 +97,11 @@ export async function initNotifications(user) {
     <button class="notif-bell" id="notifBellBtn" aria-label="Notifications">
       ${SVG_BELL}<span class="notif-badge" id="notifBadge" style="display:none">0</span>
     </button>
-    <div class="notif-panel" id="notifPanel" style="display:none">
-      <div class="notif-panel-head">Notifications</div>
+<div class="notif-panel" id="notifPanel" style="display:none">
+      <div class="notif-panel-head">
+        <span>Notifications</span>
+        <button class="notif-mark-all" id="notifMarkAll">Mark all read</button>
+      </div>
       <div class="notif-panel-list" id="notifList"><div class="notif-empty">Loading...</div></div>
     </div>`;
   anchor.parentNode.insertBefore(wrap, anchor);
@@ -160,19 +149,30 @@ export async function initNotifications(user) {
     });
   }
 
-  btn.addEventListener('click', e => {
+btn.addEventListener('click', e => {
     e.stopPropagation();
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
   });
+
+  wrap.querySelector('#notifMarkAll').addEventListener('click', async e => {
+    e.stopPropagation();
+    const noLeidas = realNotifs.filter(n => !n.leido);
+    if (!noLeidas.length) return;
+    try {
+      await Promise.all(noLeidas.map(n =>
+        updateDoc(doc(db, 'usuarios', user.uid, 'notificaciones', n.id), { leido: true })
+      ));
+    } catch (e2) { console.warn('No se pudo marcar todo como leído:', e2.message); }
+  });
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) panel.style.display = 'none'; });
 
-  const q = query(collection(db, 'usuarios', user.uid, 'notificaciones'), orderBy('creadoEn', 'desc'), limit(30));
+const q = query(collection(db, 'usuarios', user.uid, 'notificaciones'), orderBy('creadoEn', 'desc'), limit(25));
   unsubscribeSnap = onSnapshot(q, snap => {
     realNotifs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     updateBadge(); render();
   }, () => {});
 
-  const [ayer, semana] = await Promise.all([checkTriviaAyer(user.uid), checkTriviaSemana(user.uid)]);
-  virtuales = [ayer, semana].filter(Boolean);
+const ayer = await checkTriviaAyer(user.uid);
+  virtuales = ayer ? [ayer] : [];
   updateBadge(); render();
 }
