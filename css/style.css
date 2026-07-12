@@ -328,27 +328,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .icon-btn-love:hover { border-color: var(--danger); background: rgba(248,113,113,.07); }
 .icon-btn-love:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--danger)); }
 .icon-btn-love.active-love { border-color: var(--danger); background: rgba(248,113,113,.07); }
-.icon-btn-love.active-love img { opacity: 1; filter: drop-shadow(0 0 4px var(--danger)); }
+.icon-btn-love.active-love img { opacity: 1; }
 .icon-btn-love.active-love .icon-count { color: var(--danger); }
 
 /* ── MEH (morado) ── */
 .icon-btn-meh:hover { border-color: var(--purple); background: rgba(167,139,250,.07); }
 .icon-btn-meh:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--purple)); }
 .icon-btn-meh.active-meh { border-color: var(--purple); background: rgba(167,139,250,.07); }
-.icon-btn-meh.active-meh img { opacity: 1; filter: drop-shadow(0 0 4px var(--purple)); }
+.icon-btn-meh.active-meh img { opacity: 1; }
 .icon-btn-meh.active-meh .icon-count { color: var(--purple); }
 
 /* ── FAVORITO (dorado) ── */
 .icon-btn-fav:hover { border-color: var(--gold); background: rgba(251,191,36,.07); }
 .icon-btn-fav:hover img { opacity: 1; filter: drop-shadow(0 0 4px var(--gold)); }
 .icon-btn-fav.active-fav { border-color: var(--gold); background: rgba(251,191,36,.07); }
-.icon-btn-fav.active-fav img { opacity: 1; filter: drop-shadow(0 0 4px var(--gold)); }
+.icon-btn-fav.active-fav img { opacity: 1; }
 
 /* ── DESCARGAR (cyan, solo mientras descarga) ── */
 .icon-btn-dl:hover { border-color: var(--cyan); }
 .icon-btn-dl:hover img { opacity: 1; }
 .icon-btn-dl.active-dl { border-color: var(--cyan); background: rgba(103,232,249,.07); }
-.icon-btn-dl.active-dl img { opacity: 1; filter: drop-shadow(0 0 4px var(--cyan)); } 
+.icon-btn-dl.active-dl img { opacity: 1; } 
 
 /* ── COMENTARIOS (cyan) ── */
 .icon-btn-comments:hover { border-color: var(--cyan); background: rgba(103,232,249,.07); }
