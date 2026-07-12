@@ -6,6 +6,7 @@ import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initNotifications, teardownNotifications } from './notifications.js';
 
 const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
 const BASE = location.pathname.includes('/pages/') ? '..' : '.';
@@ -59,8 +60,11 @@ await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn
   } else {
     clearCachedUser();
   }
-  renderNav(user, nombre, avatar);
+renderNav(user, nombre, avatar);
   renderMobile(user, nombre);
+
+  if (user) initNotifications(user);
+  else teardownNotifications();
 });
 
 function renderNav(user, nombre, avatar) {
