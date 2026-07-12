@@ -242,6 +242,7 @@ import { auth, db } from '../js/firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc, collection, getDocs, query, where, arrayUnion, arrayRemove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { crearNotificacion, getMiPerfil } from '../js/notifications.js';
 
   const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
   const uid = new URLSearchParams(location.search).get('uid');
@@ -304,11 +305,13 @@ window.toggleFollow = async function() {
       btn.classList.remove('following');
       btn.querySelector('.follow-label').textContent = 'Follow';
       window.showToast && window.showToast('Unfollowed');
-    } else {
+} else {
       await updateDoc(ref, { siguiendo: arrayUnion(uid) });
       btn.classList.add('following');
       btn.querySelector('.follow-label').textContent = 'Following';
       window.showToast && window.showToast('You are now following this player');
+      const yo = await getMiPerfil(currentUser.uid);
+      crearNotificacion(uid, { tipo: 'follow', deUid: currentUser.uid, deNombre: yo.nombre });
     }
     const countSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains',uid)));
     document.getElementById('pubStatSeguidores').textContent = countSnap.size;

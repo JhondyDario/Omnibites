@@ -45,7 +45,20 @@
     .popup-box{background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:2rem;max-width:400px;width:100%;text-align:center;}
     .popup-box h3{font-family:var(--font-pixel);font-size:.65rem;color:var(--danger);margin-bottom:.75rem;}
     .popup-box p{font-size:.85rem;color:var(--text-dim);margin-bottom:1.25rem;line-height:1.6;}
-    .popup-actions{display:flex;gap:.75rem;justify-content:center;}
+.popup-actions{display:flex;gap:.75rem;justify-content:center;}
+    .notif-pref-row{display:flex;align-items:center;gap:.9rem;padding:.75rem 0;border-bottom:1px solid var(--border);}
+    .notif-pref-row:last-child{border-bottom:none;}
+    .notif-pref-row.master{padding-bottom:1rem;margin-bottom:.25rem;}
+    .notif-pref-label{display:flex;flex-direction:column;gap:.1rem;}
+    .notif-pref-label strong{font-size:.85rem;color:var(--text);}
+    .notif-pref-label span{font-size:.72rem;color:var(--text-dim);}
+    #notifSubPrefs.disabled{opacity:.4;pointer-events:none;}
+    .switch{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;}
+    .switch input{opacity:0;width:0;height:0;}
+    .switch-slider{position:absolute;cursor:pointer;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:22px;transition:.2s;}
+    .switch-slider::before{content:'';position:absolute;height:16px;width:16px;left:2px;top:2px;background:var(--text-dim);border-radius:50%;transition:.2s;}
+    .switch input:checked + .switch-slider{background:rgba(74,222,128,.15);border-color:var(--neon);}
+    .switch input:checked + .switch-slider::before{transform:translateX(18px);background:var(--neon);}
   </style>
 </head>
 <body>
@@ -85,6 +98,32 @@
         <button class="theme-btn" data-mode="auto">Automatic</button>
         <button class="theme-btn" data-mode="day">Day</button>
         <button class="theme-btn" data-mode="night">Night</button>
+      </div>
+    </div>
+
+<div class="sbox">
+      <h2>Notifications</h2>
+      <div class="notif-pref-row master">
+        <label class="switch"><input type="checkbox" id="notifEnabled" checked/><span class="switch-slider"></span></label>
+        <div class="notif-pref-label"><strong>All notifications</strong><span>Turn off to stop receiving any notification</span></div>
+      </div>
+      <div id="notifSubPrefs">
+        <div class="notif-pref-row">
+          <label class="switch"><input type="checkbox" id="notifReaction" checked/><span class="switch-slider"></span></label>
+          <div class="notif-pref-label"><strong>Reactions</strong><span>When someone reacts to your soundbites</span></div>
+        </div>
+        <div class="notif-pref-row">
+          <label class="switch"><input type="checkbox" id="notifComment" checked/><span class="switch-slider"></span></label>
+          <div class="notif-pref-label"><strong>Comments</strong><span>When someone comments on your soundbites</span></div>
+        </div>
+        <div class="notif-pref-row">
+          <label class="switch"><input type="checkbox" id="notifFavorite" checked/><span class="switch-slider"></span></label>
+          <div class="notif-pref-label"><strong>Favorites</strong><span>When someone favorites your soundbites</span></div>
+        </div>
+        <div class="notif-pref-row">
+          <label class="switch"><input type="checkbox" id="notifFollow" checked/><span class="switch-slider"></span></label>
+          <div class="notif-pref-label"><strong>Followers</strong><span>When someone starts following you</span></div>
+        </div>
       </div>
     </div>
 
@@ -162,15 +201,35 @@
       document.getElementById('infoVerif').textContent  = user.emailVerified ? 'Yes' : 'Pending';
       document.getElementById('infoVerif').style.color  = user.emailVerified ? 'var(--neon)' : 'var(--gold)';
 
-      try {
+try {
         const ref = doc(db,'usuarios',user.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           document.getElementById('nombreInput').value = snap.data().nombre || '';
           await updateDoc(ref, { emailVerified: user.emailVerified });
+          const np = snap.data().notifPrefs || {};
+          document.getElementById('notifEnabled').checked  = np.enabled  !== false;
+          document.getElementById('notifReaction').checked = np.reaction !== false;
+          document.getElementById('notifComment').checked  = np.comment  !== false;
+          document.getElementById('notifFavorite').checked = np.favorite !== false;
+          document.getElementById('notifFollow').checked   = np.follow   !== false;
+          document.getElementById('notifSubPrefs').classList.toggle('disabled', !document.getElementById('notifEnabled').checked);
         }
       } catch {}
     });
+
+    function saveNotifPref(field, value) {
+      updateDoc(doc(db,'usuarios',currentUser.uid), { [`notifPrefs.${field}`]: value })
+        .catch(e => window.showToast && window.showToast('Error: '+e.message,'error'));
+    }
+    document.getElementById('notifEnabled').addEventListener('change', e => {
+      document.getElementById('notifSubPrefs').classList.toggle('disabled', !e.target.checked);
+      saveNotifPref('enabled', e.target.checked);
+    });
+    document.getElementById('notifReaction').addEventListener('change', e => saveNotifPref('reaction', e.target.checked));
+    document.getElementById('notifComment').addEventListener('change',  e => saveNotifPref('comment',  e.target.checked));
+    document.getElementById('notifFavorite').addEventListener('change', e => saveNotifPref('favorite', e.target.checked));
+    document.getElementById('notifFollow').addEventListener('change',   e => saveNotifPref('follow',   e.target.checked));
 
     document.getElementById('saveNombreBtn').addEventListener('click', async () => {
       const raw   = document.getElementById('nombreInput').value.trim();

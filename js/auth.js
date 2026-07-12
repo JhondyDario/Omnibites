@@ -6,6 +6,7 @@ import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initNotifications, teardownNotifications } from './notifications.js';
 
 const ROOT = location.hostname === 'jhondydario.github.io' ? '/Omnibites' : '';
 const BASE = location.pathname.includes('/pages/') ? '..' : '.';
@@ -59,8 +60,11 @@ await setDoc(ref, { nombre: n, email: user.email||'', avatar:'avatar1', creadoEn
   } else {
     clearCachedUser();
   }
-  renderNav(user, nombre, avatar);
+renderNav(user, nombre, avatar);
   renderMobile(user, nombre);
+
+  if (user) initNotifications(user);
+  else teardownNotifications();
 });
 
 function renderNav(user, nombre, avatar) {
@@ -68,7 +72,7 @@ function renderNav(user, nombre, avatar) {
   if (!el) return;
   const onPerfil = location.pathname.includes('/perfil.html');
   if (user && onPerfil) { el.innerHTML = ''; return; }
-  if (user) {
+if (user) {
     const name = nombre || user.email?.split('@')[0] || 'Player';
     const initial = name.charAt(0).toUpperCase();
     const avatarHTML = avatar
@@ -77,9 +81,8 @@ function renderNav(user, nombre, avatar) {
          <div class="nav-avatar-fallback" style="display:none">${initial}</div>`
       : `<div class="nav-avatar-fallback">${initial}</div>`;
     el.innerHTML = `
-      <a href="${ROOT}/pages/perfil.html" class="nav-user-btn" style="text-decoration:none">
+      <a href="${ROOT}/pages/perfil.html" class="nav-user-btn" title="${name}" style="text-decoration:none">
         ${avatarHTML}
-        <span class="nav-user-name">${name.split(' ')[0]}</span>
       </a>`;
   } else {
     el.innerHTML = `<a href="${ROOT}/pages/login.html" class="nav-login-btn">Sign in</a>`;
