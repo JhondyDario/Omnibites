@@ -82,11 +82,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .nav-login-btn{display:flex;align-items:center;gap:.4rem;color:var(--text-dim);text-decoration:none;font-size:.82rem;font-weight:600;padding:.35rem .9rem;border:1px solid var(--border);border-radius:20px;transition:border-color var(--transition),color var(--transition);}
 .nav-login-btn:hover{border-color:var(--neon);color:var(--neon);}
 
-.nav-user-btn{display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.3rem .9rem .3rem .4rem;cursor:pointer;color:var(--text);font-size:.82rem;font-weight:500;font-family:var(--font-body);transition:border-color var(--transition);text-decoration:none;}
-.nav-user-btn:hover{border-color:var(--neon);}
-.nav-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:var(--bg3);}
-.nav-avatar-fallback{width:26px;height:26px;border-radius:50%;background:var(--neon);color:#000;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.nav-user-name{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-user-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;cursor:pointer;text-decoration:none;flex-shrink:0;}
+.nav-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:var(--bg3);transition:border-color var(--transition);}
+.nav-user-btn:hover .nav-avatar{border-color:var(--neon);}
+.nav-avatar-fallback{width:36px;height:36px;border-radius:50%;background:var(--neon);color:#000;font-size:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity var(--transition);}
+.nav-user-btn:hover .nav-avatar-fallback{opacity:.85;}
 
 /* Hamburger */
 .hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:.25rem;}
