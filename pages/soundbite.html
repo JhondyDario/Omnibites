@@ -65,8 +65,29 @@
     .edit-title-form select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
     .edit-title-form select:focus{border-color:var(--neon);}
 
-    .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
-    .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;}
+.sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
+    .sb-img-wrap{position:relative;width:170px;height:170px;flex-shrink:0;}
+    .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:transform .3s ease,box-shadow .3s ease;}
+    .sb-img-wrap:hover .sb-detail-img{transform:scale(1.04);box-shadow:0 0 18px rgba(74,222,128,.35);}
+
+    @keyframes sb-img-pulse{
+      0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(74,222,128,0);}
+      50%{transform:scale(1.035);box-shadow:0 0 22px rgba(74,222,128,.5);}
+    }
+    .sb-img-wrap.playing .sb-detail-img{animation:sb-img-pulse 1.6s ease-in-out infinite;border-color:var(--neon);}
+
+    @keyframes sb-wave-ring{
+      0%{transform:scale(1);opacity:.65;}
+      50%{transform:scale(1.16);opacity:.15;}
+      100%{transform:scale(1);opacity:.65;}
+    }
+    .sb-img-wrap.playing::before,
+    .sb-img-wrap.playing::after{
+      content:'';position:absolute;inset:-6px;border-radius:18px;
+      border:2px solid var(--neon);pointer-events:none;
+      animation:sb-wave-ring 1.6s ease-in-out infinite;
+    }
+    .sb-img-wrap.playing::after{inset:-14px;border-width:1.5px;opacity:.4;animation-delay:.5s;}
     .edit-title-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);padding:.5rem 1rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:border-color .2s,color .2s;display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
     .edit-title-btn:hover{border-color:var(--neon);color:var(--neon);}
     .edit-title-btn img{width:16px;height:16px;object-fit:contain;}
@@ -158,7 +179,9 @@
       </div>
 
 <div class="sb-detail-img-row">
-        <img id="sbImage" class="sb-detail-img" src="" alt=""/>
+        <div class="sb-img-wrap" id="sbImgWrap">
+          <img id="sbImage" class="sb-detail-img" src="" alt=""/>
+        </div>
         <div class="edit-btns-col">
           <button class="edit-title-btn" id="editTitleBtn" style="display:none">
             <img src="../assets/icons/camera.png" alt=""/> Edit soundtrack
@@ -606,8 +629,9 @@ arrayUnion, arrayRemove, serverTimestamp} from "https://www.gstatic.com/firebase
         source = gain = volGain = null;
       }
       clearInterval(progIv);
-      const btn = document.getElementById('sbPlayBtn');
+const btn = document.getElementById('sbPlayBtn');
       if (btn) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.classList.remove('playing'); btn.disabled = false; }
+      document.getElementById('sbImgWrap')?.classList.remove('playing');
       if (!isPause) {
         document.getElementById('sbProgFill').style.width = '0%';
         document.getElementById('sbCur').textContent = '0:00';
@@ -652,9 +676,10 @@ arrayUnion, arrayRemove, serverTimestamp} from "https://www.gstatic.com/firebase
         src.connect(g); g.connect(vg); vg.connect(ctx.destination);
         await audioEl.play();
 
-        source = audioEl; gain = g; volGain = vg; isPlaying = true;
+source = audioEl; gain = g; volGain = vg; isPlaying = true;
         btn.innerHTML = '<img src="../assets/icons/pause.png" alt="Pause"/>';
         btn.classList.add('playing'); btn.disabled = false;
+        document.getElementById('sbImgWrap')?.classList.add('playing');
 
         const endTimeout = setTimeout(() => { if (myToken === playToken) stopPlayback(); }, remaining * 1000);
         source._endTimeout = endTimeout;
