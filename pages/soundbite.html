@@ -69,31 +69,36 @@
 .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
     .sb-img-wrap{position:relative;width:170px;height:170px;flex-shrink:0;}
 
-    /* Cartas de atrás — degradado oscuro real (negro encima) para que se note en day y night */
+/* Cartas de atrás — brightness relativo, se nota igual en day y night */
     .sb-img-card{
       position:absolute;inset:0;border-radius:16px;
-      border:1px solid var(--border);
-      box-shadow:0 4px 12px rgba(0,0,0,.35);
+      background:var(--bg3);
+      box-shadow:0 6px 16px rgba(0,0,0,.4);
+      transition:opacity .3s ease;
       z-index:0;
     }
     .sb-img-card-1{
-      background:linear-gradient(160deg, rgba(0,0,0,.05), rgba(0,0,0,.35)), var(--bg2);
+      border:1px solid rgba(167,139,250,.35);
       transform:rotate(-9deg) translate(-9px,7px);
+      filter:brightness(.88);
     }
     .sb-img-card-2{
-      background:linear-gradient(160deg, rgba(0,0,0,.1), rgba(0,0,0,.45)), var(--bg2);
+      border:1px solid rgba(103,232,249,.3);
       transform:rotate(9deg) translate(9px,7px);
+      filter:brightness(.74);
     }
     .sb-img-card-3{
-      background:linear-gradient(160deg, rgba(0,0,0,.15), rgba(0,0,0,.55)), var(--bg2);
+      border:1px solid rgba(74,222,128,.28);
       transform:rotate(-16deg) translate(-16px,12px);
+      filter:brightness(.6);
     }
+    /* Mientras suena, las cartas de atrás se ocultan del todo — evita que el
+       glow-ring se monte feo sobre sus esquinas rotadas */
+    .sb-img-wrap.playing .sb-img-card{opacity:0;}
 
     .sb-detail-img{position:relative;z-index:2;width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:border-color .25s ease;}
     .sb-img-wrap:hover .sb-detail-img{border-color:var(--neon);}
 
-    /* Anillo de "está sonando" — capa aparte, así el fundido de entrada/salida es suave
-       y el ciclo de color sigue corriendo detrás aunque esté invisible */
     .sb-img-glow{
       position:absolute;inset:-3px;border-radius:18px;
       border:2px solid transparent;
