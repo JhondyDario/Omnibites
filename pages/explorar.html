@@ -270,18 +270,29 @@
     .state-msg p { font-size: 0.9rem; margin-bottom: 0.5rem; }
     .state-msg small { font-size: 0.78rem; }
 
-    /* ── Animación de lupa buscando — mismo patrón de anillo pulsante que los avatares ── */
-    .search-idle-icon-wrap {
-      position: relative;
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 2.25rem;
+/* ── Carrusel 3D de carátulas — animación idle mientras no hay búsqueda ── */
+    .cover-carousel-3d{
+      position:relative;
+      width:100%;
+      height:150px;
+      margin:0 auto 2rem;
+      perspective:900px;
     }
-    @keyframes search-wave-ring {
-      0%   { transform: scale(1);    opacity: .7; }
-      50%  { transform: scale(1.25); opacity: .2; }
-      100% { transform: scale(1);    opacity: .7; }
+    .cover-panel{
+      position:absolute;
+      top:0; left:50%;
+      width:96px; height:96px;
+      margin-left:-48px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.6rem;
+      box-shadow:0 8px 20px rgba(0,0,0,.35);
+      transition:transform .6s ease, opacity .6s ease;
+      will-change:transform,opacity;
     }
+    .cover-panel span{ filter:drop-shadow(0 0 4px rgba(0,0,0,.4)); }
     .search-idle-icon-wrap::before,
     .search-idle-icon-wrap::after {
       content: '';
@@ -397,13 +408,8 @@
     </div>
 
     <div id="relatedWrap" style="display:none" class="related-wrap"></div>
-    <div id="stateMsg" class="state-msg">
-      <div class="search-idle-icon-wrap">
-        <svg viewBox="0 0 64 64" width="64" height="64" fill="none">
-          <circle cx="27" cy="27" r="17" stroke="var(--purple)" stroke-width="4"/>
-          <line x1="39" y1="39" x2="55" y2="55" stroke="var(--purple)" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-      </div>
+<div id="stateMsg" class="state-msg">
+      <div class="cover-carousel-3d" id="coverCarousel"></div>
       <p>Search a game to find its audio</p>
       <small>Find thousands of free soundtracks</small>
     </div>
@@ -530,16 +536,12 @@
       document.getElementById('resultsList').innerHTML = '';
       document.getElementById('resultsHeader').style.display = 'none';
       document.getElementById('relatedWrap').style.display = 'none';
-      const state = document.getElementById('stateMsg');
+const state = document.getElementById('stateMsg');
       state.style.display = 'block';
       state.innerHTML = `
-        <div class="search-idle-icon-wrap">
-          <svg viewBox="0 0 64 64" width="64" height="64" fill="none">
-            <circle cx="27" cy="27" r="17" stroke="var(--purple)" stroke-width="4"/>
-            <line x1="39" y1="39" x2="55" y2="55" stroke="var(--purple)" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <div class="cover-carousel-3d" id="coverCarousel"></div>
         <p>Search a game to find its audio</p><small>Find thousands of free soundtracks</small>`;
+      initCoverCarousel();
     });
 
     // ══════════════════════════════════════════════
@@ -969,6 +971,51 @@ function showEmpty(q) {
       rawgSuggest(q);
       searchInput.focus();
     };
+
+    // ══════════════════════════════════════════════
+    // CARRUSEL 3D — animación idle (reemplaza la lupa)
+    // ══════════════════════════════════════════════
+    const CAROUSEL_COLORS = [
+      'linear-gradient(135deg, var(--neon-solid), #14532d)',
+      'linear-gradient(135deg, var(--purple-solid), #4c1d95)',
+      'linear-gradient(135deg, var(--cyan-solid), #164e63)',
+      'linear-gradient(135deg, var(--gold-solid), #78350f)',
+      'linear-gradient(135deg, var(--danger-solid), #7f1d1d)',
+      'linear-gradient(135deg, var(--purple-solid), var(--cyan-solid))'
+    ];
+    let carouselInterval = null;
+    let carouselCenter = 0;
+
+    function tickCarousel() {
+      const box = document.getElementById('coverCarousel');
+      if (!box) { clearInterval(carouselInterval); carouselInterval = null; return; }
+      const n = CAROUSEL_COLORS.length;
+      if (!box.children.length) {
+        box.innerHTML = CAROUSEL_COLORS.map((_, i) => `<div class="cover-panel" id="cp-${i}"><span>🎵</span></div>`).join('');
+      }
+      for (let i = 0; i < n; i++) {
+        const panel = document.getElementById(`cp-${i}`);
+        if (!panel) continue;
+        let offset = i - carouselCenter;
+        if (offset > n / 2) offset -= n;
+        if (offset < -n / 2) offset += n;
+        const abs = Math.abs(offset);
+        panel.style.background = CAROUSEL_COLORS[i];
+        panel.style.transform = `translateX(${offset * 78}px) translateZ(${abs === 0 ? 0 : -120}px) rotateY(${offset * -28}deg) scale(${abs === 0 ? 1 : 0.72})`;
+        panel.style.opacity = abs > 2 ? 0 : (abs === 0 ? 1 : 0.55);
+        panel.style.zIndex = 10 - abs;
+      }
+      carouselCenter = (carouselCenter + 1) % n;
+    }
+
+    function initCoverCarousel() {
+      if (carouselInterval) clearInterval(carouselInterval);
+      carouselCenter = 0;
+      tickCarousel();
+      carouselInterval = setInterval(tickCarousel, 2200);
+    }
+
+    initCoverCarousel();
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('q')) {
