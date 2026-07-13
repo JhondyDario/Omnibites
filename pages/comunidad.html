@@ -243,7 +243,7 @@
                  onclick="location.href='soundbite.html?id=${a.id}'"
                  onerror="this.onerror=null;this.src='${ROOT}/assets/avatars/avatar0.png'"/>
             <div class="sb-head-info">
-              <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Untitled'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.consola||'—'} · ${a.categoria||'soundbite'}</span></div>
+              <div class="sb-title" style="cursor:pointer" onclick="location.href='soundbite.html?id=${a.id}'">${a.titulo||'Untitled'} <span class="sb-dot">·</span> <span class="sb-tag-inline">${a.categoria||'soundbite'}</span> <span class="sb-dot">·</span> <span class="sb-tag-consola">${a.consola||'—'}</span></div>
               <div class="sb-meta">${a.juego||'—'} · <a class="sb-author" href="jugador.html?uid=${a.autorId||''}" style="text-decoration:none;color:var(--purple)">${a.autorNombre||'Anonymous'}</a></div>
             </div>
           </div>
