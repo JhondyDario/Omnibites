@@ -33,7 +33,8 @@
     .sb-detail-meta{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:.82rem;margin-bottom:1rem;flex-wrap:wrap;text-align:center;}
     .sb-meta-autor{color:var(--purple);font-weight:600;text-decoration:none;}
     .sb-meta-autor:hover{text-decoration:underline;}
-    .sb-meta-neon{color:var(--neon);font-weight:600;}
+.sb-meta-neon{color:var(--neon);font-weight:600;}
+    .sb-meta-blue{color:#3b82f6;font-weight:600;}
     .sb-meta-dot{color:var(--border);}
 
     .sb-prog-bar{cursor:pointer;}
@@ -67,8 +68,26 @@
 
 .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
     .sb-img-wrap{position:relative;width:170px;height:170px;flex-shrink:0;}
-    .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:transform .3s ease,box-shadow .3s ease;}
+    .sb-img-wrap::before,
+    .sb-img-wrap::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:16px;
+      background:linear-gradient(160deg,var(--bg3),var(--bg) 85%);
+      border:1px solid var(--border);
+      z-index:0;
+    }
+    .sb-img-wrap::before{transform:rotate(-7deg) translate(-5px,4px);opacity:.6;}
+    .sb-img-wrap::after{transform:rotate(7deg) translate(5px,4px);opacity:.35;}
+    .sb-detail-img{position:relative;z-index:1;width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:transform .3s ease,box-shadow .3s ease;}
     .sb-img-wrap:hover .sb-detail-img{transform:scale(1.04);box-shadow:0 0 18px rgba(74,222,128,.35);}
+
+    @keyframes sb-img-glow{
+      0%,100%{box-shadow:0 0 6px rgba(74,222,128,.3);}
+      50%{box-shadow:0 0 16px rgba(74,222,128,.6);}
+    }
+    .sb-img-wrap.playing .sb-detail-img{animation:sb-img-glow 1.8s ease-in-out infinite;border-color:var(--neon);}
 
     @keyframes sb-img-pulse{
       0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(74,222,128,0);}
@@ -170,14 +189,6 @@
 
     <div id="sbMain" style="display:none">
 
-      <div class="sb-detail-meta">
-        <a id="sbAutorLink" class="sb-meta-autor" href="#"></a>
-        <span class="sb-meta-dot">·</span>
-        <span id="sbClasificacion" class="sb-meta-neon"></span>
-        <span class="sb-meta-dot">·</span>
-        <span id="sbConsolaMeta" class="sb-meta-neon"></span>
-      </div>
-
 <div class="sb-detail-img-row">
         <div class="sb-img-wrap" id="sbImgWrap">
           <img id="sbImage" class="sb-detail-img" src="" alt=""/>
@@ -195,6 +206,14 @@
 <div class="sb-detail-header" id="titleDisplay">
         <h1 id="sbTitulo"></h1>
         <p class="sb-detail-juego" id="sbJuego"></p>
+      </div>
+
+      <div class="sb-detail-meta">
+        <a id="sbAutorLink" class="sb-meta-autor" href="#"></a>
+        <span class="sb-meta-dot">·</span>
+        <span id="sbClasificacion" class="sb-meta-neon"></span>
+        <span class="sb-meta-dot">·</span>
+        <span id="sbConsolaMeta" class="sb-meta-blue"></span>
       </div>
 
       <div class="edit-title-form" id="editTitleForm">
