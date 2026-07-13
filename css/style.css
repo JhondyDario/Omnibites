@@ -604,6 +604,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 
 /* ── SB CARD inline tag ── */
 .sb-tag-inline{font-size:.65rem;font-weight:600;color:var(--neon);text-transform:uppercase;letter-spacing:.4px;}
+.sb-tag-consola{font-size:.65rem;font-weight:600;color:#3b82f6;text-transform:uppercase;letter-spacing:.4px;}
 .sb-dot{color:var(--border);margin:0 .2rem;}
 
 /* ── STAT CARD ÚNICA CON ICONOS ── */
