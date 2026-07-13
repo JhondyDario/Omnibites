@@ -68,26 +68,49 @@
 
 .sb-detail-img-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
     .sb-img-wrap{position:relative;width:170px;height:170px;flex-shrink:0;}
-    .sb-img-wrap::before,
-    .sb-img-wrap::after{
-      content:'';
-      position:absolute;
-      inset:0;
-      border-radius:16px;
-      background:linear-gradient(160deg,var(--bg3),var(--bg) 85%);
+
+    /* Cartas de atrás — degradado oscuro real (negro encima) para que se note en day y night */
+    .sb-img-card{
+      position:absolute;inset:0;border-radius:16px;
       border:1px solid var(--border);
+      box-shadow:0 4px 12px rgba(0,0,0,.35);
       z-index:0;
     }
-    .sb-img-wrap::before{transform:rotate(-7deg) translate(-5px,4px);opacity:.6;}
-    .sb-img-wrap::after{transform:rotate(7deg) translate(5px,4px);opacity:.35;}
-    .sb-detail-img{position:relative;z-index:1;width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:transform .3s ease,box-shadow .3s ease;}
-    .sb-img-wrap:hover .sb-detail-img{transform:scale(1.04);box-shadow:0 0 18px rgba(74,222,128,.35);}
-
-    @keyframes sb-img-glow{
-      0%,100%{box-shadow:0 0 6px rgba(74,222,128,.3);}
-      50%{box-shadow:0 0 16px rgba(74,222,128,.6);}
+    .sb-img-card-1{
+      background:linear-gradient(160deg, rgba(0,0,0,.05), rgba(0,0,0,.35)), var(--bg2);
+      transform:rotate(-9deg) translate(-9px,7px);
     }
-    .sb-img-wrap.playing .sb-detail-img{animation:sb-img-glow 1.8s ease-in-out infinite;border-color:var(--neon);}
+    .sb-img-card-2{
+      background:linear-gradient(160deg, rgba(0,0,0,.1), rgba(0,0,0,.45)), var(--bg2);
+      transform:rotate(9deg) translate(9px,7px);
+    }
+    .sb-img-card-3{
+      background:linear-gradient(160deg, rgba(0,0,0,.15), rgba(0,0,0,.55)), var(--bg2);
+      transform:rotate(-16deg) translate(-16px,12px);
+    }
+
+    .sb-detail-img{position:relative;z-index:2;width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;transition:border-color .25s ease;}
+    .sb-img-wrap:hover .sb-detail-img{border-color:var(--neon);}
+
+    /* Anillo de "está sonando" — capa aparte, así el fundido de entrada/salida es suave
+       y el ciclo de color sigue corriendo detrás aunque esté invisible */
+    .sb-img-glow{
+      position:absolute;inset:-3px;border-radius:18px;
+      border:2px solid transparent;
+      opacity:0;
+      transition:opacity .5s ease;
+      pointer-events:none;
+      z-index:3;
+      animation:sb-glow-cycle 4s linear infinite;
+    }
+    .sb-img-wrap.playing .sb-img-glow{opacity:1;}
+
+    @keyframes sb-glow-cycle{
+      0%{border-color:var(--neon);box-shadow:0 0 8px rgba(74,222,128,.5);}
+      33%{border-color:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,.5);}
+      66%{border-color:var(--purple);box-shadow:0 0 8px rgba(167,139,250,.5);}
+      100%{border-color:var(--neon);box-shadow:0 0 8px rgba(74,222,128,.5);}
+    }
 
     @keyframes sb-img-pulse{
       0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(74,222,128,0);}
@@ -191,6 +214,10 @@
 
 <div class="sb-detail-img-row">
         <div class="sb-img-wrap" id="sbImgWrap">
+          <div class="sb-img-card sb-img-card-3"></div>
+          <div class="sb-img-card sb-img-card-2"></div>
+          <div class="sb-img-card sb-img-card-1"></div>
+          <div class="sb-img-glow"></div>
           <img id="sbImage" class="sb-detail-img" src="" alt=""/>
         </div>
         <div class="edit-btns-col">
