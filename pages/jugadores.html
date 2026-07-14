@@ -126,6 +126,14 @@
     .state-msg p { font-size: .9rem; }
     .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes cardRiseIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.player-card {
+  opacity: 0;
+  animation: cardRiseIn .5s ease forwards;
+}
   </style>
 </head>
 <body>
@@ -293,11 +301,11 @@ onAuthStateChanged(auth, u => {
       return fullPlayers;
     }
 
-    function cardHTML(p) {
+function cardHTML(p, i) {
       const name = p.nombre || 'Player';
       const initial = name.charAt(0).toUpperCase();
       const avatarHTML = p.avatar
-        ? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
+? `<img class="player-avatar" src="${ROOT}/assets/avatars/${p.avatar}.png" alt="${name}"
              onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
            <div class="player-avatar-fallback" style="display:none">${initial}</div>`
         : `<div class="player-avatar-fallback">${initial}</div>`;
@@ -305,8 +313,8 @@ onAuthStateChanged(auth, u => {
       const isMe = currentUser && currentUser.uid === p.uid;
       const href = isMe ? 'perfil.html' : `jugador.html?uid=${p.uid}`;
 
-      return `
-        <a class="player-card" href="${href}">
+return `
+        <a class="player-card" href="${href}" style="animation-delay:${Math.min(i,14) * 0.05}s">
           ${avatarHTML}
           <div class="player-name">${name}</div>
 <div class="player-stats">
@@ -356,7 +364,7 @@ onAuthStateChanged(auth, u => {
         return;
       }
 
-      grid.innerHTML = filtered.map(cardHTML).join('');
+grid.innerHTML = filtered.map((p, i) => cardHTML(p, i)).join('');
     }
 
     document.getElementById('searchBtn').addEventListener('click', () => {

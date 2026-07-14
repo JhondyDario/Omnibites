@@ -101,6 +101,48 @@
     .editor-box.locked #trimContent { opacity: .35; pointer-events: none; filter: grayscale(60%); }
     .lock-msg { display: none; font-size: .82rem; color: var(--text-dim); background: var(--bg3); border-radius: 8px; padding: .85rem 1rem; text-align: center; }
     .editor-box.locked .lock-msg { display: block; margin-bottom: 1rem; }
+    /* ── OVERLAY DE SOUNDBITE PUBLICADO ── */
+.sb-success-overlay{
+  position:fixed;inset:0;background:rgba(8,8,12,.92);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:1.5rem;
+  animation:sbOverlayFade .3s ease;
+}
+@keyframes sbOverlayFade{from{opacity:0}to{opacity:1}}
+.sb-success-box{position:relative;text-align:center;max-width:360px;width:100%;}
+.sb-success-cover-wrap{position:relative;width:170px;height:170px;margin:0 auto 1.5rem;}
+.sb-success-cover{
+  width:100%;height:100%;border-radius:16px;object-fit:cover;
+  border:1px solid var(--border);background:var(--bg3);
+  opacity:0;transform:scale(.5);
+  animation:sbCoverIn .5s cubic-bezier(.34,1.56,.64,1) .2s forwards;
+}
+@keyframes sbCoverIn{to{opacity:1;transform:scale(1)}}
+.sb-success-flash{
+  position:absolute;inset:-8px;border-radius:20px;
+  background:#fff;opacity:0;pointer-events:none;
+  animation:sbFlash .7s ease 1s forwards;
+}
+@keyframes sbFlash{0%{opacity:0}15%{opacity:.9}40%{opacity:0}100%{opacity:0}}
+.sb-success-cover.sb-evolve{animation:sbEvolveGlow 1.4s ease 1s forwards;}
+@keyframes sbEvolveGlow{
+  0%{box-shadow:0 0 0 rgba(74,222,128,0)}
+  30%{box-shadow:0 0 40px 10px rgba(74,222,128,.6)}
+  100%{box-shadow:0 0 18px 2px rgba(74,222,128,.35)}
+}
+.sb-note{position:absolute;font-size:1.4rem;opacity:0;pointer-events:none;animation:sbNoteFloat 1.8s ease forwards;}
+@keyframes sbNoteFloat{
+  0%{opacity:0;transform:translate(0,0) scale(.6) rotate(0deg)}
+  15%{opacity:1}
+  100%{opacity:0;transform:var(--note-end) scale(1.1) rotate(var(--note-rot))}
+}
+.sb-success-title{
+  font-family:var(--font-head);font-size:1.15rem;font-weight:700;
+  color:var(--neon);opacity:0;margin-bottom:1.5rem;
+  animation:sbTextIn .4s ease 1.6s forwards;
+}
+@keyframes sbTextIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sb-success-actions{display:flex;flex-direction:column;gap:.65rem;opacity:0;animation:sbTextIn .4s ease 1.85s forwards;}
   </style>
 </head>
 <body>
@@ -292,9 +334,24 @@
         <p class="char-counter" id="descripcionCounter">0/300</p>
       </div>
 
-      <button class="btn-primary form-submit" id="submitBtn">Publish Soundbite</button>
+<button class="btn-primary form-submit" id="submitBtn">Publish Soundbite</button>
     </div>
   </main>
+
+  <div class="sb-success-overlay" id="successOverlay">
+    <div class="sb-success-box">
+      <div class="sb-success-cover-wrap" id="successNotesWrap">
+        <img class="sb-success-cover" id="successCoverImg" src="" alt=""/>
+        <div class="sb-success-flash"></div>
+      </div>
+      <div class="sb-success-title">✨ Soundbite added!</div>
+      <div class="sb-success-actions">
+        <button class="btn-primary" id="btnAddAnother">Add another</button>
+        <button class="btn-outline" id="btnGoSoundbite">View soundbite</button>
+        <a class="btn-outline" id="btnGoComunidad" href="comunidad.html" style="text-align:center">Go to Community</a>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { auth, db } from '../js/firebase-config.js';
@@ -777,19 +834,20 @@ localFileUrl      = URL.createObjectURL(file);
           where('juego','==',juego));
         const dupeSnap = await getDocs(dupeQ);
 
-        if (!dupeSnap.empty) {
-          await updateDoc(doc(db,'audios',dupeSnap.docs[0].id), {
+if (!dupeSnap.empty) {
+          const dupeId = dupeSnap.docs[0].id;
+          await updateDoc(doc(db,'audios',dupeId), {
             url, consola, categoria,
             descripcion: document.getElementById('descripcion').value.trim(),
             trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
             autorNombre, imagen: imagenFromRawg || imagenFromArchive || '', creadoEn: serverTimestamp()
           });
-          window.showToast('Soundbite updated (an identical one already existed)');
-          setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
+          btn.disabled = false; btn.textContent = 'Publish Soundbite';
+          mostrarAnimacionExito(dupeId, imagenFromRawg || imagenFromArchive || '');
           return;
         }
 
-        await addDoc(collection(db,'audios'), {
+const nuevoDoc = await addDoc(collection(db,'audios'), {
           url, titulo, juego, consola, categoria,
           descripcion: document.getElementById('descripcion').value.trim(),
           trimStart, trimEnd,
@@ -800,8 +858,8 @@ localFileUrl      = URL.createObjectURL(file);
           imagen: imagenFromRawg || imagenFromArchive || '',
           creadoEn: serverTimestamp()
         });
-        window.showToast('Soundbite published');
-        setTimeout(() => window.location.href = ROOT + '/pages/comunidad.html', 1200);
+        btn.disabled = false; btn.textContent = 'Publish Soundbite';
+        mostrarAnimacionExito(nuevoDoc.id, imagenFromRawg || imagenFromArchive || '');
       } catch(e) {
         console.error(e);
         window.showToast('Error publishing: ' + e.message, 'error');
@@ -812,6 +870,51 @@ localFileUrl      = URL.createObjectURL(file);
     function fmt(s) {
       if (!s || isNaN(s)) return '0:00';
       return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
+    }
+    // ════════════════════════════════════════════
+    // ANIMACIÓN DE ÉXITO AL PUBLICAR
+    // ════════════════════════════════════════════
+    const NOTE_SYMBOLS = ['♪','♫','♬','♩'];
+    const NOTE_COLORS  = ['var(--neon)','var(--purple)','var(--cyan)','var(--gold)','var(--danger)'];
+
+    function mostrarAnimacionExito(soundbiteId, imagenUrl) {
+      const overlay = document.getElementById('successOverlay');
+      const cover   = document.getElementById('successCoverImg');
+      const wrap    = document.getElementById('successNotesWrap');
+
+      cover.src = imagenUrl || `${ROOT}/assets/avatars/avatar0.png`;
+      cover.onerror = () => { cover.onerror = null; cover.src = `${ROOT}/assets/avatars/avatar0.png`; };
+      cover.classList.remove('sb-evolve');
+
+      wrap.querySelectorAll('.sb-note').forEach(n => n.remove());
+
+      const total = 10;
+      for (let i = 0; i < total; i++) {
+        const note = document.createElement('span');
+        note.className = 'sb-note';
+        note.textContent = NOTE_SYMBOLS[i % NOTE_SYMBOLS.length];
+        note.style.color = NOTE_COLORS[i % NOTE_COLORS.length];
+        const angle = (Math.PI * 2 * i) / total + (Math.random() * 0.4 - 0.2);
+        const dist  = 90 + Math.random() * 60;
+        const endX  = Math.cos(angle) * dist;
+        const endY  = Math.sin(angle) * dist - 40;
+        note.style.left = '50%';
+        note.style.top  = '50%';
+        note.style.setProperty('--note-end', `translate(${endX}px, ${endY}px)`);
+        note.style.setProperty('--note-rot', `${Math.random() * 60 - 30}deg`);
+        note.style.animationDelay = `${0.15 + i * 0.05}s`;
+        wrap.appendChild(note);
+      }
+
+      setTimeout(() => cover.classList.add('sb-evolve'), 1000);
+      overlay.style.display = 'flex';
+
+      document.getElementById('btnGoSoundbite').onclick = () => {
+        window.location.href = `soundbite.html?id=${soundbiteId}`;
+      };
+      document.getElementById('btnAddAnother').onclick = () => {
+        window.location.href = ROOT + '/pages/subir.html';
+      };
     }
   </script>
   <script type="module" src="../js/auth.js"></script>
