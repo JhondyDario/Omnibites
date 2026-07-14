@@ -68,10 +68,12 @@
 .collapse-body { display: none; padding: .75rem 1.25rem 1.25rem; }
     .collapse-body.open { display: block; }
 
-    .follow-btn{display:flex;align-items:center;gap:.5rem;margin:0 auto 1.25rem;padding:.55rem 1.4rem;border-radius:20px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font-body);border:1px solid var(--cyan);background:transparent;color:var(--cyan);transition:background .2s,color .2s;}
-.follow-btn:hover{background:var(--cyan-solid);color:#000;}
-.follow-btn.following{background:var(--cyan-solid);color:#000;}
-.follow-btn img{width:20px;height:20px;object-fit:contain;}
+.player-title-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;}
+    .player-page-title{font-family:var(--font-head);font-size:1.4rem;font-weight:700;}
+    .follow-icon-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;cursor:pointer;font-family:var(--font-body);border:1px solid var(--cyan);background:transparent;transition:background .2s;padding:0;}
+    .follow-icon-btn:hover{background:var(--cyan-solid);}
+    .follow-icon-btn.following{background:var(--cyan-solid);border-color:var(--cyan-solid);}
+    .follow-icon-btn img{width:22px;height:22px;object-fit:contain;display:block;}
 
     .mini-sb-card { background: var(--bg3); border-radius: 8px; padding: .75rem 1rem; margin-bottom: .5rem; }
     .mini-sb-title { font-size: .85rem; font-weight: 600; }
@@ -166,18 +168,19 @@
       <p>Loading profile...</p>
     </div>
 
-    <div id="profileContent" style="display:none">
+<div id="profileContent" style="display:none">
+      <div class="player-title-row">
+        <h1 class="player-page-title">Player Profile</h1>
+        <button class="follow-icon-btn" id="followBtn" style="display:none" onclick="toggleFollow()" title="Follow">
+          <img src="../assets/icons/follow.png" alt="Follow" id="followIcon"/>
+        </button>
+      </div>
       <div class="pub-avatar-wrap">
         <img id="pubAvatar" src="../assets/avatars/avatar1.png" alt="Avatar" class="pub-avatar"
              onerror="this.style.display='none';document.getElementById('pubAvatarFallback').style.display='flex'"/>
         <div class="pub-avatar-fallback" id="pubAvatarFallback" style="display:none"></div>
       </div>
 <div class="pub-name" id="pubName"></div>
-
-<button class="follow-btn" id="followBtn" style="display:none" onclick="toggleFollow()">
-  <img src="../assets/icons/follow.png" alt=""/>
-  <span class="follow-label">Follow</span>
-</button>
       
 <div class="pstat-single">
   <div class="pstat-row">
@@ -287,8 +290,9 @@ async function maybeRenderFollow() {
     const meSnap = await getDoc(doc(db,'usuarios',currentUser.uid));
     const misSeguidos = meSnap.exists() ? (meSnap.data().siguiendo || []) : [];
     const isFollowing = misSeguidos.includes(uid);
-    btn.classList.toggle('following', isFollowing);
-    btn.querySelector('.follow-label').textContent = isFollowing ? 'Following' : 'Follow';
+btn.classList.toggle('following', isFollowing);
+    document.getElementById('followIcon').src = `${ROOT}/assets/icons/${isFollowing ? 'following' : 'follow'}.png`;
+    btn.title = isFollowing ? 'Following' : 'Follow';
   } catch {}
 }
 
@@ -300,11 +304,19 @@ window.toggleFollow = async function() {
   btn.disabled = true;
   try {
     const ref = doc(db,'usuarios',currentUser.uid);
-    if (isFollowing) {
+if (isFollowing) {
       await updateDoc(ref, { siguiendo: arrayRemove(uid) });
       btn.classList.remove('following');
-      btn.querySelector('.follow-label').textContent = 'Follow';
+      document.getElementById('followIcon').src = `${ROOT}/assets/icons/follow.png`;
+      btn.title = 'Follow';
       window.showToast && window.showToast('Unfollowed');
+    } else {
+      await updateDoc(ref, { siguiendo: arrayUnion(uid) });
+      btn.classList.add('following');
+      document.getElementById('followIcon').src = `${ROOT}/assets/icons/following.png`;
+      btn.title = 'Following';
+      window.showToast && window.showToast('You are now following this player');
+    }
 } else {
       await updateDoc(ref, { siguiendo: arrayUnion(uid) });
       btn.classList.add('following');
