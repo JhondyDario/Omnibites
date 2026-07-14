@@ -213,7 +213,7 @@
       if (currentPage >= totalPages) currentPage = totalPages - 1;
       const slice = items.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
-      grid.innerHTML = slice.map(a => sbCard(a)).join('');
+grid.innerHTML = slice.map((a, i) => sbCard(a, i)).join('');
       pagEl.innerHTML = comPaginatorHTML(currentPage, totalPages);
       if (currentUser) await loadUserData();
     }
@@ -233,11 +233,11 @@
       document.querySelector('.com-header').scrollIntoView({ behavior: 'smooth' });
     };
 
-    function sbCard(a) {
-      const r = a.reactions || { love:0, meh:0 };
-      const imgSrc = a.imagen || `${ROOT}/assets/avatars/avatar0.png`;
-      return `
-        <div class="sb-card" id="card-${a.id}">
+function sbCard(a, i) {
+  const r = a.reactions || { love:0, meh:0 };
+  const imgSrc = a.imagen || `${ROOT}/assets/avatars/avatar0.png`;
+  return `
+        <div class="sb-card" id="card-${a.id}" style="animation-delay:${Math.min(i,14) * 0.05}s">
     <div class="sb-head">
             <img class="sb-thumb" src="${imgSrc}" alt="" loading="lazy" style="cursor:pointer"
                  onclick="location.href='soundbite.html?id=${a.id}'"
@@ -335,17 +335,28 @@ updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
               audioId: id, audioTitulo: audioSnap.data().titulo || 'Untitled', reactionType: type
             });
           }
-          const newBtn = document.getElementById(`r-${type}-${id}`);
+const newBtn = document.getElementById(`r-${type}-${id}`);
           if (newBtn) {
             newBtn.classList.add(`active-${type}`);
             const s = newBtn.querySelector('.icon-count');
             if (s) s.textContent = updates[`reactions.${type}`];
           }
+          triggerScanline(id);
         }
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       }
     };
+
+    function triggerScanline(id) {
+      const card = document.getElementById(`card-${id}`);
+      if (!card) return;
+      card.classList.remove('reacted');
+      void card.offsetWidth;
+      card.classList.add('reacted');
+      clearTimeout(card._scanTimeout);
+      card._scanTimeout = setTimeout(() => card.classList.remove('reacted'), 1200);
+    }
 
     window.toggleFav = async function(id) {
       if (!currentUser) { showAuthPrompt(); return; }
@@ -357,10 +368,11 @@ updates[`reactions.${type}`] = (reactions[type] || 0) + 1;
           await updateDoc(ref, { favoritos: arrayRemove(id) });
           btn.classList.remove('active-fav');
           window.showToast && window.showToast('Removed from favorites');
-} else {
+        } else {
           await updateDoc(ref, { favoritos: arrayUnion(id) });
           btn.classList.add('active-fav');
           window.showToast && window.showToast('Saved to favorites');
+          triggerScanline(id);
           try {
             const aSnap = await getDoc(doc(db,'audios',id));
             if (aSnap.exists() && aSnap.data().autorId && aSnap.data().autorId !== currentUser.uid) {
