@@ -290,7 +290,7 @@ async function maybeRenderFollow() {
     const meSnap = await getDoc(doc(db,'usuarios',currentUser.uid));
     const misSeguidos = meSnap.exists() ? (meSnap.data().siguiendo || []) : [];
     const isFollowing = misSeguidos.includes(uid);
-btn.classList.toggle('following', isFollowing);
+    btn.classList.toggle('following', isFollowing);
     document.getElementById('followIcon').src = `${ROOT}/assets/icons/${isFollowing ? 'following' : 'follow'}.png`;
     btn.title = isFollowing ? 'Following' : 'Follow';
   } catch {}
@@ -304,7 +304,7 @@ window.toggleFollow = async function() {
   btn.disabled = true;
   try {
     const ref = doc(db,'usuarios',currentUser.uid);
-if (isFollowing) {
+    if (isFollowing) {
       await updateDoc(ref, { siguiendo: arrayRemove(uid) });
       btn.classList.remove('following');
       document.getElementById('followIcon').src = `${ROOT}/assets/icons/follow.png`;
@@ -316,14 +316,10 @@ if (isFollowing) {
       document.getElementById('followIcon').src = `${ROOT}/assets/icons/following.png`;
       btn.title = 'Following';
       window.showToast && window.showToast('You are now following this player');
-    }
-} else {
-      await updateDoc(ref, { siguiendo: arrayUnion(uid) });
-      btn.classList.add('following');
-      btn.querySelector('.follow-label').textContent = 'Following';
-      window.showToast && window.showToast('You are now following this player');
-      const yo = await getMiPerfil(currentUser.uid);
-      crearNotificacion(uid, { tipo: 'follow', deUid: currentUser.uid, deNombre: yo.nombre });
+      try {
+        const yo = await getMiPerfil(currentUser.uid);
+        crearNotificacion(uid, { tipo: 'follow', deUid: currentUser.uid, deNombre: yo.nombre });
+      } catch(e2) { console.warn('No se pudo crear la notificación de follow:', e2.message); }
     }
     const countSnap = await getDocs(query(collection(db,'usuarios'), where('siguiendo','array-contains',uid)));
     document.getElementById('pubStatSeguidores').textContent = countSnap.size;
