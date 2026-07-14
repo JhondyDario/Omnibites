@@ -84,11 +84,18 @@
     .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes wave-ring {
+@keyframes wave-ring {
   0%   { transform: scale(1);    opacity: .7; }
   50%  { transform: scale(1.13); opacity: .3; }
   100% { transform: scale(1);    opacity: .7; }
 }
+
+@keyframes avatarBoomIn {
+  0%   { transform: scale(.6); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.avatar-boom { animation: avatarBoomIn .5s cubic-bezier(.34,1.56,.64,1) forwards; }
 
 .pub-avatar-wrap::before,
 .pub-avatar-wrap::after {
@@ -97,14 +104,21 @@
   inset: -6px;
   border-radius: 50%;
   border: 2px solid var(--cyan);
-  animation: wave-ring 2s ease-in-out infinite;
+  opacity: 0;
   pointer-events: none;
 }
 
 .pub-avatar-wrap::after {
   inset: -12px;
   border-width: 1.5px;
-  opacity: .4;
+}
+
+.pub-avatar-wrap.waves-active::before,
+.pub-avatar-wrap.waves-active::after {
+  animation: wave-ring 2s ease-in-out infinite;
+}
+
+.pub-avatar-wrap.waves-active::after {
   animation-delay: .6s;
 }
 
@@ -175,10 +189,10 @@
           <img src="../assets/icons/follow.png" alt="Follow" id="followIcon"/>
         </button>
       </div>
-      <div class="pub-avatar-wrap">
-<img id="pubAvatar" src="../assets/avatars/avatar1.png" alt="Avatar" class="pub-avatar avatar-flicker"
+<div class="pub-avatar-wrap" id="pubAvatarWrap">
+        <img id="pubAvatar" src="../assets/avatars/avatar1.png" alt="Avatar" class="pub-avatar avatar-boom"
              onerror="this.style.display='none';document.getElementById('pubAvatarFallback').style.display='flex'"/>
-        <div class="pub-avatar-fallback" id="pubAvatarFallback" style="display:none"></div>
+        <div class="pub-avatar-fallback avatar-boom" id="pubAvatarFallback" style="display:none"></div>
       </div>
 <div class="pub-name" id="pubName"></div>
       
@@ -450,9 +464,14 @@ animCount(document.getElementById('pubStatFavs'), favAudios.length);
           '<div class="empty-mini">This player has no favorites yet.</div>';
       }
 
-      // Mostrar contenido — ESTO es lo que faltaba llegar
+// Mostrar contenido — ESTO es lo que faltaba llegar
       document.getElementById('loadingState').style.display  = 'none';
       document.getElementById('profileContent').style.display = 'block';
+
+      const avatarWrapEl = document.getElementById('pubAvatarWrap');
+      avatarWrapEl.addEventListener('animationend', e => {
+        if (e.animationName === 'avatarBoomIn') avatarWrapEl.classList.add('waves-active');
+      });
 
     } catch(e) {
       document.getElementById('loadingState').innerHTML = '<p>Error loading profile.</p>';
