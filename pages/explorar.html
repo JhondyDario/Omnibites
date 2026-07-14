@@ -975,7 +975,16 @@ function showEmpty(q) {
     // ══════════════════════════════════════════════
     // CARRUSEL 3D — animación idle (reemplaza la lupa)
     // ══════════════════════════════════════════════
-    const CAROUSEL_COLORS = [
+    const CAROUSEL_COVERS = [
+      '../assets/carousel/cover1.png',
+      '../assets/carousel/cover2.png',
+      '../assets/carousel/cover3.png',
+      '../assets/carousel/cover4.png',
+      '../assets/carousel/cover5.png',
+      '../assets/carousel/cover6.png'
+    ];
+    // Fallback por si falta algún PNG — mismo gradiente de antes
+    const CAROUSEL_FALLBACK_COLORS = [
       'linear-gradient(135deg, var(--neon-solid), #14532d)',
       'linear-gradient(135deg, var(--purple-solid), #4c1d95)',
       'linear-gradient(135deg, var(--cyan-solid), #164e63)',
@@ -989,9 +998,13 @@ function showEmpty(q) {
     function tickCarousel() {
       const box = document.getElementById('coverCarousel');
       if (!box) { clearInterval(carouselInterval); carouselInterval = null; return; }
-      const n = CAROUSEL_COLORS.length;
+      const n = CAROUSEL_COVERS.length;
       if (!box.children.length) {
-        box.innerHTML = CAROUSEL_COLORS.map((_, i) => `<div class="cover-panel" id="cp-${i}"><span>🎵</span></div>`).join('');
+        box.innerHTML = CAROUSEL_COVERS.map((src, i) => `
+          <div class="cover-panel" id="cp-${i}" style="background:${CAROUSEL_FALLBACK_COLORS[i]}">
+            <img src="${src}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;"
+                 onerror="this.style.display='none'"/>
+          </div>`).join('');
       }
       for (let i = 0; i < n; i++) {
         const panel = document.getElementById(`cp-${i}`);
@@ -1000,7 +1013,6 @@ function showEmpty(q) {
         if (offset > n / 2) offset -= n;
         if (offset < -n / 2) offset += n;
         const abs = Math.abs(offset);
-        panel.style.background = CAROUSEL_COLORS[i];
         panel.style.transform = `translateX(${offset * 78}px) translateZ(${abs === 0 ? 0 : -120}px) rotateY(${offset * -28}deg) scale(${abs === 0 ? 1 : 0.72})`;
         panel.style.opacity = abs > 2 ? 0 : (abs === 0 ? 1 : 0.55);
         panel.style.zIndex = 10 - abs;
