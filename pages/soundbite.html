@@ -232,6 +232,9 @@
           <img id="sbImage" class="sb-detail-img" src="" alt=""/>
         </div>
 <div class="edit-btns-col sb-reveal">
+  <button class="edit-title-btn" id="editUrlBtn" style="display:none">
+  <img src="../assets/icons/camera.png" alt=""/> Fix audio link
+</button>
           <button class="edit-title-btn" id="editTitleBtn" style="display:none">
             <img src="../assets/icons/camera.png" alt=""/> Edit soundtrack
           </button>
@@ -264,6 +267,14 @@
         </div>
       </div>
 
+<div class="edit-title-form" id="editUrlForm">
+  <input type="url" id="editUrlInput" placeholder="https://archive.org/download/..."/>
+  <div class="edit-title-actions">
+    <button class="btn-primary" id="saveUrlBtn">Save</button>
+    <button class="btn-outline" id="cancelUrlBtn">Cancel</button>
+  </div>
+</div>
+  
 <div class="edit-title-form" id="editCategoriaForm">
         <select id="editCategoriaSelect">
           <option value="orquestal">Orchestral & Instrumental</option>
@@ -458,14 +469,15 @@ function render() {
         document.getElementById('descBox').style.display = 'block';
       }
 
-      updateEditButtonVisibility();
+updateEditButtonVisibility();
       if (currentUser) applyUserState();
     }
 
-    function updateEditButtonVisibility() {
+function updateEditButtonVisibility() {
       const isOwner = currentUser && sbData && currentUser.uid === sbData.autorId;
       document.getElementById('editTitleBtn').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('editCategoriaBtn').style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('editUrlBtn').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('deleteSBBtn').style.display = isOwner ? 'flex' : 'none';
     }
 
@@ -537,6 +549,48 @@ function render() {
         window.showToast && window.showToast('Category updated');
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save';
+      }
+    });
+
+    document.getElementById('editUrlBtn').addEventListener('click', () => {
+      document.getElementById('editTitleForm').style.display = 'none';
+      document.getElementById('editCategoriaForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'none';
+      document.getElementById('editUrlForm').style.display = 'flex';
+      document.getElementById('editUrlInput').value = sbData.url || '';
+    });
+
+    document.getElementById('cancelUrlBtn').addEventListener('click', () => {
+      document.getElementById('editUrlForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'block';
+    });
+
+    document.getElementById('saveUrlBtn').addEventListener('click', async () => {
+      if (!currentUser || currentUser.uid !== sbData.autorId) return;
+      const nuevaUrl = document.getElementById('editUrlInput').value.trim();
+      if (!nuevaUrl) { window.showToast && window.showToast('Paste a link first.', 'error'); return; }
+
+      const btn = document.getElementById('saveUrlBtn');
+      btn.disabled = true; btn.textContent = 'Checking link...';
+
+      try {
+        await new Promise((resolve, reject) => {
+          const test = new Audio();
+          test.crossOrigin = 'anonymous';
+          test.addEventListener('loadedmetadata', resolve, { once: true });
+          test.addEventListener('error', () => reject(new Error('That link doesn\'t load. Check it and try again.')), { once: true });
+          test.src = nuevaUrl;
+        });
+
+        await updateDoc(doc(db,'audios',sbId), { url: nuevaUrl });
+        sbData.url = nuevaUrl;
+        document.getElementById('editUrlForm').style.display = 'none';
+        document.getElementById('titleDisplay').style.display = 'block';
+        window.showToast && window.showToast('Link fixed');
+      } catch(e) {
+        window.showToast && window.showToast(e.message || ('Error: ' + e.message), 'error');
       } finally {
         btn.disabled = false; btn.textContent = 'Save';
       }
