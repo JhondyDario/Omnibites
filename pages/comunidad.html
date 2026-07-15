@@ -499,16 +499,15 @@ const newBtn = document.getElementById(`r-${type}-${id}`);
           if(el >= dur) clearInterval(progIv);
         }, 100);
 
-      }catch(e){
-        if(myToken !== playToken) return;
-        const b = document.getElementById(`sbplay-${id}`);
-        if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.style.background='var(--danger)'; b.disabled=false; }
-        setTimeout(() => {
-          const b = document.getElementById(`sbplay-${id}`);
-          if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.style.background=''; b.disabled=false; }
-        }, 3000);
-      }
-    }
+}catch(e){
+  if(myToken !== playToken) return;
+  const b = document.getElementById(`sbplay-${id}`);
+  if(b){ b.innerHTML='<img src="../assets/icons/error.png" alt="Error"/>'; b.disabled=false; }
+  setTimeout(() => {
+    const b = document.getElementById(`sbplay-${id}`);
+    if(b){ b.innerHTML='<img src="../assets/icons/play.png" alt="Play"/>'; b.disabled=false; }
+  }, 3000);
+}
 
     window.playSB = async function(id, url, ts, te){
       if(activeSBId === id){
