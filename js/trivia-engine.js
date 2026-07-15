@@ -112,7 +112,7 @@ async function fetchTracksForGame(nombreJuego, cantidad = 2) {
       const data = await res.json();
       const files = (data?.result || [])
         .filter(f => /\.(mp3|ogg)$/i.test(f.name))
-        .filter(f => { const s = parseFloat(f.length) || 0; return s === 0 || (s >= 15 && s <= 400); })
+        .filter(f => { const s = parseFloat(f.length) || 0; return s === 0 || (s >= 15 && s <= 300); })
         .filter(f => !/\b(sfx|effect|jingle|voice|vo_|fx_|podcast|interview)\b/i.test(f.name));
       for (const f of files) {
         if (tracks.length >= cantidad) break;
