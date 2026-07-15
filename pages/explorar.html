@@ -633,7 +633,7 @@ let audioCtx = null;
           .filter(f => /\.(mp3|ogg|flac|wav)$/i.test(f.name))
           .filter(f => {
             const secs = parseFloat(f.length) || 0;
-            return secs === 0 || (secs >= 10 && secs <= 600);
+            return secs === 0 || (secs >= 10 && secs <= 300);
           })
           .filter(f => !/\b(sfx|effect|jingle|short|voice|vo_|fx_|podcast|interview|episode)\b/i.test(f.name));
 
