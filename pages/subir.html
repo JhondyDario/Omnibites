@@ -36,6 +36,10 @@
     .auth-wall p { color:var(--text-dim);font-size:.85rem;margin-bottom:1.5rem; }
     .auth-wall .aw-btns { display:flex;gap:.75rem;justify-content:center; }
 
+    /* ── SELECTOR DE MODO (short / long) ── */
+    .modo-toggle-wrap { margin-bottom: 1.25rem; }
+    .modo-btn:disabled { opacity:.35; cursor:not-allowed; }
+
     /* ── SLIDER DE RECORTE ── */
     .trim-slider-wrap { margin-bottom: 1rem; }
     .trim-track { position:relative;height:42px;background:var(--bg3);border-radius:8px;margin-top:.5rem;cursor:pointer;touch-action:none; }
@@ -201,6 +205,16 @@
           <span class="source-chip">OverClocked ReMix</span>
           <span class="source-chip">Any direct .mp3 / .ogg</span>
         </div>
+      </div>
+
+      <div class="modo-toggle-wrap">
+        <p style="font-size:.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem">Clip length</p>
+        <div class="tab-row" style="margin-bottom:.5rem">
+          <button type="button" class="tab-btn modo-btn active" data-modo="short" id="modoShortBtn">Short (10–15s)</button>
+          <button type="button" class="tab-btn modo-btn" data-modo="long" id="modoLongBtn">Long (30–60s)</button>
+        </div>
+        <p style="font-size:.72rem;color:var(--text-dim);line-height:1.6">The longer the clip, the more it weighs — Short is best for quick previews, Long for full musical passages.</p>
+        <p id="modoLockHint" style="display:none;font-size:.72rem;color:var(--gold);margin-top:.4rem">This audio is shorter than 30s, so Long mode isn't available here.</p>
       </div>
 
       <div class="url-wrap">
@@ -369,6 +383,49 @@
     let imagenFromArchive = '';
     let imagenFromRawg    = '';
 
+    // ── MODO short/long — define el rango permitido del clip ──
+    const MODOS = { short: { min: 10, max: 15, label: 'Short' }, long: { min: 30, max: 60, label: 'Long' } };
+    let modoActual = 'short';
+
+    function updateModoAvailability(dur) {
+      const longBtn  = document.getElementById('modoLongBtn');
+      const lockHint = document.getElementById('modoLockHint');
+      if (dur < 30) {
+        longBtn.disabled = true;
+        lockHint.style.display = 'block';
+        if (modoActual === 'long') modoActual = 'short';
+      } else {
+        longBtn.disabled = false;
+        lockHint.style.display = 'none';
+      }
+      document.querySelectorAll('.modo-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === modoActual));
+    }
+
+    function reclampTrimToModo() {
+      const dur = audioPlayer.duration;
+      if (!dur) return;
+      const cfg    = MODOS[modoActual];
+      const maxLen = Math.min(cfg.max, dur);
+      const minLen = Math.min(cfg.min, maxLen);
+      let start = 0, end = maxLen;
+      if (end - start < minLen) start = Math.max(0, end - minLen);
+      setupTrimSlider(dur, start, end);
+      document.getElementById('durationInfo').textContent =
+        `Total duration: ${fmt(dur)} — drag the block to move the clip, the edges to resize it (${minLen}–${Math.round(maxLen)} sec)`;
+    }
+
+    document.getElementById('modoShortBtn').addEventListener('click', () => {
+      modoActual = 'short';
+      document.querySelectorAll('.modo-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === 'short'));
+      if (audioPlayer.duration) reclampTrimToModo();
+    });
+    document.getElementById('modoLongBtn').addEventListener('click', () => {
+      if (document.getElementById('modoLongBtn').disabled) return;
+      modoActual = 'long';
+      document.querySelectorAll('.modo-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === 'long'));
+      if (audioPlayer.duration) reclampTrimToModo();
+    });
+
     async function getNombreUsuario(uid) {
       try {
         const snap = await getDoc(doc(db, 'usuarios', uid));
@@ -447,12 +504,16 @@
       audioPlayer.load();
       audioPlayer.onloadedmetadata = () => {
         const dur = audioPlayer.duration;
+        updateModoAvailability(dur);
+        const cfg    = MODOS[modoActual];
+        const maxLen = Math.min(cfg.max, dur);
+        const minLen = Math.min(cfg.min, maxLen);
         let start = Math.max(0, startHint);
         let end   = Math.min(endHint, dur);
-        if (end - start < 10) end   = Math.min(start + 15, dur);
-        if (end - start < 10) start = Math.max(0, end - 10);
+        if (end - start < minLen) end   = Math.min(start + maxLen, dur);
+        if (end - start < minLen) start = Math.max(0, end - minLen);
         setupTrimSlider(dur, start, end);
-        document.getElementById('durationInfo').textContent = `Total duration: ${fmt(dur)} — drag the block to move the clip, the edges to resize it (10–15 sec)`;
+        document.getElementById('durationInfo').textContent = `Total duration: ${fmt(dur)} — drag the block to move the clip, the edges to resize it (${minLen}–${Math.round(maxLen)} sec)`;
         document.getElementById('previewSection').classList.remove('locked');
       };
       audioPlayer.onerror = () => {
@@ -464,7 +525,7 @@
 
     // ════════════════════════════════════════════
     // SLIDER DE RECORTE
-    // - Arrastrar un borde: redimensiona el clip (10–15s)
+    // - Arrastrar un borde: redimensiona el clip (respetando el modo short/long activo)
     // - Arrastrar el bloque verde (el medio): mueve el clip completo
     // - Tocar cualquier parte vacía de la pista: salta el clip hasta ahí
     // - Elementos reconstruidos en cada carga para evitar listeners viejos
@@ -525,14 +586,17 @@
           handle.setPointerCapture(e.pointerId);
 
           function onMove(ev) {
+            const cfg    = MODOS[modoActual];
+            const maxLen = Math.min(cfg.max, trackDuration);
+            const minLen = Math.min(cfg.min, maxLen);
             let sec = secFromX(ev.clientX);
             if (isStart) {
-              sec = Math.min(sec, sliderEnd - 10);
-              sec = Math.max(sec, sliderEnd - 15);
+              sec = Math.min(sec, sliderEnd - minLen);
+              sec = Math.max(sec, sliderEnd - maxLen);
               sliderStart = Math.max(0, sec);
             } else {
-              sec = Math.max(sec, sliderStart + 10);
-              sec = Math.min(sec, sliderStart + 15);
+              sec = Math.max(sec, sliderStart + minLen);
+              sec = Math.min(sec, sliderStart + maxLen);
               sliderEnd = Math.min(sec, trackDuration);
             }
             render();
@@ -636,8 +700,7 @@
       if (previewGain) previewGain.gain.cancelScheduledValues(getPreviewCtx().currentTime);
     });
 
-    // Drop zone
-      function setupCharCounter(inputId, counterId, max) {
+    function setupCharCounter(inputId, counterId, max) {
       const input   = document.getElementById(inputId);
       const counter = document.getElementById(counterId);
       input.addEventListener('input', () => {
@@ -648,31 +711,6 @@
     }
     setupCharCounter('titulo', 'tituloCounter', 60);
     setupCharCounter('descripcion', 'descripcionCounter', 300);
-
-    function validateFile(file) {
-      const errEl = document.getElementById('fileError');
-      const okEl  = document.getElementById('fileOk');
-      errEl.style.display = 'none'; okEl.style.display = 'none';
-      if (!file) return;
-      if (file.type !== 'audio/mpeg' && !file.name.endsWith('.mp3')) {
-        errEl.textContent = 'Only MP3 files are accepted.'; errEl.style.display = 'block'; return;
-      }
-      const tmpUrl = URL.createObjectURL(file);
-      const tmp    = new Audio(tmpUrl);
-      tmp.onloadedmetadata = () => {
-        const dur = tmp.duration;
-        URL.revokeObjectURL(tmpUrl);
-        if (dur < 10 || dur > 15) {
-          errEl.textContent = `The file is ${dur.toFixed(1)}s long. It must be between 10 and 15 seconds.`;
-          errEl.style.display = 'block'; localFileUrl = null; return;
-        }
-localFileUrl      = URL.createObjectURL(file);
-        localFileObj      = file;
-        localFileDuration = dur;
-        okEl.textContent  = `${file.name} — ${dur.toFixed(1)}s ready to publish`;
-        okEl.style.display = 'block';
-      };
-    }
 
     // ════════════════════════════════════════════
     // AUTOCOMPLETE DE JUEGO — RAWG API
@@ -818,9 +856,10 @@ localFileUrl      = URL.createObjectURL(file);
       if (!url) { window.showToast('Paste an audio link.','error'); return; }
       const trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
       const trimEnd   = parseFloat(document.getElementById('trimEnd').value)   || 15;
-      const clipDur = trimEnd - trimStart;
-      if (clipDur < 10) { window.showToast('The clip must be at least 10 seconds long.','error'); return; }
-      if (clipDur > 15) { window.showToast('The clip can\'t be longer than 15 seconds.','error'); return; }
+      const modoCfg   = MODOS[modoActual];
+      const clipDur   = trimEnd - trimStart;
+      if (clipDur < modoCfg.min) { window.showToast(`The clip must be at least ${modoCfg.min} seconds long.`,'error'); return; }
+      if (clipDur > modoCfg.max) { window.showToast(`The clip can't be longer than ${modoCfg.max} seconds.`,'error'); return; }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true; btn.textContent = 'Publishing...';
@@ -837,7 +876,7 @@ localFileUrl      = URL.createObjectURL(file);
 if (!dupeSnap.empty) {
           const dupeId = dupeSnap.docs[0].id;
           await updateDoc(doc(db,'audios',dupeId), {
-            url, consola, categoria,
+            url, consola, categoria, modo: modoActual,
             descripcion: document.getElementById('descripcion').value.trim(),
             trimStart, trimEnd, duracion: fmt(trimEnd - trimStart),
             autorNombre, imagen: imagenFromRawg || imagenFromArchive || '', creadoEn: serverTimestamp()
@@ -848,7 +887,7 @@ if (!dupeSnap.empty) {
         }
 
 const nuevoDoc = await addDoc(collection(db,'audios'), {
-          url, titulo, juego, consola, categoria,
+          url, titulo, juego, consola, categoria, modo: modoActual,
           descripcion: document.getElementById('descripcion').value.trim(),
           trimStart, trimEnd,
           duracion: fmt(trimEnd - trimStart),
