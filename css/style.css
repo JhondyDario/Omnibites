@@ -787,3 +787,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 @media(max-width:480px){
   .notif-panel{position:fixed;top:58px;right:.5rem;left:.5rem;width:auto;max-width:none;}
 }
+
+.modo-btn:disabled{opacity:.35;cursor:not-allowed;}
+.sb-time-range{display:inline-flex;gap:.3rem;}
+.modo-badge{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:.15rem .55rem;border-radius:20px;background:var(--bg3);color:var(--cyan);border:1px solid var(--border);white-space:nowrap;}
+.modo-badge.long{color:var(--purple);border-color:var(--purple);}
