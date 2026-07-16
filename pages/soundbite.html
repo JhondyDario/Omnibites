@@ -62,7 +62,6 @@
 .sb-volume-label img{width:16px;height:16px;object-fit:contain;opacity:.7;}
 .sb-volume-card input[type="range"]{flex:1;accent-color:var(--cyan);}
 
-    .edit-btns-col{display:flex;flex-direction:column;gap:.5rem;}
     .edit-title-form select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.65rem .85rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
     .edit-title-form select:focus{border-color:var(--neon);}
 
@@ -95,7 +94,7 @@
     /* Mientras suena, las cartas de atrás se ocultan del todo — evita que el
        glow-ring se monte feo sobre sus esquinas rotadas */
     .sb-img-wrap.playing .sb-img-card{opacity:0;}
-
+.sb-thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);}
 .sb-detail-img{width:170px;height:170px;border-radius:16px;object-fit:cover;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;animation:sbCoverIntro .7s cubic-bezier(.34,1.56,.64,1) forwards;}
     @keyframes sbCoverIntro{0%{transform:scale(.4);opacity:0;}60%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);opacity:1;}}
     .sb-reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease;}
@@ -138,10 +137,25 @@
       animation:sb-wave-ring 1.6s ease-in-out infinite;
     }
     .sb-img-wrap.playing::after{inset:-14px;border-width:1.5px;opacity:.4;animation-delay:.5s;}
-    .edit-title-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);padding:.5rem 1rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:border-color .2s,color .2s;display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
-    .edit-title-btn:hover{border-color:var(--neon);color:var(--neon);}
-    .edit-title-btn img{width:16px;height:16px;object-fit:contain;}
+    .sb-title-row{display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.sb-title-row h1{margin:0;}
 
+.edit-pencil-btn{
+  background:none;border:none;cursor:pointer;padding:.2rem;
+  display:inline-flex;align-items:center;justify-content:center;
+  opacity:.55;transition:opacity .2s;
+}
+.edit-pencil-btn:hover{opacity:1;}
+.edit-pencil-btn img{width:18px;height:18px;object-fit:contain;}
+
+.edit-pencil-btn-sm{
+  background:none;border:none;cursor:pointer;padding:0 .1rem;
+  display:inline-flex;align-items:center;
+  opacity:.55;transition:opacity .2s;
+}
+.edit-pencil-btn-sm:hover{opacity:1;}
+.edit-pencil-btn-sm img{width:14px;height:14px;object-fit:contain;}
+    
     .sb-detail-header{text-align:center;margin-bottom:1.5rem;}
     .sb-detail-header h1{font-family:var(--font-head);font-size:1.35rem;font-weight:700;margin-bottom:.3rem;}
     .sb-detail-juego{font-size:.8rem;color:var(--text-dim);}
@@ -172,8 +186,7 @@
 @media(max-width:480px){
       .sb-detail-img-row{flex-direction:column;}
       .sb-detail-img{width:150px;height:150px;}
-      .edit-btns-col{width:100%;align-items:center;}
-      .edit-title-btn{width:100%;max-width:220px;justify-content:center;}
+    .sb-thumb{width:56px;height:56px;}
     }
 
     .icon-btn-report:hover{border-color:var(--danger);background:rgba(248,113,113,.07);}
@@ -224,29 +237,22 @@
     <div id="sbMain" style="display:none">
 
 <div class="sb-detail-img-row">
-        <div class="sb-img-wrap" id="sbImgWrap">
-          <div class="sb-img-card sb-img-card-3"></div>
-          <div class="sb-img-card sb-img-card-2"></div>
-          <div class="sb-img-card sb-img-card-1"></div>
-          <div class="sb-img-glow"></div>
-          <img id="sbImage" class="sb-detail-img" src="" alt=""/>
-        </div>
-<div class="edit-btns-col sb-reveal">
-  <button class="edit-title-btn" id="editUrlBtn" style="display:none">
-  <img src="../assets/icons/camera.png" alt=""/> Fix audio link
-</button>
-          <button class="edit-title-btn" id="editTitleBtn" style="display:none">
-            <img src="../assets/icons/camera.png" alt=""/> Edit soundtrack
-          </button>
-          <button class="edit-title-btn" id="editCategoriaBtn" style="display:none">
-            <img src="../assets/icons/camera.png" alt=""/> Edit category
-          </button>
-        </div>
-      </div>
+  <div class="sb-img-wrap" id="sbImgWrap">
+    <div class="sb-img-card sb-img-card-3"></div>
+    <div class="sb-img-card sb-img-card-2"></div>
+    <div class="sb-img-card sb-img-card-1"></div>
+    <div class="sb-img-glow"></div>
+    <img id="sbImage" class="sb-detail-img" src="" alt=""/>
+  </div>
+</div>
 
-<div class="sb-reveal" id="sbRevealWrap">
 <div class="sb-detail-header" id="titleDisplay">
-        <h1 id="sbTitulo"></h1>
+        <div class="sb-title-row">
+          <h1 id="sbTitulo"></h1>
+          <button class="edit-pencil-btn" id="editTitleBtn" style="display:none" title="Edit title">
+            <img src="../assets/icons/edit.png" alt="Edit"/>
+          </button>
+        </div>
         <p class="sb-detail-juego" id="sbJuego"></p>
       </div>
 
@@ -254,6 +260,9 @@
         <a id="sbAutorLink" class="sb-meta-autor" href="#"></a>
         <span class="sb-meta-dot">·</span>
         <span id="sbClasificacion" class="sb-meta-neon"></span>
+        <button class="edit-pencil-btn-sm" id="editCategoriaBtn" style="display:none" title="Edit category">
+          <img src="../assets/icons/edit.png" alt="Edit"/>
+        </button>
         <span class="sb-meta-dot">·</span>
         <span id="sbConsolaMeta" class="sb-meta-blue"></span>
       </div>
@@ -324,6 +333,9 @@
         </button>
 <button class="icon-btn icon-btn-report" id="reportBtn" title="Report">
           <img src="../assets/icons/report.png" alt="Report"/>
+        </button>
+<button class="icon-btn" id="editUrlBtn" title="Fix audio link" style="display:none">
+          <img src="../assets/icons/edit.png" alt="Edit link"/>
         </button>
         <button class="icon-btn icon-btn-report" id="deleteSBBtn" title="Delete" style="display:none">
           <img src="../assets/reactions/delete.png" alt="Delete"/>
@@ -475,9 +487,9 @@ updateEditButtonVisibility();
 
 function updateEditButtonVisibility() {
       const isOwner = currentUser && sbData && currentUser.uid === sbData.autorId;
-      document.getElementById('editTitleBtn').style.display = isOwner ? 'flex' : 'none';
-      document.getElementById('editCategoriaBtn').style.display = isOwner ? 'flex' : 'none';
-      document.getElementById('editUrlBtn').style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('editTitleBtn').style.display = isOwner ? 'inline-flex' : 'none';
+      document.getElementById('editCategoriaBtn').style.display = isOwner ? 'inline-flex' : 'none';
+      document.getElementById('editUrlBtn').style.display = isOwner ? 'inline-flex' : 'none';
       document.getElementById('deleteSBBtn').style.display = isOwner ? 'flex' : 'none';
     }
 
