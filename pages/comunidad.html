@@ -253,7 +253,10 @@ function sbCard(a, i) {
     </button>
     <div class="sb-prog-wrap">
                   <div class="sb-prog-bar" id="sbbar-${a.id}" style="cursor:pointer" onclick="seekSB(event,'${a.id}','${a.url}',${a.trimStart||0},${a.trimEnd||15})"><div class="sb-prog-fill" id="sbprog-${a.id}"></div></div>
-                  <div class="sb-time"><span id="sbcur-${a.id}">0:00</span><span>${a.duracion||'0:15'}</span></div>
+<div class="sb-time">
+  <span class="sb-time-range"><span id="sbcur-${a.id}">0:00</span> - <span>${a.duracion||'0:15'}</span></span>
+  <span class="modo-badge ${a.modo==='long'?'long':''}">${a.modo==='long'?'Long':'Short'}</span>
+</div>
                 </div>
               </div>
               <div class="sb-footer">
