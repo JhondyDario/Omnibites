@@ -155,6 +155,18 @@
 }
 .edit-pencil-btn-sm:hover{opacity:1;}
 .edit-pencil-btn-sm img{width:14px;height:14px;object-fit:contain;}
+
+    /* ── BADGE SHORT/LONG ── */
+    .sb-time-range{display:inline-flex;gap:.3rem;}
+    .modo-badge{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:.15rem .55rem;border-radius:20px;background:var(--bg3);color:var(--cyan);border:1px solid var(--border);white-space:nowrap;}
+    .modo-badge.long{color:var(--purple);border-color:var(--purple);}
+    .modo-toggle-wrap .tab-row{margin-bottom:.5rem;}
+    .modo-btn:disabled{opacity:.35;cursor:not-allowed;}
+    .edit-clip-inputs{display:flex;gap:.6rem;margin-bottom:.5rem;}
+    .edit-clip-inputs div{flex:1;}
+    .edit-clip-inputs label{font-size:.7rem;color:var(--text-dim);display:block;margin-bottom:.2rem;}
+    .edit-clip-inputs input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.5rem .7rem;font-size:.9rem;font-family:var(--font-body);outline:none;}
+    .edit-clip-inputs input:focus{border-color:var(--neon);}
     
     .sb-detail-header{text-align:center;margin-bottom:1.5rem;}
     .sb-detail-header h1{font-family:var(--font-head);font-size:1.35rem;font-weight:700;margin-bottom:.3rem;}
@@ -300,13 +312,42 @@
         </div>
       </div>
 
+<div class="edit-title-form" id="editClipForm" style="max-width:420px">
+  <div class="modo-toggle-wrap">
+    <div class="tab-row">
+      <button type="button" class="tab-btn modo-btn" data-modo="short" id="editModoShortBtn">Short (10–15s)</button>
+      <button type="button" class="tab-btn modo-btn" data-modo="long" id="editModoLongBtn">Long (30–60s)</button>
+    </div>
+  </div>
+  <p style="font-size:.72rem;color:var(--text-dim);margin-bottom:.6rem" id="editClipHint">Loading full track duration...</p>
+  <div class="edit-clip-inputs">
+    <div>
+      <label>Start (sec)</label>
+      <input type="number" id="editStartInput" min="0" step="1"/>
+    </div>
+    <div>
+      <label>End (sec)</label>
+      <input type="number" id="editEndInput" min="0" step="1"/>
+    </div>
+  </div>
+  <div class="edit-title-actions">
+    <button class="btn-primary" id="saveClipBtn">Save</button>
+    <button class="btn-outline" id="cancelClipBtn">Cancel</button>
+  </div>
+</div>
+
 <div class="sb-player">
   <button class="sb-play" id="sbPlayBtn"><img src="../assets/icons/play.png" alt="Play"/></button>
   <div class="sb-prog-wrap">
     <div class="sb-prog-bar" id="sbProgBar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
 <div class="sb-time">
   <span class="sb-time-range"><span id="sbCur">0:00</span> - <span id="sbTotal">0:15</span></span>
-  <span class="modo-badge" id="sbModoBadge">Short</span>
+  <span style="display:inline-flex;align-items:center;gap:.3rem">
+    <span class="modo-badge" id="sbModoBadge">Short</span>
+    <button class="edit-pencil-btn-sm" id="editClipBtn" style="display:none" title="Edit clip length">
+      <img src="../assets/icons/edit.png" alt="Edit"/>
+    </button>
+  </span>
 </div>
   </div>
 </div>
@@ -390,7 +431,12 @@ arrayUnion, arrayRemove, serverTimestamp} from "https://www.gstatic.com/firebase
 
     let currentUser = null, sbData = null, lastElapsed = 0;
     let audioCtx = null, source = null, gain = null, volGain = null, isPlaying = false, progIv = null, playToken = 0, pausedAt = 0, currentVolume = 1;
-    const CLIP = 15, FADE = 2;
+    const FADE = 2;
+
+    // ── MODO short/long — el tope real del clip depende de sbData.modo.
+    // Los soundbites viejos sin campo `modo` se tratan como 'short'. ──
+    const MODOS_CLIP = { short: 15, long: 60 };
+    function getClipCap() { return MODOS_CLIP[sbData?.modo === 'long' ? 'long' : 'short']; }
 
     function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
     function fmt(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
@@ -475,6 +521,11 @@ function render() {
 
       document.getElementById('sbTotal').textContent = sbData.duracion || '0:15';
 
+      const modo = sbData.modo === 'long' ? 'long' : 'short';
+      const badgeEl = document.getElementById('sbModoBadge');
+      badgeEl.textContent = modo === 'long' ? 'Long' : 'Short';
+      badgeEl.classList.toggle('long', modo === 'long');
+
       const r = sbData.reactions || { love: 0, meh: 0 };
       document.getElementById('loveCount').textContent = r.love || 0;
       document.getElementById('mehCount').textContent  = r.meh  || 0;
@@ -493,6 +544,7 @@ function updateEditButtonVisibility() {
       document.getElementById('editTitleBtn').style.display = isOwner ? 'inline-flex' : 'none';
       document.getElementById('editCategoriaBtn').style.display = isOwner ? 'inline-flex' : 'none';
       document.getElementById('editUrlBtn').style.display = isOwner ? 'inline-flex' : 'none';
+      document.getElementById('editClipBtn').style.display = isOwner ? 'inline-flex' : 'none';
       document.getElementById('deleteSBBtn').style.display = isOwner ? 'flex' : 'none';
     }
 
@@ -529,8 +581,16 @@ function updateEditButtonVisibility() {
       btn.title = 'You already reported this soundbite';
     }
 
-    document.getElementById('editTitleBtn').addEventListener('click', () => {
+    function ocultarTodosLosFormsDeEdicion() {
+      document.getElementById('editTitleForm').style.display = 'none';
       document.getElementById('editCategoriaForm').style.display = 'none';
+      document.getElementById('editUrlForm').style.display = 'none';
+      document.getElementById('editClipForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'block';
+    }
+
+    document.getElementById('editTitleBtn').addEventListener('click', () => {
+      ocultarTodosLosFormsDeEdicion();
       document.getElementById('titleDisplay').style.display = 'none';
       document.getElementById('editTitleForm').style.display = 'flex';
       const input = document.getElementById('editTitleInput');
@@ -540,8 +600,7 @@ function updateEditButtonVisibility() {
     });
 
     document.getElementById('editCategoriaBtn').addEventListener('click', () => {
-      document.getElementById('editTitleForm').style.display = 'none';
-      document.getElementById('titleDisplay').style.display = 'block';
+      ocultarTodosLosFormsDeEdicion();
       document.getElementById('editCategoriaForm').style.display = 'flex';
       document.getElementById('editCategoriaSelect').value = sbData.categoria || '';
     });
@@ -570,9 +629,7 @@ function updateEditButtonVisibility() {
     });
 
     document.getElementById('editUrlBtn').addEventListener('click', () => {
-      document.getElementById('editTitleForm').style.display = 'none';
-      document.getElementById('editCategoriaForm').style.display = 'none';
-      document.getElementById('titleDisplay').style.display = 'none';
+      ocultarTodosLosFormsDeEdicion();
       document.getElementById('editUrlForm').style.display = 'flex';
       document.getElementById('editUrlInput').value = sbData.url || '';
     });
@@ -635,6 +692,108 @@ function updateEditButtonVisibility() {
         document.getElementById('editTitleForm').style.display = 'none';
         document.getElementById('titleDisplay').style.display = 'block';
         window.showToast && window.showToast('Title updated');
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save';
+      }
+    });
+
+    // ── EDITAR LARGO DEL CLIP (short/long) ──
+    const MODOS_EDIT = { short: { min: 10, max: 15 }, long: { min: 30, max: 60 } };
+    let editModo = 'short', editFullDuration = 0, editAudioProbe = null;
+
+    document.getElementById('editClipBtn').addEventListener('click', async () => {
+      ocultarTodosLosFormsDeEdicion();
+      document.getElementById('editClipForm').style.display = 'flex';
+
+      editModo = sbData.modo === 'long' ? 'long' : 'short';
+      document.querySelectorAll('#editClipForm .modo-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === editModo));
+      document.getElementById('editStartInput').value = sbData.trimStart || 0;
+      document.getElementById('editEndInput').value   = sbData.trimEnd || 15;
+      document.getElementById('editClipHint').textContent = 'Loading full track duration...';
+
+      if (!editAudioProbe) {
+        editAudioProbe = new Audio();
+        editAudioProbe.crossOrigin = 'anonymous';
+        editAudioProbe.preload = 'metadata';
+        editAudioProbe.src = sbData.url;
+        await new Promise(resolve => {
+          editAudioProbe.addEventListener('loadedmetadata', resolve, { once: true });
+          editAudioProbe.addEventListener('error', resolve, { once: true });
+        });
+      }
+      editFullDuration = editAudioProbe.duration || (sbData.trimEnd || 15);
+
+      const longBtn = document.getElementById('editModoLongBtn');
+      longBtn.disabled = editFullDuration < 30;
+      if (editModo === 'long' && longBtn.disabled) {
+        editModo = 'short';
+        document.querySelectorAll('#editClipForm .modo-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === 'short'));
+      }
+      const maxLen = Math.min(MODOS_EDIT[editModo].max, editFullDuration);
+      document.getElementById('editClipHint').textContent =
+        `Full track is ${fmt(editFullDuration)} long. In ${editModo} mode the clip must be between ${MODOS_EDIT[editModo].min} and ${Math.round(maxLen)} seconds.`;
+    });
+
+    document.querySelectorAll('#editClipForm .modo-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        if (b.disabled) return;
+        editModo = b.dataset.modo;
+        document.querySelectorAll('#editClipForm .modo-btn').forEach(x => x.classList.toggle('active', x === b));
+        const cfg = MODOS_EDIT[editModo];
+        const maxLen = Math.min(cfg.max, editFullDuration);
+        const minLen = Math.min(cfg.min, maxLen);
+        document.getElementById('editStartInput').value = 0;
+        document.getElementById('editEndInput').value = Math.round(maxLen);
+        document.getElementById('editClipHint').textContent =
+          `Full track is ${fmt(editFullDuration)} long. In ${editModo} mode the clip must be between ${minLen} and ${Math.round(maxLen)} seconds.`;
+      });
+    });
+
+    document.getElementById('cancelClipBtn').addEventListener('click', () => {
+      document.getElementById('editClipForm').style.display = 'none';
+      document.getElementById('titleDisplay').style.display = 'block';
+    });
+
+    document.getElementById('saveClipBtn').addEventListener('click', async () => {
+      if (!currentUser || currentUser.uid !== sbData.autorId) return;
+      const cfg = MODOS_EDIT[editModo];
+      const start = parseFloat(document.getElementById('editStartInput').value) || 0;
+      const end   = parseFloat(document.getElementById('editEndInput').value) || 0;
+      const clipDur = end - start;
+      const maxLen = Math.min(cfg.max, editFullDuration);
+
+      if (start < 0 || end > editFullDuration) { window.showToast && window.showToast('Range is outside the track length.', 'error'); return; }
+      if (clipDur < cfg.min || clipDur > maxLen) {
+        window.showToast && window.showToast(`The clip must be between ${cfg.min} and ${Math.round(maxLen)} seconds for ${editModo} mode.`, 'error');
+        return;
+      }
+
+      const btn = document.getElementById('saveClipBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const nuevaDuracion = fmt(clipDur);
+        await updateDoc(doc(db,'audios',sbId), {
+          modo: editModo, trimStart: Math.round(start), trimEnd: Math.round(end), duracion: nuevaDuracion
+        });
+        sbData.modo = editModo;
+        sbData.trimStart = Math.round(start);
+        sbData.trimEnd = Math.round(end);
+        sbData.duracion = nuevaDuracion;
+
+        // Detenemos cualquier reproducción activa — si veníamos de long y ahora
+        // es short (o viceversa), el rango viejo ya no aplica y hay que arrancar limpio.
+        stopPlayback();
+
+        document.getElementById('sbTotal').textContent = nuevaDuracion;
+        const badgeEl = document.getElementById('sbModoBadge');
+        badgeEl.textContent = editModo === 'long' ? 'Long' : 'Short';
+        badgeEl.classList.toggle('long', editModo === 'long');
+
+        document.getElementById('editClipForm').style.display = 'none';
+        document.getElementById('titleDisplay').style.display = 'block';
+        window.showToast && window.showToast('Clip updated');
       } catch(e) {
         window.showToast && window.showToast('Error: ' + e.message, 'error');
       } finally {
@@ -789,8 +948,9 @@ const btn = document.getElementById('sbPlayBtn');
         });
         if (myToken !== playToken) { btn.innerHTML = '<img src="../assets/icons/play.png" alt="Play"/>'; btn.disabled = false; return; }
 
+        const clipCap = getClipCap();
         const baseStart = Math.min(sbData.trimStart || 0, audioEl.duration - 1);
-        const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP, audioEl.duration - baseStart);
+        const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), clipCap, audioEl.duration - baseStart);
         const safeResume = Math.min(Math.max(resumeOffset, 0), dur - 0.1);
         audioEl.currentTime = baseStart + safeResume;
 
@@ -840,7 +1000,7 @@ source = audioEl; gain = g; volGain = vg; isPlaying = true;
       if (!sbData) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-      const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), CLIP);
+      const dur = Math.min((sbData.trimEnd || 15) - (sbData.trimStart || 0), getClipCap());
       const target = frac * dur;
 
       lastElapsed = target;
@@ -867,7 +1027,7 @@ source = audioEl; gain = g; volGain = vg; isPlaying = true;
         const ctx = getCtx();
         if (ctx.state === 'suspended') await ctx.resume();
         const buf = await ctx.decodeAudioData(arrayBuf);
-        const dur = Math.min(15, buf.duration);
+        const dur = Math.min(getClipCap(), buf.duration);
         const sampleRate = Math.min(buf.sampleRate, 44100);
         const offCtx = new OfflineAudioContext(1, Math.floor(dur * sampleRate), sampleRate);
         const src = offCtx.createBufferSource();
