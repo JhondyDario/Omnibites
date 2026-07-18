@@ -21,7 +21,29 @@
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
   <title>Soundbites — Omnibites</title>
   <link rel="stylesheet" href="../css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .paginator {
+      display: flex;
+      gap: .4rem;
+      justify-content: center;
+      margin-top: .75rem;
+      flex-wrap: wrap;
+    }
+    .page-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 6px;
+      padding: .3rem .65rem;
+      font-size: .72rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: border-color .2s, color .2s;
+    }
+    .page-btn:hover { border-color: var(--neon); color: var(--neon); }
+    .page-btn.active { border-color: var(--neon); color: var(--neon); background: rgba(74,222,128,.08); }
+  </style>
 </head>
 <body>
   <nav class="navbar">
