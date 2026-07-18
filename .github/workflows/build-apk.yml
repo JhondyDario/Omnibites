@@ -1,0 +1,56 @@
+name: Build Omnibites APK
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "mobile/**"
+      - "index.html"
+      - "pages/**"
+      - "css/**"
+      - "js/**"
+      - "assets/**"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Copy web assets into www/
+        run: npm run prepare-www
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: mobile/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: omnibites-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,13 @@
+{
+  "appId": "com.jhondydario.omnibites",
+  "appName": "Omnibites",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
