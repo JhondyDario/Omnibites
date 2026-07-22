@@ -372,6 +372,9 @@
         <button class="icon-btn icon-btn-dl" id="dlBtn" title="Download">
           <img src="../assets/reactions/download.png" alt="Download"/>
         </button>
+        <button class="icon-btn" id="iisuBtn" title="Save to iiSU" style="display:none">
+          <img src="../assets/reactions/download.png" alt="iiSU"/>
+        </button>
         <button class="icon-btn" id="shareBtn" title="Share">
           <img src="../assets/icons/share.png" alt="Share"/>
         </button>
@@ -421,6 +424,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
     import { buildMp3Blob } from '../js/id3-cover.js';
+    import { isNativeApp, iisuFolderConfigured, iisuPickFolder, iisuSaveSoundbite } from '../js/iisu-export.js';
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, orderBy, where,
@@ -1015,44 +1019,48 @@ source = audioEl; gain = g; volGain = vg; isPlaying = true;
     }
 
     // ── DESCARGA ──
+    async function buildTrimmedMp3Blob() {
+      const response = await fetch(sbData.url, { mode: 'cors' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const arrayBuf = await response.arrayBuffer();
+      const ctx = getCtx();
+      if (ctx.state === 'suspended') await ctx.resume();
+      const buf = await ctx.decodeAudioData(arrayBuf);
+      const dur = Math.min(getClipCap(), buf.duration);
+      const sampleRate = Math.min(buf.sampleRate, 44100);
+      const offCtx = new OfflineAudioContext(1, Math.floor(dur * sampleRate), sampleRate);
+      const src = offCtx.createBufferSource();
+      src.buffer = buf;
+      const g = offCtx.createGain();
+      g.gain.setValueAtTime(0, 0);
+      g.gain.linearRampToValueAtTime(1, Math.min(2, dur * 0.15));
+      g.gain.setValueAtTime(1, Math.max(dur - 2, dur * 0.85));
+      g.gain.linearRampToValueAtTime(0, dur);
+      src.connect(g); g.connect(offCtx.destination); src.start(0, 0, dur);
+      const rendered = await offCtx.startRendering();
+      const samples = rendered.getChannelData(0);
+      const int16 = new Int16Array(samples.length);
+      for (let i = 0; i < samples.length; i++) int16[i] = Math.max(-32768, Math.min(32767, Math.round(samples[i] * 32767)));
+      if (typeof lamejs === 'undefined') throw new Error('lamejs not loaded');
+      const enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
+      const mp3 = []; const bs = 1152;
+      for (let i = 0; i < int16.length; i += bs) {
+        const chunk = int16.subarray(i, Math.min(i + bs, int16.length));
+        const d = enc.encodeBuffer(chunk);
+        if (d.length > 0) mp3.push(new Uint8Array(d));
+      }
+      const end = enc.flush();
+      if (end.length > 0) mp3.push(new Uint8Array(end));
+      return buildMp3Blob(mp3, sbData.imagen || '');
+    }
+
     async function downloadSB() {
       const btn = document.getElementById('dlBtn');
       const img = btn.querySelector('img');
       if (img) img.style.opacity = '.3';
       btn.disabled = true;
       try {
-        const response = await fetch(sbData.url, { mode: 'cors' });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const arrayBuf = await response.arrayBuffer();
-        const ctx = getCtx();
-        if (ctx.state === 'suspended') await ctx.resume();
-        const buf = await ctx.decodeAudioData(arrayBuf);
-        const dur = Math.min(getClipCap(), buf.duration);
-        const sampleRate = Math.min(buf.sampleRate, 44100);
-        const offCtx = new OfflineAudioContext(1, Math.floor(dur * sampleRate), sampleRate);
-        const src = offCtx.createBufferSource();
-        src.buffer = buf;
-        const g = offCtx.createGain();
-        g.gain.setValueAtTime(0, 0);
-        g.gain.linearRampToValueAtTime(1, Math.min(2, dur * 0.15));
-        g.gain.setValueAtTime(1, Math.max(dur - 2, dur * 0.85));
-        g.gain.linearRampToValueAtTime(0, dur);
-        src.connect(g); g.connect(offCtx.destination); src.start(0, 0, dur);
-        const rendered = await offCtx.startRendering();
-        const samples = rendered.getChannelData(0);
-        const int16 = new Int16Array(samples.length);
-        for (let i = 0; i < samples.length; i++) int16[i] = Math.max(-32768, Math.min(32767, Math.round(samples[i] * 32767)));
-        if (typeof lamejs === 'undefined') throw new Error('lamejs not loaded');
-        const enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
-        const mp3 = []; const bs = 1152;
-        for (let i = 0; i < int16.length; i += bs) {
-          const chunk = int16.subarray(i, Math.min(i + bs, int16.length));
-          const d = enc.encodeBuffer(chunk);
-          if (d.length > 0) mp3.push(new Uint8Array(d));
-        }
-        const end = enc.flush();
-        if (end.length > 0) mp3.push(new Uint8Array(end));
-        const blob = await buildMp3Blob(mp3, sbData.imagen || '');
+        const blob = await buildTrimmedMp3Blob();
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `${sbData.juego || 'Game'} · ${(sbData.titulo || 'soundbite').slice(0, 50)} · Omnibites.mp3`.replace(/[<>:"/\\|?*]/g, '');
@@ -1066,6 +1074,35 @@ source = audioEl; gain = g; volGain = vg; isPlaying = true;
         if (img) img.style.opacity = '';
         btn.disabled = false;
       }
+    }
+
+    // ── GUARDAR EN IISU (solo dentro de la app) ──
+    async function guardarEnIiSU() {
+      const btn = document.getElementById('iisuBtn');
+      btn.disabled = true;
+      try {
+        if (!(await iisuFolderConfigured())) {
+          window.showToast && window.showToast('Selecciona la carpeta "consoles" de iiSU');
+          await iisuPickFolder();
+        }
+        const blob = await buildTrimmedMp3Blob();
+        const resultado = await iisuSaveSoundbite(sbData.consola, sbData.juego, blob);
+        if (resultado.matched) {
+          window.showToast && window.showToast(`Guardado en ${resultado.carpeta}`);
+        } else {
+          window.showToast && window.showToast('No se encontró la carpeta del juego automáticamente.', 'error');
+          console.log('Carpetas disponibles:', resultado.candidatos);
+        }
+      } catch(e) {
+        window.showToast && window.showToast('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    if (isNativeApp()) {
+      document.getElementById('iisuBtn').style.display = 'flex';
+      document.getElementById('iisuBtn').addEventListener('click', guardarEnIiSU);
     }
 
     // ── COMENTARIOS ──
