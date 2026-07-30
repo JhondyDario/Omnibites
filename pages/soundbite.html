@@ -372,9 +372,6 @@
         <button class="icon-btn icon-btn-dl" id="dlBtn" title="Download">
           <img src="../assets/reactions/download.png" alt="Download"/>
         </button>
-        <button class="icon-btn" id="iisuBtn" title="Save to iiSU" style="display:none">
-          <img src="../assets/reactions/download.png" alt="iiSU"/>
-        </button>
         <button class="icon-btn" id="shareBtn" title="Share">
           <img src="../assets/icons/share.png" alt="Share"/>
         </button>
@@ -424,7 +421,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script type="module">
     import { buildMp3Blob } from '../js/id3-cover.js';
-    import { isNativeApp, iisuFolderConfigured, iisuPickFolder, iisuSaveSoundbite } from '../js/iisu-export.js';
     import { auth, db } from '../js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, orderBy, where,
@@ -1074,35 +1070,6 @@ source = audioEl; gain = g; volGain = vg; isPlaying = true;
         if (img) img.style.opacity = '';
         btn.disabled = false;
       }
-    }
-
-    // ── GUARDAR EN IISU (solo dentro de la app) ──
-    async function guardarEnIiSU() {
-      const btn = document.getElementById('iisuBtn');
-      btn.disabled = true;
-      try {
-        if (!(await iisuFolderConfigured())) {
-          window.showToast && window.showToast('Selecciona la carpeta "consoles" de iiSU');
-          await iisuPickFolder();
-        }
-        const blob = await buildTrimmedMp3Blob();
-        const resultado = await iisuSaveSoundbite(sbData.consola, sbData.juego, blob);
-        if (resultado.matched) {
-          window.showToast && window.showToast(`Guardado en ${resultado.carpeta}`);
-        } else {
-          window.showToast && window.showToast('No se encontró la carpeta del juego automáticamente.', 'error');
-          console.log('Carpetas disponibles:', resultado.candidatos);
-        }
-      } catch(e) {
-        window.showToast && window.showToast('Error: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    if (isNativeApp()) {
-      document.getElementById('iisuBtn').style.display = 'flex';
-      document.getElementById('iisuBtn').addEventListener('click', guardarEnIiSU);
     }
 
     // ── COMENTARIOS ──
