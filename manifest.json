@@ -1,0 +1,32 @@
+{
+  "name": "Omnibites — Video Game Soundbites",
+  "short_name": "Omnibites",
+  "description": "The community to find, rate, download, and share soundbites from your favorite games.",
+  "start_url": "/Omnibites/index.html",
+  "scope": "/Omnibites/",
+  "id": "/Omnibites/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0d12",
+  "theme_color": "#0d0d12",
+  "icons": [
+    {
+      "src": "/Omnibites/assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Omnibites/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Omnibites/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
