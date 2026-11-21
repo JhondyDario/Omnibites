@@ -41,11 +41,6 @@ Omnibites was born to preserve that music and make it accessible in a way that n
 
 **Add soundbites to your favorite games, right inside your launcher.** Hover over a title and let its theme play — the same trick iiSU and other front-ends use to bring your library to life.
 
-<p>
-  <img src="https://jhondydario.github.io/Omnibites/assets/showcase/preview1.png" width="48%"/>
-  <img src="https://jhondydario.github.io/Omnibites/assets/showcase/preview2.png" width="48%"/>
-</p>
-
 </div>
 
 > [!NOTE]
